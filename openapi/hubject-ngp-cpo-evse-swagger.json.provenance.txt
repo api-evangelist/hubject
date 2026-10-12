@@ -1,0 +1,6 @@
+generated: '2026-10-13'
+method: searched
+source: https://raw.githubusercontent.com/hubject/NGP-Automation-APIs/HEAD/NGPAutomationAPIs/CPO/v1/evse%20openapi-spec_v1.json
+found_on: https://github.com/hubject
+ownership: github.com/hubject is Hubject's own GitHub organization (declares https://www.hubject.com/ as its website)
+note: verbatim

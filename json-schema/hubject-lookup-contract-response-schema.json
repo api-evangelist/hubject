@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubject/main/json-schema/hubject-lookup-contract-response-schema.json",
+  "title": "LookupContractResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/hubject-opcp-ccp-openapi.json#/components/schemas/LookupContractResponse",
+  "type": "object",
+  "properties": {
+    "XMLContracts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pcid": {
+            "type": "string",
+            "description": "PCID of vehicle certificate",
+            "pattern": "^[a-zA-Z0-9]{17,18}$",
+            "minLength": 17,
+            "maxLength": 18
+          },
+          "emaid": {
+            "type": "string",
+            "description": "contract identifier of contract certificate",
+            "pattern": "^[A-Za-z]{2}[-]?\\w{3}[-]?\\w{9}[-]?(\\w{1})?$",
+            "minLength": 14,
+            "maxLength": 15
+          },
+          "xsdMsgDefNamespace": {
+            "type": "string",
+            "description": "ISO Version"
+          },
+          "contractCertificate": {
+            "type": "string",
+            "description": "Contract Certificate in base64 encoded DER form",
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "maxLength": 800
+          },
+          "defaultContract": {
+            "type": "boolean",
+            "description": "If set to true it will get delivered as certificateInstallationResponse. the value is defined by the OEM/User if multiple contracts are stored in the CCP for one PCID.",
+            "enum": [
+              true,
+              false
+            ]
+          },
+          "certValidFrom": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Valid From Date and Time of contract certificate"
+          },
+          "certValidTo": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Valid to Date and Time of contract certificate"
+          },
+          "cpsRootCertificateDN": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{8}\\-([0-9a-fA-F]{4}\\-){3}[0-9a-fA-F]{12}$",
+            "description": "The DN of the desired V2G root CA",
+            "x-stoplight": {
+              "id": "i0q8u31ihz6re"
+            }
+          },
+          "cpsV2GRootCertificateFingerprint": {
+            "type": "string",
+            "description": "The SHA256 Fingerprint of the desired V2G root CA which shall was used to sign these data with the regarding CPS signing certificate. Its optional. If not given, the CPS will decide which CPS signing V2G PKI will be renurned",
+            "pattern": "^((CN|OU|O|C|DC|ST)=[^,]+,? ?)+$",
+            "x-stoplight": {
+              "id": "vl0bfmhcp30fg"
+            }
+          }
+        }
+      }
+    }
+  }
+}

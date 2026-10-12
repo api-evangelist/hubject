@@ -1,0 +1,908 @@
+{
+  "@context": {
+    "@vocab": "https://hubject.com/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "hubject": "https://hubject.com/schema#",
+    "RFIDMifareFamilyIdentification": "hubject:RFIDMifareFamilyIdentification",
+    "UID": {
+      "@id": "hubject:UID",
+      "@type": "@id"
+    },
+    "RFID": "hubject:RFID",
+    "RFIDIdentification": "hubject:RFIDIdentification",
+    "EvcoID": {
+      "@id": "hubject:EvcoID",
+      "@type": "@id"
+    },
+    "PrintedNumber": {
+      "@id": "hubject:PrintedNumber",
+      "@type": "xsd:string"
+    },
+    "ExpiryDate": {
+      "@id": "hubject:ExpiryDate",
+      "@type": "xsd:string"
+    },
+    "QRCodeIdentification": "hubject:QRCodeIdentification",
+    "HashedPIN": {
+      "@id": "hubject:HashedPIN"
+    },
+    "PIN": {
+      "@id": "hubject:PIN",
+      "@type": "xsd:string"
+    },
+    "PlugAndChargeIdentification": "hubject:PlugAndChargeIdentification",
+    "RemoteIdentification": "hubject:RemoteIdentification",
+    "Identification": "hubject:Identification",
+    "eRoamingAuthorizeStart": "hubject:eRoamingAuthorizeStart",
+    "SessionID": {
+      "@id": "hubject:SessionID",
+      "@type": "@id"
+    },
+    "CPOPartnerSessionID": {
+      "@id": "hubject:CPOPartnerSessionID",
+      "@type": "xsd:string"
+    },
+    "EMPPartnerSessionID": {
+      "@id": "hubject:EMPPartnerSessionID",
+      "@type": "xsd:string"
+    },
+    "OperatorID": {
+      "@id": "hubject:OperatorID",
+      "@type": "@id"
+    },
+    "EvseID": {
+      "@id": "hubject:EvseID",
+      "@type": "@id"
+    },
+    "PartnerProductID": {
+      "@id": "hubject:PartnerProductID",
+      "@type": "@id"
+    },
+    "StatusCode": "hubject:StatusCode",
+    "Code": {
+      "@id": "hubject:Code",
+      "@type": "xsd:string"
+    },
+    "Description": {
+      "@id": "hubject:Description",
+      "@type": "xsd:string"
+    },
+    "AdditionalInfo": {
+      "@id": "hubject:AdditionalInfo",
+      "@type": "xsd:string"
+    },
+    "eRoamingAuthorizationStart": "hubject:eRoamingAuthorizationStart",
+    "ProviderID": {
+      "@id": "hubject:ProviderID",
+      "@type": "@id"
+    },
+    "AuthorizationStatus": {
+      "@id": "hubject:AuthorizationStatus",
+      "@type": "xsd:string"
+    },
+    "AuthorizationStopIdentifications": {
+      "@id": "hubject:AuthorizationStopIdentifications",
+      "@container": "@list"
+    },
+    "eRoamingAuthorizeStop": "hubject:eRoamingAuthorizeStop",
+    "eRoamingAuthorizationStop": "hubject:eRoamingAuthorizationStop",
+    "eRoamingAuthorizeRemoteStart": "hubject:eRoamingAuthorizeRemoteStart",
+    "eRoamingAcknowledgment": "hubject:eRoamingAcknowledgment",
+    "Result": {
+      "@id": "hubject:Result",
+      "@type": "xsd:boolean"
+    },
+    "eRoamingAuthorizeRemoteStop": "hubject:eRoamingAuthorizeRemoteStop",
+    "eRoamingChargeDetailRecord": "hubject:eRoamingChargeDetailRecord",
+    "ChargingStart": {
+      "@id": "hubject:ChargingStart",
+      "@type": "xsd:dateTime"
+    },
+    "ChargingEnd": {
+      "@id": "hubject:ChargingEnd",
+      "@type": "xsd:dateTime"
+    },
+    "SessionStart": {
+      "@id": "hubject:SessionStart",
+      "@type": "xsd:dateTime"
+    },
+    "SessionEnd": {
+      "@id": "hubject:SessionEnd",
+      "@type": "xsd:dateTime"
+    },
+    "MeterValueStart": {
+      "@id": "hubject:MeterValueStart",
+      "@type": "xsd:decimal"
+    },
+    "MeterValueEnd": {
+      "@id": "hubject:MeterValueEnd",
+      "@type": "xsd:decimal"
+    },
+    "MeterValueInBetween": {
+      "@id": "hubject:MeterValueInBetween"
+    },
+    "ConsumedEnergy": {
+      "@id": "hubject:ConsumedEnergy",
+      "@type": "xsd:decimal"
+    },
+    "SignedMeteringValues": {
+      "@id": "hubject:SignedMeteringValues",
+      "@container": "@list"
+    },
+    "CalibrationLawVerificationInfo": {
+      "@id": "hubject:CalibrationLawVerificationInfo"
+    },
+    "HubOperatorID": {
+      "@id": "hubject:HubOperatorID",
+      "@type": "@id"
+    },
+    "HubProviderID": {
+      "@id": "hubject:HubProviderID",
+      "@type": "@id"
+    },
+    "eRoamingAuthorizeRemoteReservationStart": "hubject:eRoamingAuthorizeRemoteReservationStart",
+    "EMPPartnerSessionId": {
+      "@id": "hubject:EMPPartnerSessionId",
+      "@type": "xsd:string"
+    },
+    "Duration": {
+      "@id": "hubject:Duration",
+      "@type": "xsd:integer"
+    },
+    "eRoamingAuthorizeRemoteReservationStop": "hubject:eRoamingAuthorizeRemoteReservationStop",
+    "InfoTextType": "hubject:InfoTextType",
+    "lang": {
+      "@id": "hubject:lang",
+      "@type": "xsd:string"
+    },
+    "value": {
+      "@id": "hubject:value",
+      "@type": "xsd:string"
+    },
+    "AddressIso19773": "hubject:AddressIso19773",
+    "Country": {
+      "@id": "hubject:Country",
+      "@type": "xsd:string"
+    },
+    "City": {
+      "@id": "hubject:City",
+      "@type": "xsd:string"
+    },
+    "Street": {
+      "@id": "hubject:Street",
+      "@type": "xsd:string"
+    },
+    "PostalCode": {
+      "@id": "hubject:PostalCode",
+      "@type": "xsd:string"
+    },
+    "HouseNum": {
+      "@id": "hubject:HouseNum",
+      "@type": "xsd:string"
+    },
+    "Floor": {
+      "@id": "hubject:Floor",
+      "@type": "xsd:string"
+    },
+    "Region": {
+      "@id": "hubject:Region",
+      "@type": "xsd:string"
+    },
+    "ParkingFacility": {
+      "@id": "hubject:ParkingFacility",
+      "@type": "xsd:boolean"
+    },
+    "ParkingSpot": {
+      "@id": "hubject:ParkingSpot",
+      "@type": "xsd:string"
+    },
+    "TimeZone": {
+      "@id": "hubject:TimeZone",
+      "@type": "xsd:string"
+    },
+    "GeoCoordinates": "hubject:GeoCoordinates",
+    "Google": {
+      "@id": "hubject:Google"
+    },
+    "DecimalDegree": {
+      "@id": "hubject:DecimalDegree"
+    },
+    "DegreeMinuteSeconds": {
+      "@id": "hubject:DegreeMinuteSeconds"
+    },
+    "Plug": "hubject:Plug",
+    "ChargingFacility": "hubject:ChargingFacility",
+    "PowerType": {
+      "@id": "hubject:PowerType",
+      "@type": "xsd:string"
+    },
+    "Voltage": {
+      "@id": "hubject:Voltage",
+      "@type": "xsd:integer"
+    },
+    "Amperage": {
+      "@id": "hubject:Amperage",
+      "@type": "xsd:integer"
+    },
+    "Power": {
+      "@id": "hubject:Power",
+      "@type": "xsd:integer"
+    },
+    "ChargingModes": {
+      "@id": "hubject:ChargingModes",
+      "@container": "@list"
+    },
+    "EnergySource": "hubject:EnergySource",
+    "Energy": {
+      "@id": "hubject:Energy",
+      "@type": "xsd:string"
+    },
+    "Percentage": {
+      "@id": "hubject:Percentage",
+      "@type": "xsd:integer"
+    },
+    "AuthenticationMode": "hubject:AuthenticationMode",
+    "PaymentOption": "hubject:PaymentOption",
+    "ValueAddedService": "hubject:ValueAddedService",
+    "Accessibility": "hubject:Accessibility",
+    "OpeningTimes": "hubject:OpeningTimes",
+    "Period": {
+      "@id": "hubject:Period",
+      "@container": "@list"
+    },
+    "on": {
+      "@id": "hubject:on",
+      "@type": "xsd:string"
+    },
+    "EvseDataRecord": "hubject:EvseDataRecord",
+    "deltaType": {
+      "@id": "hubject:deltaType",
+      "@type": "xsd:string"
+    },
+    "lastUpdate": {
+      "@id": "hubject:lastUpdate",
+      "@type": "xsd:dateTime"
+    },
+    "ChargingPoolID": {
+      "@id": "hubject:ChargingPoolID",
+      "@type": "@id"
+    },
+    "ChargingStationId": {
+      "@id": "hubject:ChargingStationId",
+      "@type": "xsd:string"
+    },
+    "ChargingStationNames": {
+      "@id": "hubject:ChargingStationNames",
+      "@container": "@list"
+    },
+    "HardwareManufacturer": {
+      "@id": "hubject:HardwareManufacturer",
+      "@type": "xsd:string"
+    },
+    "ChargingStationImage": {
+      "@id": "hubject:ChargingStationImage",
+      "@type": "xsd:string"
+    },
+    "SubOperatorName": {
+      "@id": "hubject:SubOperatorName",
+      "@type": "xsd:string"
+    },
+    "Address": {
+      "@id": "hubject:Address",
+      "@type": "@id"
+    },
+    "Plugs": {
+      "@id": "hubject:Plugs",
+      "@container": "@list"
+    },
+    "DynamicPowerLevel": {
+      "@id": "hubject:DynamicPowerLevel",
+      "@type": "xsd:boolean"
+    },
+    "ChargingFacilities": {
+      "@id": "hubject:ChargingFacilities",
+      "@container": "@list"
+    },
+    "RenewableEnergy": {
+      "@id": "hubject:RenewableEnergy",
+      "@type": "xsd:boolean"
+    },
+    "EnvironmentalImpact": {
+      "@id": "hubject:EnvironmentalImpact"
+    },
+    "CalibrationLawDataAvailability": {
+      "@id": "hubject:CalibrationLawDataAvailability",
+      "@type": "xsd:string"
+    },
+    "AuthenticationModes": {
+      "@id": "hubject:AuthenticationModes",
+      "@container": "@list"
+    },
+    "MaxCapacity": {
+      "@id": "hubject:MaxCapacity",
+      "@type": "xsd:integer"
+    },
+    "PaymentOptions": {
+      "@id": "hubject:PaymentOptions",
+      "@container": "@list"
+    },
+    "ValueAddedServices": {
+      "@id": "hubject:ValueAddedServices",
+      "@container": "@list"
+    },
+    "AccessibilityLocation": {
+      "@id": "hubject:AccessibilityLocation",
+      "@type": "xsd:string"
+    },
+    "HotlinePhoneNumber": {
+      "@id": "hubject:HotlinePhoneNumber",
+      "@type": "xsd:string"
+    },
+    "ChargingStationLocationReference": {
+      "@id": "hubject:ChargingStationLocationReference",
+      "@container": "@list"
+    },
+    "GeoChargingPointEntrance": {
+      "@id": "hubject:GeoChargingPointEntrance",
+      "@type": "@id"
+    },
+    "IsOpen24Hours": {
+      "@id": "hubject:IsOpen24Hours",
+      "@type": "xsd:boolean"
+    },
+    "ClearinghouseID": {
+      "@id": "hubject:ClearinghouseID",
+      "@type": "xsd:string"
+    },
+    "IsHubjectCompatible": {
+      "@id": "hubject:IsHubjectCompatible",
+      "@type": "xsd:boolean"
+    },
+    "DynamicInfoAvailable": {
+      "@id": "hubject:DynamicInfoAvailable",
+      "@type": "xsd:string"
+    },
+    "eRoamingPushEvseData": "hubject:eRoamingPushEvseData",
+    "ActionType": {
+      "@id": "hubject:ActionType",
+      "@type": "xsd:string"
+    },
+    "OperatorEvseData": {
+      "@id": "hubject:OperatorEvseData"
+    },
+    "eRoamingPushEvseStatus": "hubject:eRoamingPushEvseStatus",
+    "OperatorEvseStatus": {
+      "@id": "hubject:OperatorEvseStatus"
+    },
+    "PricingProductDataRecord": "hubject:PricingProductDataRecord",
+    "ProductID": {
+      "@id": "hubject:ProductID",
+      "@type": "@id"
+    },
+    "ReferenceUnit": {
+      "@id": "hubject:ReferenceUnit",
+      "@type": "@id"
+    },
+    "ProductPriceCurrency": {
+      "@id": "hubject:ProductPriceCurrency",
+      "@type": "@id"
+    },
+    "PricePerReferenceUnit": {
+      "@id": "hubject:PricePerReferenceUnit",
+      "@type": "xsd:decimal"
+    },
+    "MaximumProductChargingPower": {
+      "@id": "hubject:MaximumProductChargingPower",
+      "@type": "xsd:decimal"
+    },
+    "IsValid24hours": {
+      "@id": "hubject:IsValid24hours",
+      "@type": "xsd:boolean"
+    },
+    "ProductAvailabilityTimes": {
+      "@id": "hubject:ProductAvailabilityTimes",
+      "@container": "@list"
+    },
+    "AdditionalReferences": {
+      "@id": "hubject:AdditionalReferences",
+      "@container": "@list"
+    },
+    "eRoamingPushPricingProductData": "hubject:eRoamingPushPricingProductData",
+    "PricingProductData": {
+      "@id": "hubject:PricingProductData"
+    },
+    "eRoamingPushEVSEPricing": "hubject:eRoamingPushEVSEPricing",
+    "EVSEPricing": {
+      "@id": "hubject:EVSEPricing",
+      "@container": "@list"
+    },
+    "ChargingNotificationType": "hubject:ChargingNotificationType",
+    "eRoamingChargingNotificationStart": "hubject:eRoamingChargingNotificationStart",
+    "Type": {
+      "@id": "hubject:Type",
+      "@type": "@id"
+    },
+    "eRoamingChargingNotificationProgress": "hubject:eRoamingChargingNotificationProgress",
+    "EventOccurred": {
+      "@id": "hubject:EventOccurred",
+      "@type": "xsd:dateTime"
+    },
+    "ChargingDuration": {
+      "@id": "hubject:ChargingDuration",
+      "@type": "xsd:integer"
+    },
+    "ConsumedEnergyProgress": {
+      "@id": "hubject:ConsumedEnergyProgress",
+      "@type": "xsd:decimal"
+    },
+    "eRoamingChargingNotificationEnd": "hubject:eRoamingChargingNotificationEnd",
+    "PenaltyTimeStart": {
+      "@id": "hubject:PenaltyTimeStart",
+      "@type": "xsd:dateTime"
+    },
+    "eRoamingChargingNotificationError": "hubject:eRoamingChargingNotificationError",
+    "ErrorType": {
+      "@id": "hubject:ErrorType",
+      "@type": "xsd:string"
+    },
+    "ErrorAdditionalInfo": {
+      "@id": "hubject:ErrorAdditionalInfo",
+      "@type": "xsd:string"
+    },
+    "eRoamingGetChargeDetailRecords": "hubject:eRoamingGetChargeDetailRecords",
+    "From": {
+      "@id": "hubject:From",
+      "@type": "xsd:dateTime"
+    },
+    "To": {
+      "@id": "hubject:To",
+      "@type": "xsd:dateTime"
+    },
+    "CDRForwarder": {
+      "@id": "hubject:CDRForwarder",
+      "@type": "xsd:boolean"
+    },
+    "eRoamingChargeDetailRecords": "hubject:eRoamingChargeDetailRecords",
+    "content": {
+      "@id": "hubject:content",
+      "@container": "@list"
+    },
+    "number": {
+      "@id": "hubject:number",
+      "@type": "xsd:integer"
+    },
+    "size": {
+      "@id": "hubject:size",
+      "@type": "xsd:integer"
+    },
+    "totalElements": {
+      "@id": "hubject:totalElements",
+      "@type": "xsd:integer"
+    },
+    "pageable": {
+      "@id": "hubject:pageable"
+    },
+    "empty": {
+      "@id": "hubject:empty",
+      "@type": "xsd:boolean"
+    },
+    "last": {
+      "@id": "hubject:last",
+      "@type": "xsd:boolean"
+    },
+    "totalPages": {
+      "@id": "hubject:totalPages",
+      "@type": "xsd:integer"
+    },
+    "first": {
+      "@id": "hubject:first",
+      "@type": "xsd:boolean"
+    },
+    "numberOfElements": {
+      "@id": "hubject:numberOfElements",
+      "@type": "xsd:integer"
+    },
+    "ProviderAuthenticationData": "hubject:ProviderAuthenticationData",
+    "AuthenticationDataRecord": {
+      "@id": "hubject:AuthenticationDataRecord",
+      "@container": "@list"
+    },
+    "eRoamingPushAuthenticationData": "hubject:eRoamingPushAuthenticationData",
+    "GeoCoordinatesResponseFormat": "hubject:GeoCoordinatesResponseFormat",
+    "eRoamingPullEVSEData": "hubject:eRoamingPullEVSEData",
+    "SearchCenter": {
+      "@id": "hubject:SearchCenter"
+    },
+    "LastCall": {
+      "@id": "hubject:LastCall",
+      "@type": "xsd:dateTime"
+    },
+    "CountryCodes": {
+      "@id": "hubject:CountryCodes",
+      "@container": "@list"
+    },
+    "OperatorIds": {
+      "@id": "hubject:OperatorIds",
+      "@container": "@list"
+    },
+    "PullEvseDataRecord": "hubject:PullEvseDataRecord",
+    "OperatorName": {
+      "@id": "hubject:OperatorName",
+      "@type": "xsd:string"
+    },
+    "eRoamingEVSEData": "hubject:eRoamingEVSEData",
+    "EvseStatus": "hubject:EvseStatus",
+    "eRoamingPullEVSEStatus": "hubject:eRoamingPullEVSEStatus",
+    "EVSEStatus": {
+      "@id": "hubject:EVSEStatus",
+      "@type": "@id"
+    },
+    "eRoamingPullEVSEStatusByID": "hubject:eRoamingPullEVSEStatusByID",
+    "eRoamingPullEVSEStatusByOperatorID": "hubject:eRoamingPullEVSEStatusByOperatorID",
+    "eRoamingEVSEStatus": "hubject:eRoamingEVSEStatus",
+    "EvseStatuses": {
+      "@id": "hubject:EvseStatuses"
+    },
+    "eRoamingEVSEStatusByID": "hubject:eRoamingEVSEStatusByID",
+    "EVSEStatusRecords": {
+      "@id": "hubject:EVSEStatusRecords"
+    },
+    "eRoamingPullPricingProductData": "hubject:eRoamingPullPricingProductData",
+    "OperatorIDs": {
+      "@id": "hubject:OperatorIDs",
+      "@container": "@list"
+    },
+    "PricingProductDataType": "hubject:PricingProductDataType",
+    "PricingDefaultPrice": {
+      "@id": "hubject:PricingDefaultPrice",
+      "@type": "xsd:decimal"
+    },
+    "PricingDefaultPriceCurrency": {
+      "@id": "hubject:PricingDefaultPriceCurrency",
+      "@type": "@id"
+    },
+    "PricingDefaultReferenceUnit": {
+      "@id": "hubject:PricingDefaultReferenceUnit",
+      "@type": "@id"
+    },
+    "PricingProductDataRecords": {
+      "@id": "hubject:PricingProductDataRecords",
+      "@container": "@list"
+    },
+    "eRoamingPricingProductData": "hubject:eRoamingPricingProductData",
+    "eRoamingPullEVSEPricing": "hubject:eRoamingPullEVSEPricing",
+    "OperatorEVSEPricing": "hubject:OperatorEVSEPricing",
+    "eRoamingEVSEPricing": "hubject:eRoamingEVSEPricing",
+    "User": "hubject:User",
+    "id": {
+      "@id": "hubject:id",
+      "@type": "xsd:integer"
+    },
+    "firstName": {
+      "@id": "hubject:firstName",
+      "@type": "xsd:string"
+    },
+    "lastName": {
+      "@id": "hubject:lastName",
+      "@type": "xsd:string"
+    },
+    "email": {
+      "@id": "hubject:email",
+      "@type": "xsd:string"
+    },
+    "dateOfBirth": {
+      "@id": "hubject:dateOfBirth",
+      "@type": "xsd:date"
+    },
+    "emailVerified": {
+      "@id": "hubject:emailVerified",
+      "@type": "xsd:boolean"
+    },
+    "createDate": {
+      "@id": "hubject:createDate",
+      "@type": "xsd:date"
+    },
+    "GetSignedContractDataRequest": "hubject:GetSignedContractDataRequest",
+    "certificateInstallationReq": {
+      "@id": "hubject:certificateInstallationReq",
+      "@type": "xsd:string"
+    },
+    "xsdMsgDefNamespace": {
+      "@id": "hubject:xsdMsgDefNamespace",
+      "@type": "xsd:string"
+    },
+    "metadata": {
+      "@id": "hubject:metadata",
+      "@type": "xsd:string"
+    },
+    "GetSignedContractDataResponse": "hubject:GetSignedContractDataResponse",
+    "CCPResponse": {
+      "@id": "hubject:CCPResponse"
+    },
+    "ProvideContractDataResponse": "hubject:ProvideContractDataResponse",
+    "certificateInstallationRes": {
+      "@id": "hubject:certificateInstallationRes",
+      "@type": "xsd:string"
+    },
+    "cpsV2GRootCertificateFingerprint": {
+      "@id": "hubject:cpsV2GRootCertificateFingerprint",
+      "@type": "xsd:string"
+    },
+    "LookupContractResponse": "hubject:LookupContractResponse",
+    "XMLContracts": {
+      "@id": "hubject:XMLContracts",
+      "@container": "@list"
+    },
+    "Error": "hubject:Error",
+    "errorMessages": {
+      "@id": "hubject:errorMessages",
+      "@container": "@list"
+    },
+    "traceId": {
+      "@id": "hubject:traceId",
+      "@type": "xsd:string"
+    },
+    "SignedContractDataRequest": "hubject:SignedContractDataRequest",
+    "emaid": {
+      "@id": "hubject:emaid",
+      "@type": "xsd:string"
+    },
+    "pcid": {
+      "@id": "hubject:pcid",
+      "@type": "xsd:string"
+    },
+    "signedContractDataXML": {
+      "@id": "hubject:signedContractDataXML",
+      "@type": "xsd:string"
+    },
+    "contract-data": "hubject:contract-data",
+    "contractSignatureCertChain": {
+      "@id": "hubject:contractSignatureCertChain"
+    },
+    "contractSignatureEncryptedPrivateKey": {
+      "@id": "hubject:contractSignatureEncryptedPrivateKey",
+      "@type": "xsd:string"
+    },
+    "dHpublickey": {
+      "@id": "hubject:dHpublickey",
+      "@type": "xsd:string"
+    },
+    "CreateSignedContractDataRequest": "hubject:CreateSignedContractDataRequest",
+    "contractData": {
+      "@id": "hubject:contractData",
+      "@type": "@id"
+    },
+    "metaData": {
+      "@id": "hubject:metaData",
+      "@type": "xsd:string"
+    },
+    "CreateSignedContractDataResponse": "hubject:CreateSignedContractDataResponse",
+    "signedData": {
+      "@id": "hubject:signedData",
+      "@type": "xsd:string"
+    },
+    "cpsRootDistinguishedName": {
+      "@id": "hubject:cpsRootDistinguishedName",
+      "@type": "xsd:string"
+    },
+    "GenerateSignedContractDataRequest": "hubject:GenerateSignedContractDataRequest",
+    "contractBegins": {
+      "@id": "hubject:contractBegins",
+      "@type": "xsd:string"
+    },
+    "contractEnds": {
+      "@id": "hubject:contractEnds",
+      "@type": "xsd:string"
+    },
+    "subscriptionUrl": {
+      "@id": "hubject:subscriptionUrl",
+      "@type": "xsd:string"
+    },
+    "GetAllCpsSignerResponse": "hubject:GetAllCpsSignerResponse",
+    "cpsCertificates": {
+      "@id": "hubject:cpsCertificates",
+      "@container": "@list"
+    },
+    "cpsSigner-data": "hubject:cpsSigner-data",
+    "cpsDistinguishedName": {
+      "@id": "hubject:cpsDistinguishedName",
+      "@type": "xsd:string"
+    },
+    "cpsCertificate": {
+      "@id": "hubject:cpsCertificate",
+      "@type": "xsd:string"
+    },
+    "validFrom": {
+      "@id": "hubject:validFrom",
+      "@type": "xsd:dateTime"
+    },
+    "validTo": {
+      "@id": "hubject:validTo",
+      "@type": "xsd:dateTime"
+    },
+    "organizationName": {
+      "@id": "hubject:organizationName",
+      "@type": "xsd:string"
+    },
+    "cpsSubCa1Certificate": {
+      "@id": "hubject:cpsSubCa1Certificate",
+      "@type": "xsd:string"
+    },
+    "cpsSubCa2Certificate": {
+      "@id": "hubject:cpsSubCa2Certificate",
+      "@type": "xsd:string"
+    },
+    "SignedContractDataResponse": "hubject:SignedContractDataResponse",
+    "ContractData": "hubject:ContractData",
+    "contractCertificate": {
+      "@id": "hubject:contractCertificate",
+      "@type": "xsd:string"
+    },
+    "contractSubCa2Certificate": {
+      "@id": "hubject:contractSubCa2Certificate",
+      "@type": "xsd:string"
+    },
+    "contractSubCa1Certificate": {
+      "@id": "hubject:contractSubCa1Certificate",
+      "@type": "xsd:string"
+    },
+    "ProvisioningCertificate": "hubject:ProvisioningCertificate",
+    "subCA1Certificate": {
+      "@id": "hubject:subCA1Certificate",
+      "@type": "xsd:string"
+    },
+    "subCA2Certificate": {
+      "@id": "hubject:subCA2Certificate",
+      "@type": "xsd:string"
+    },
+    "vehicleCertificate": {
+      "@id": "hubject:vehicleCertificate",
+      "@type": "xsd:string"
+    },
+    "v2gRootAuthorityKeyIdentifiers": {
+      "@id": "hubject:v2gRootAuthorityKeyIdentifiers",
+      "@container": "@list"
+    },
+    "previousPcid": {
+      "@id": "hubject:previousPcid",
+      "@type": "xsd:string"
+    },
+    "GetProvisioningCertificateResponse": "hubject:GetProvisioningCertificateResponse",
+    "OEMMessage": {
+      "@id": "hubject:OEMMessage",
+      "@type": "@id"
+    },
+    "ProvisioningCertificateData": "hubject:ProvisioningCertificateData",
+    "rootIssuerDistinguishedName": {
+      "@id": "hubject:rootIssuerDistinguishedName",
+      "@type": "xsd:string"
+    },
+    "rootIssuerSerialNumber": {
+      "@id": "hubject:rootIssuerSerialNumber",
+      "@type": "xsd:string"
+    },
+    "rootAuthorityKeyIdentifier": {
+      "@id": "hubject:rootAuthorityKeyIdentifier",
+      "@type": "xsd:string"
+    },
+    "fingerprint": {
+      "@id": "hubject:fingerprint",
+      "@type": "xsd:string"
+    },
+    "GetAllRootCertsResponseV1": "hubject:GetAllRootCertsResponseV1",
+    "RootCertificateCollection": {
+      "@id": "hubject:RootCertificateCollection"
+    },
+    "GetRootCertResponseV1": "hubject:GetRootCertResponseV1",
+    "RootResponse": {
+      "@id": "hubject:RootResponse",
+      "@type": "@id"
+    },
+    "RootCertV2": "hubject:RootCertV2",
+    "rootCertificateId": {
+      "@id": "hubject:rootCertificateId",
+      "@type": "xsd:string"
+    },
+    "distinguishedName": {
+      "@id": "hubject:distinguishedName",
+      "@type": "xsd:string"
+    },
+    "rootType": {
+      "@id": "hubject:rootType",
+      "@type": "xsd:string"
+    },
+    "caCertificate": {
+      "@id": "hubject:caCertificate",
+      "@type": "xsd:string"
+    },
+    "commonName": {
+      "@id": "hubject:commonName",
+      "@type": "xsd:string"
+    },
+    "rootAuthorityKeyIdentifierHex": {
+      "@id": "hubject:rootAuthorityKeyIdentifierHex",
+      "@type": "xsd:string"
+    },
+    "certificateRevocationList": {
+      "@id": "hubject:certificateRevocationList",
+      "@type": "xsd:string"
+    },
+    "crossCertificatePair": {
+      "@id": "hubject:crossCertificatePair",
+      "@type": "xsd:string"
+    },
+    "labeledUri": {
+      "@id": "hubject:labeledUri",
+      "@type": "xsd:string"
+    },
+    "fingerprintSha1": {
+      "@id": "hubject:fingerprintSha1",
+      "@type": "xsd:string"
+    },
+    "signatureAlgorithm": {
+      "@id": "hubject:signatureAlgorithm",
+      "@type": "xsd:string"
+    },
+    "Event": "hubject:Event",
+    "EndpointRequest": "hubject:EndpointRequest",
+    "apiVersion": {
+      "@id": "hubject:apiVersion",
+      "@type": "xsd:string"
+    },
+    "description": {
+      "@id": "hubject:description",
+      "@type": "xsd:string"
+    },
+    "enabledEvents": {
+      "@id": "hubject:enabledEvents",
+      "@type": "@id"
+    },
+    "status": {
+      "@id": "hubject:status",
+      "@type": "xsd:string"
+    },
+    "url": {
+      "@id": "hubject:url",
+      "@type": "xsd:string"
+    },
+    "EndpointUpdateRequest": "hubject:EndpointUpdateRequest",
+    "EndpointResponse": "hubject:EndpointResponse",
+    "created": {
+      "@id": "hubject:created",
+      "@type": "xsd:integer"
+    },
+    "secret": {
+      "@id": "hubject:secret",
+      "@type": "xsd:string"
+    },
+    "providerIds": {
+      "@id": "hubject:providerIds",
+      "@container": "@list"
+    },
+    "wmis": {
+      "@id": "hubject:wmis",
+      "@container": "@list"
+    },
+    "userRole": {
+      "@id": "hubject:userRole",
+      "@type": "xsd:string"
+    },
+    "userName": {
+      "@id": "hubject:userName",
+      "@type": "xsd:string"
+    }
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Hubject API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Hubject's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-13) from openapi/hubject-ngp-cpo-evse-swagger.json, openapi/hubject-ngp-cpo-service-offers-swagger.json, openapi/hubject-ngp-emp-contracts-swagger.json.",
+  "dcterms:created": "2026-10-13",
+  "dcterms:source": [
+    "openapi/hubject-ngp-cpo-evse-swagger.json",
+    "openapi/hubject-ngp-cpo-service-offers-swagger.json",
+    "openapi/hubject-ngp-emp-contracts-swagger.json",
+    "openapi/hubject-oicp-cpo-2.3-openapi.yml",
+    "openapi/hubject-oicp-emp-2.3-openapi.yml"
+  ]
+}

@@ -1,0 +1,43 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-webhooks.py
+source:
+- openapi/hubject-opcp-webhooks-openapi.json
+description: 'Event surface derived from the provider''s own OpenAPI: enum Event. No AsyncAPI document is published by the provider; this catalog
+  lists the events the contract names.'
+management_operations:
+- eRoamingChargingNotifications_V1.1
+- create-webhook-endpoint
+- get-webhook-endpoints
+- get-webhook-endpoint
+- update-webhook-endpoint
+- delete-webhook-endpoint
+events:
+- event: root.cert.added
+  declared_in: components/schemas/Event
+- event: root.cert.expired
+  declared_in: components/schemas/Event
+- event: mo.prov.cert.updated
+  declared_in: components/schemas/Event
+- event: mo.prov.cert.deleted
+  declared_in: components/schemas/Event
+- event: mo.prov.cert.updated.factory.reset
+  declared_in: components/schemas/Event
+- event: mo.contract.delivered.to.oem
+  declared_in: components/schemas/Event
+- event: mo.contract.created.sent.to.oem
+  declared_in: components/schemas/Event
+- event: mo.contract.updated.sent.to.oem
+  declared_in: components/schemas/Event
+- event: mo.contract.deleted.sent.to.oem
+  declared_in: components/schemas/Event
+- event: mo.contract.rejected.by.oem
+  declared_in: components/schemas/Event
+- event: mo.contract.queued.to.oem
+  declared_in: components/schemas/Event
+- event: oem.contract.created
+  declared_in: components/schemas/Event
+- event: oem.contract.updated
+  declared_in: components/schemas/Event
+- event: oem.contract.deleted
+  declared_in: components/schemas/Event

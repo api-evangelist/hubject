@@ -1,0 +1,6 @@
+generated: '2026-10-13'
+method: searched
+source: https://github.com/hubject/oicp-emp-2.3-api-doc/blob/9a773b3a77c05264f087e73c5af04268425f9296/src/openapi.yaml
+found_on: https://github.com/hubject
+ownership: github.com/hubject is Hubject's own GitHub organization (declares https://www.hubject.com/ as its website)
+note: multi-file source bundled into one document with @redocly/cli 1.25.0 bundle; content unchanged, refs inlined

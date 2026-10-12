@@ -1,0 +1,6 @@
+generated: '2026-10-13'
+method: searched
+source: https://github.com/hubject/oicp-cpo-2.3-api-doc/blob/f5a8e2f2eac29c76ad840f855181e54b11394e68/src/openapi.yaml
+found_on: https://github.com/hubject
+ownership: github.com/hubject is Hubject's own GitHub organization (declares https://www.hubject.com/ as its website)
+note: multi-file source bundled into one document with @redocly/cli 1.25.0 bundle; content unchanged, refs inlined

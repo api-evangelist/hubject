@@ -1,0 +1,134 @@
+generated: '2026-10-13'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 9
+  own: 7
+  other_domain: 1
+  platform: 1
+  roles:
+  - api
+  - other
+  - portal
+  - source
+  - support
+  - website
+hosts:
+- host: api.hubject.com
+  found_by:
+  - contract-discovery
+  types: []
+  serves: []
+  registrable_domain: hubject.com
+  role: api
+  relation: own
+- host: github.com
+  found_by:
+  - pointer
+  - apis[]
+  types:
+  - GitHubOrganization
+  serves:
+  - docs
+  registrable_domain: github.com
+  role: source
+  relation: platform
+- host: hubject.stoplight.io
+  found_by:
+  - pointer
+  - apis[]
+  types:
+  - Sandbox
+  serves:
+  - docs
+  registrable_domain: stoplight.io
+  role: other
+  relation: other-domain
+- host: info.hubject.com
+  found_by:
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: hubject.com
+  role: other
+  relation: own
+- host: pardot.hubject.com
+  found_by:
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: hubject.com
+  role: other
+  relation: own
+- host: portal.hubject.com
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - docs-index
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - DeveloperPortal
+  serves:
+  - docs
+  - cdn
+  vendor: cloudfront
+  registrable_domain: hubject.com
+  role: portal
+  relation: own
+- host: service.hubject.com
+  found_by:
+  - apis[]
+  types: []
+  serves:
+  - api
+  registrable_domain: hubject.com
+  role: other
+  relation: own
+- host: support.hubject.com
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - well-known
+  - vendor-detect
+  types:
+  - Support
+  serves:
+  - support
+  vendor: zendesk
+  registrable_domain: hubject.com
+  role: support
+  relation: own
+- host: www.hubject.com
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - docs-index
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - Website
+  - Documentation
+  - Pricing
+  - Newsroom
+  - PrivacyPolicy
+  - Community
+  serves:
+  - docs
+  - cdn
+  vendor: cloudflare
+  registrable_domain: hubject.com
+  role: website
+  relation: own

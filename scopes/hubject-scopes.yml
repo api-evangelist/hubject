@@ -1,0 +1,5 @@
+generated: '2026-10-13'
+method: none
+source: openapi/hubject-opcp-ccp-openapi.json, openapi/hubject-opcp-cps-openapi.json, openapi/hubject-opcp-est-openapi.json, openapi/hubject-opcp-pcp-openapi.json, openapi/hubject-opcp-rcp-openapi.json
+note: The OPCP specifications declare OAuth2 authorizationCode schemes (MO, OEM, CPO, ...) but name no scopes; checked, nothing to record.
+scopes: []

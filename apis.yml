@@ -1,23 +1,211 @@
 aid: hubject
+
 name: Hubject
-description: 'Hubject is a company surfaced via the API Evangelist harvest backlog (source: gap-automotive-real-estate)
-  and added to the network as a stub for full-pipeline profiling.'
+
+image: https://cdn.prod.website-files.com/602cf2b08109ccbc93d7f9ed/605b6eb0adff115b326d5c57_OpenGraph%20Hubject%20Image.png
+
+description: 'Hubject is the Berlin-based eMobility interoperability hub behind the intercharge network, connecting charge point operators (CPOs)
+  and e-mobility service providers (EMPs) for cross-network EV charging (eRoaming) and operating a leading ISO 15118 Plug&Charge public key infrastructure.
+  It publishes its interfaces openly on GitHub: the Open InterCharge Protocol (OICP 2.3) for CPOs and EMPs (authorization, charge detail records,
+  EVSE data and status, dynamic pricing, reservation and charging notifications against service.hubject.com/api/oicp), the Open Plug&Charge Protocol
+  (OPCP 1.0) for contract and certificate provisioning, and Next Generation Pricing (NGP) automation APIs, plus a hosted Open Plug&Charge testing
+  environment.'
+
 url: https://raw.githubusercontent.com/api-evangelist/hubject/refs/heads/main/apis.yml
+
 x-type: company
+
 x-source: harvest:gap-automotive-real-estate
-x-tier: stub
-x-tier-reason: harvest
+
+x-tier: profiled
+
+x-tier-reason: enrichment pass 2026-10-13 (local-v5; was harvest)
+
 specificationVersion: '0.20'
+
 created: '2026-10-13'
+
 modified: '2026-10-13'
+
 tags:
 - Company
-apis: []
+- Electric Vehicles
+- EV Charging
+- eRoaming
+- Plug and Charge
+- ISO 15118
+- Energy
+- Mobility
+
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+
 common:
+- type: AgenticAccess
+  url: agentic-access/hubject-agentic-access.yml
+- type: Spectral
+  url: rules/hubject-rules.yml
+- type: JSONLD
+  url: json-ld/hubject-context.jsonld
+- type: Vocabulary
+  url: vocabulary/hubject-vocabulary.yml
+- type: Webhooks
+  url: asyncapi/hubject-webhooks.yml
+- type: DataModel
+  url: data-model/hubject-data-model.yml
+- type: ErrorCatalog
+  url: errors/hubject-problem-types.yml
+- type: Conformance
+  url: conformance/hubject-conformance.yml
+- type: Hosts
+  url: hosts/hubject-hosts.yml
+- type: Vendors
+  url: vendors/hubject-vendors.yml
+- type: SDKs
+  url: packages/hubject-packages.yml
+- type: Packages
+  url: packages/hubject-packages.yml
+- type: Authentication
+  url: authentication/hubject-authentication.yml
+- type: DomainSecurity
+  url: security/hubject-domain-security.yml
 - type: Website
   url: https://www.hubject.com/
+- type: DeveloperPortal
+  url: https://portal.hubject.com/
+- type: Documentation
+  url: https://www.hubject.com/company/download
+- type: Sandbox
+  url: https://hubject.stoplight.io/
+- type: GitHubOrganization
+  url: https://github.com/hubject
+- type: Support
+  url: https://support.hubject.com/hc/en-us
+- type: Pricing
+  url: https://www.hubject.com/pricing
+- type: Newsroom
+  url: https://www.hubject.com/company/newsroom
+- type: PrivacyPolicy
+  url: https://www.hubject.com/privacy-notice
+- type: Community
+  url: https://www.hubject.com/community
+
+apis:
+- aid: hubject:oicp-cpo
+  name: Open InterCharge Protocol (OICP) 2.3 - CPO
+  description: 'OICP 2.3 operations for charge point operators on the Hubject Business System: authorize start/stop, remote start/stop, charge
+    detail records, push EVSE data and status, push pricing product and EVSE pricing, reservations and charging notifications.'
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - eRoaming
+  - EV Charging
+  - CPO
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-oicp-cpo-2.3-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://github.com/hubject/oicp-cpo-2.3-api-doc/blob/master/src/openapi.yaml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+- aid: hubject:oicp-emp
+  name: Open InterCharge Protocol (OICP) 2.3 - EMP
+  description: 'OICP 2.3 operations for e-mobility providers: push authentication data, authorize and remote start/stop, pull EVSE data, status
+    and pricing, get charge detail records, reservations and charging notifications.'
+  humanURL: https://www.hubject.com/products/intercharge-emp
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - eRoaming
+  - EV Charging
+  - EMP
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-oicp-emp-2.3-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://github.com/hubject/oicp-emp-2.3-api-doc/blob/master/src/openapi.yaml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+- aid: hubject:open-plug-and-charge
+  name: Open Plug&Charge Protocol (OPCP) 1.0
+  description: 'ISO 15118 Plug&Charge interfaces: access token, contract certificate pool (CCP), certificate provisioning service (CPS), enrollment
+    (EST), provisioning certificate pool (PCP), root certificate pool (RCP) and webhooks, testable in Hubject''s hosted Open Plug&Charge testing
+    environment. No production base URL is published in the specifications.'
+  humanURL: https://hubject.stoplight.io/docs/open-plugncharge
+  tags:
+  - Plug and Charge
+  - ISO 15118
+  - PKI
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-opcp-ccp-openapi.json
+  - type: OpenAPI
+    url: openapi/hubject-opcp-cps-openapi.json
+  - type: OpenAPI
+    url: openapi/hubject-opcp-pcp-openapi.json
+  - type: OpenAPI
+    url: openapi/hubject-opcp-rcp-openapi.json
+  - type: OpenAPI
+    url: openapi/hubject-opcp-est-openapi.json
+  - type: OpenAPI
+    url: openapi/hubject-opcp-accesstoken-openapi.json
+  - type: OpenAPI
+    url: openapi/hubject-opcp-webhooks-openapi.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:ngp-automation
+  name: Next Generation Pricing (NGP) Automation APIs
+  description: 'Swagger 2.0 partner APIs for Hubject''s Next Generation Pricing: CPO service offers and EVSE assignment, and EMP contracts. No
+    base URL is published in the specifications.'
+  humanURL: https://github.com/hubject/NGP-Automation-APIs
+  tags:
+  - Pricing
+  - EV Charging
+  properties:
+  - type: Swagger
+    url: openapi/hubject-ngp-cpo-service-offers-swagger.json
+  - type: Swagger
+    url: openapi/hubject-ngp-cpo-evse-swagger.json
+  - type: Swagger
+    url: openapi/hubject-ngp-emp-contracts-swagger.json
+
+x-enrichment:
+  status: enriched
+  pass: local-v5
+  date: '2026-10-13'

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubject/main/json-schema/hubject-get-signed-contract-data-request-schema.json",
+  "title": "GetSignedContractDataRequest",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/hubject-opcp-ccp-openapi.json#/components/schemas/GetSignedContractDataRequest",
+  "type": "object",
+  "minProperties": 2,
+  "properties": {
+    "certificateInstallationReq": {
+      "type": "string",
+      "description": "base64 encoded"
+    },
+    "xsdMsgDefNamespace": {
+      "type": "string",
+      "description": "ISO Version"
+    },
+    "metadata": {
+      "type": "string",
+      "description": "open for future usage"
+    }
+  },
+  "required": [
+    "certificateInstallationReq",
+    "xsdMsgDefNamespace"
+  ]
+}

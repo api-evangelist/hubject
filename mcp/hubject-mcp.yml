@@ -1,0 +1,226 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-mcp-candidate.py
+source:
+- openapi/hubject-ngp-cpo-evse-swagger.json
+- openapi/hubject-ngp-cpo-service-offers-swagger.json
+- openapi/hubject-ngp-emp-contracts-swagger.json
+- openapi/hubject-oicp-cpo-2.3-openapi.yml
+- openapi/hubject-oicp-emp-2.3-openapi.yml
+- openapi/hubject-opcp-accesstoken-openapi.json
+- openapi/hubject-opcp-ccp-openapi.json
+- openapi/hubject-opcp-cps-openapi.json
+- openapi/hubject-opcp-est-openapi.json
+- openapi/hubject-opcp-pcp-openapi.json
+- openapi/hubject-opcp-rcp-openapi.json
+- openapi/hubject-opcp-webhooks-openapi.json
+status: candidate
+deployment:
+  mode: none
+  auth: unknown
+  verified: probed
+note: 'No MCP server was found. The pre-flight posted tools/list to /mcp on api.hubject.com, www.hubject.com, info.hubject.com, pardot.hubject.com;
+  verdict opaque (https://info.hubject.com/api/mcp answered 401: the edge authenticates before it routes, which proves nothing either way). Candidate
+  tools below are derived from the 56 operation(s) in the provider''s own OpenAPI (40 listed); they describe what a server WOULD expose, not one
+  that exists.'
+tools:
+- name: update_operators_network
+  operationId: PUT /api/evsenetwork/v1/operators/{externalOperatorId}/network
+  method: PUT
+  path: /api/evsenetwork/v1/operators/{externalOperatorId}/network
+  description: Assign EVSEs to groups
+- name: create_operators_service-offers
+  operationId: POST /api/partner/v1/operators/{externalID}/service-offers
+  method: POST
+  path: /api/partner/v1/operators/{externalID}/service-offers
+  description: Create a service offer
+- name: get_providers_operators
+  operationId: GET /api/premium/contracts/v1/providers/{providerId}/operators/{operatorId}
+  method: GET
+  path: /api/premium/contracts/v1/providers/{providerId}/operators/{operatorId}
+  description: Fetch contracts details between provider and operator
+- name: e_roaming_authorize_start_v2_1
+  operationId: eRoamingAuthorizeStart_v2.1
+  method: POST
+  path: /charging/v21/operators/{operatorID}/authorize/start
+  description: eRoamingAuthorizeStart_v2.1
+- name: e_roaming_get_charge_detail_records_v2_2
+  operationId: eRoamingGetChargeDetailRecords_V2.2
+  method: POST
+  path: /cdrmgmt/v22/providers/{providerID}/get-charge-detail-records-request
+  description: eRoamingGetChargeDetailRecords_V2.2
+- name: issue_token
+  operationId: issue-token
+  method: POST
+  path: /oauth/token
+  description: Create New User
+- name: get_signed_contract_data
+  operationId: getSignedContractData
+  method: POST
+  path: /v1/ccp/signedContractData
+  description: Get Signed Contract Data
+- name: put_v1_cps_sign_contract_data
+  operationId: put-v1-cps-signContractData
+  method: PUT
+  path: /v1/cps/contractData/signed
+  description: Sign Contract Data by CPS
+- name: simpleenroll
+  operationId: simpleenroll
+  method: POST
+  path: /.well-known/est/{ca}/simpleenroll/{iso-version}
+  description: simpleEnroll
+- name: get_oemprov_cert
+  operationId: getOEMProvCert
+  method: GET
+  path: /v1/oem/provCerts/{pcid}
+  description: Get Provisioning Certificate
+- name: get_root_cert
+  operationId: getRootCert
+  method: GET
+  path: /v1/root/rootCerts/{rootCertificateId}
+  description: getRootCert
+- name: create_webhook_endpoint
+  operationId: create-webhook-endpoint
+  method: POST
+  path: /v1/webhook/endpoints
+  description: Create webhook endpoint
+- name: create_operators_networks
+  operationId: POST /api/evsenetwork/v1/operators/{externalOperatorId}/networks
+  method: POST
+  path: /api/evsenetwork/v1/operators/{externalOperatorId}/networks
+  description: Create EVSE Network
+- name: create_service-offers_attachments
+  operationId: POST /api/partner/v1/operators/{externalID}/service-offers/attachments
+  method: POST
+  path: /api/partner/v1/operators/{externalID}/service-offers/attachments
+  description: Upload service offer T&C document
+- name: get_groups_evses
+  operationId: GET /api/premium/contracts/v1/providers/{providerId}/operators/{operatorId}/service-offers/{serviceOfferId}/networks/{networkId}/groups/{groupId}/evses
+  method: GET
+  path: /api/premium/contracts/v1/providers/{providerId}/operators/{operatorId}/service-offers/{serviceOfferId}/networks/{networkId}/groups/{groupId}/evses
+  description: Fetch EVSEs belonging to a Service Offer's Network's EVSE group
+- name: e_roaming_authorize_stop_v2_1
+  operationId: eRoamingAuthorizeStop_V2.1
+  method: POST
+  path: /charging/v21/operators/{operatorID}/authorize/stop
+  description: eRoamingAuthorizeStop_V2.1
+- name: e_roaming_push_authentication_data_v2_1
+  operationId: eRoamingPushAuthenticationData_V2.1
+  method: POST
+  path: /authdata/v21/providers/{providerID}/push-request
+  description: eRoamingPushAuthenticationData_V2.1
+- name: add_signed_contract_data
+  operationId: addSignedContractData
+  method: PUT
+  path: /v1/ccp/signedContractData
+  description: Add Signed Contract Data to CCP
+- name: create_and_forward_signed_contract_data
+  operationId: createAndForwardSignedContractData
+  method: PUT
+  path: /v1/cps/forward/signedContractData
+  description: Create and forward Signed Contract Data
+- name: cacerts
+  operationId: cacerts
+  method: GET
+  path: /{ca}/cacerts/{iso-version}/{algorithm}/
+  description: Obtaining CA Certificates
+- name: delete_oemprov_cert
+  operationId: deleteOEMProvCert
+  method: DELETE
+  path: /v1/oem/provCerts/{pcid}
+  description: Delete Provisioning Certificate
+- name: delete_v1_root_root_certs_root_certificate_id
+  operationId: delete-v1-root-rootCerts-rootCertificateId
+  method: DELETE
+  path: /v1/root/rootCerts/{rootCertificateId}
+  description: deleteRootCa
+- name: get_webhook_endpoints
+  operationId: get-webhook-endpoints
+  method: GET
+  path: /v1/webhook/endpoints
+  description: Get all endpoints
+- name: get_service-offers_info
+  operationId: GET /api/partner/v1/operators/{externalID}/service-offers/info
+  method: GET
+  path: /api/partner/v1/operators/{externalID}/service-offers/info
+  description: Extract active NGP service offers info
+- name: e_roaming_authorize_remote_start_v2_1
+  operationId: eRoamingAuthorizeRemoteStart_v2.1
+  method: POST
+  path: /charging/v21/providers/{providerID}/authorize-remote/start
+  description: eRoamingAuthorizeRemoteStart_v2.1
+- name: e_roaming_pull_evse_data_v2_3
+  operationId: eRoamingPullEvseData_V2.3
+  method: POST
+  path: /evsepull/v23/providers/{providerID}/data-records
+  description: eRoamingPullEvseData_V2.3
+- name: delete_signed_contract_data
+  operationId: deleteSignedContractData
+  method: DELETE
+  path: /v1/ccp/signedContractData/{emaid}
+  description: Delete Signed Contract Data
+- name: create_signed_contract_data
+  operationId: createSignedContractData
+  method: PUT
+  path: /v1/cps/signedContractData
+  description: Create Signed Contract Data
+- name: add_oemprov_cert
+  operationId: addOEMProvCert
+  method: PUT
+  path: /v1/oem/provCerts
+  description: Add Provisioning Certificate
+- name: get_all_root_certs
+  operationId: getAllRootCerts
+  method: GET
+  path: /v1/root/rootCerts
+  description: getAllRootCerts
+- name: get_webhook_endpoint
+  operationId: get-webhook-endpoint
+  method: GET
+  path: /v1/webhook/endpoints/{id}
+  description: Get webhook endpoint
+- name: update_operators_service-offers
+  operationId: PUT /api/partner/v1/operators/{externalID}/service-offers/{serviceOfferId}
+  method: PUT
+  path: /api/partner/v1/operators/{externalID}/service-offers/{serviceOfferId}
+  description: Update a service offer
+- name: e_roaming_authorize_remote_stop_v2_1
+  operationId: eRoamingAuthorizeRemoteStop_v2.1
+  method: POST
+  path: /charging/v21/providers/{providerID}/authorize-remote/stop
+  description: eRoamingAuthorizeRemoteStop_v2.1
+- name: e_roaming_pull_evse_status_v2_1
+  operationId: eRoamingPullEvseStatus_V2.1
+  method: POST
+  path: /evsepull/v21/providers/{providerID}/status-records
+  description: eRoamingPullEvseStatus_V2.1
+- name: provide_signed_contract_data
+  operationId: provideSignedContractData
+  method: GET
+  path: /v1/ccp/provideSignedContractData/{emaid}/{pcid}
+  description: Provide Signed Contract Data
+- name: generate_signed_contract_data
+  operationId: generateSignedContractData
+  method: PUT
+  path: /v1/cps/generate/signedContractData
+  description: Generate Signed Contract Data
+- name: lookup_vehicle
+  operationId: lookupVehicle
+  method: GET
+  path: /v1/oem/provCerts/lookupVehicle/{pcid}
+  description: Lookup Vehicle
+- name: put_v1_root_root_certs
+  operationId: put-v1-root-rootCerts
+  method: PUT
+  path: /v1/root/rootCerts
+  description: saveRootCa
+- name: update_webhook_endpoint
+  operationId: update-webhook-endpoint
+  method: PUT
+  path: /v1/webhook/endpoints/{id}
+  description: Update existing webhook endpoint
+- name: get_service-offers_historical-versions-info
+  operationId: GET /api/partner/v1/operators/{externalID}/service-offers/{serviceOfferId}/historical-versions-info
+  method: GET
+  path: /api/partner/v1/operators/{externalID}/service-offers/{serviceOfferId}/historical-versions-info
+  description: Extract historical versions info of an active NGP service offer

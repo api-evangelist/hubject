@@ -1,0 +1,79 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/hubject-ngp-cpo-evse-swagger.json
+- openapi/hubject-ngp-cpo-service-offers-swagger.json
+- openapi/hubject-ngp-emp-contracts-swagger.json
+- openapi/hubject-oicp-cpo-2.3-openapi.yml
+- openapi/hubject-oicp-emp-2.3-openapi.yml
+- openapi/hubject-opcp-accesstoken-openapi.json
+- openapi/hubject-opcp-ccp-openapi.json
+- openapi/hubject-opcp-cps-openapi.json
+- openapi/hubject-opcp-est-openapi.json
+- openapi/hubject-opcp-pcp-openapi.json
+- openapi/hubject-opcp-rcp-openapi.json
+- openapi/hubject-opcp-webhooks-openapi.json
+format: custom
+envelope:
+  media_type: application/json
+  schema: Error
+coverage:
+  operations: 64
+  statuses_declared: 8
+problems:
+- status: 400
+  title: Bad Request
+  description: Bad Request
+  operations: 25
+  media_types:
+  - application/json
+  - application/xml
+  schema: Error
+- status: 401
+  title: Unauthorized
+  description: Unauthorized
+  operations: 35
+  media_types:
+  - application/json
+  schema: Error
+- status: 403
+  title: Forbidden
+  description: Forbidden
+  operations: 34
+  media_types:
+  - application/json
+  schema: Error
+- status: 404
+  title: Not Found
+  description: Not Found
+  operations: 27
+  media_types:
+  - application/json
+  - application/xml
+  - multipart/form-data
+  schema: Error
+- status: 500
+  title: Internal Server Error
+  description: Internal Server Error
+  operations: 23
+  media_types: []
+  schema: null
+- status: 502
+  title: Bad Gateway
+  description: Bad Gateway
+  operations: 13
+  media_types: []
+  schema: null
+- status: 503
+  title: Service Unavailable
+  description: Service Unavailable
+  operations: 13
+  media_types: []
+  schema: null
+- status: 5XX
+  title: null
+  description: Internal Server Error
+  operations: 2
+  media_types: []
+  schema: null

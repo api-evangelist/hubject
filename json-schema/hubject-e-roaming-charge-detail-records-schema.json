@@ -1,0 +1,468 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubject/main/json-schema/hubject-e-roaming-charge-detail-records-schema.json",
+  "title": "eRoamingChargeDetailRecords",
+  "description": "eRoamingChargeDetailRecord is a message containing charging process details (such as meter values, etc.).",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/eRoamingChargeDetailRecords",
+  "type": "object",
+  "required": [
+    "content",
+    "number",
+    "size",
+    "totalElements",
+    "last",
+    "totalPages",
+    "first",
+    "numberOfElements",
+    "StatusCode"
+  ],
+  "properties": {
+    "content": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/eRoamingChargeDetailRecord"
+      }
+    },
+    "number": {
+      "type": "integer",
+      "description": "Number of the page"
+    },
+    "size": {
+      "type": "integer",
+      "description": "Size of records requested per page"
+    },
+    "totalElements": {
+      "type": "integer",
+      "description": "Number of total charge detail records available from the request"
+    },
+    "pageable": {
+      "type": "object",
+      "properties": {
+        "sort": {
+          "type": "object",
+          "properties": {
+            "sorted": {
+              "type": "boolean",
+              "description": "Whether the results are sorted."
+            },
+            "empty": {
+              "type": "boolean",
+              "description": "Whether the sort is empty."
+            },
+            "unsorted": {
+              "type": "boolean",
+              "description": "Whether the results are unsorted."
+            }
+          }
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "The number of items per page."
+        },
+        "pageNumber": {
+          "type": "integer",
+          "description": "The current page number."
+        },
+        "offset": {
+          "type": "integer",
+          "description": "The offset of the current page."
+        },
+        "paged": {
+          "type": "boolean",
+          "description": "Whether the response is paginated."
+        },
+        "unpaged": {
+          "type": "boolean",
+          "description": "Whether the response is unpaginated."
+        }
+      }
+    },
+    "empty": {
+      "type": "boolean",
+      "description": "Whether the data set is empty."
+    },
+    "last": {
+      "type": "boolean",
+      "description": "Indicates if the current page is the last page"
+    },
+    "totalPages": {
+      "type": "integer",
+      "description": "Number of total pages available for the request"
+    },
+    "first": {
+      "type": "boolean",
+      "description": "indicates if the current page is the first page"
+    },
+    "numberOfElements": {
+      "type": "integer",
+      "description": "Number of records in the page"
+    },
+    "StatusCode": {
+      "$ref": "#/$defs/StatusCode"
+    }
+  },
+  "$defs": {
+    "EvcoID": {
+      "type": "string",
+      "pattern": "^(([A-Za-z]{2}\\-?[A-Za-z0-9]{3}\\-?C[A-Za-z0-9]{8}\\-?[\\d|A-Za-z])|([A-Za-z]{2}[\\*|\\-]?[A-Za-z0-9]{3}[\\*|\\-]?[A-Za-z0-9]{6}[\\*|\\-]?[\\d|X]))$",
+      "description": "A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.\n\n^(([A-Za-z]{2}\\-?[A-Za-z0-9]{3}\\-?C[A-Za-z0-9]{8}\\-?[\\d|A-Za-z])|([A-Za-z]{2}[\\*|\\-]?[A-Za-z0-9]{3}[\\*|\\-]?[A-Za-z0-9]{6}[\\*|\\-]?[\\d|X]))$\nThe expression validates the string as EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.\n\nIn case the EvcoID is provided corresponding to ISO, the instance part MUST be eight characters long and MUST be provided with a prepended “C”. The optional separating character MUST be “-“.\n\nIn case the EvcoID is provided corresponding to DIN, the instance part MUST be six characters long. The optional separating character can either be “*” or “-“.\n\nExamples ISO: “DE-8EO-CAet5e4XY-3”, “DE8EOCAet5e43X1”\n\nExamples DIN: “DE*8EO*Aet5e4*3”, “DE-8EO-Aet5e4-3”, “DE8EOAet5e43”\n"
+    },
+    "EvseID": {
+      "type": "string",
+      "pattern": "^(([A-Za-z]{2}\\*?[A-Za-z0-9]{3}\\*?E[A-Za-z0-9\\*]{1,30})|(\\+?[0-9]{1,3}\\*[0-9]{3}\\*[0-9\\*]{1,32}))$",
+      "description": "The ID that identifies the charging spot.\n\nA string that `MUST` be valid with respect to the following regular expression: ISO | DIN.\n\n`^(([A-Za-z]{2}\\*?[A-Za-z0-9]{3}\\*?E[A-Za-z0-9\\*]{1,30})|(\\+?[0-9]{1,3}\\*[0-9]{3}\\*[0-9\\*]{1,32}))$`\nThe expression validates the string as EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.\n\nIn case the EvseID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional. Furthermore the ID MUST provide an “E” after the OperatorID in order to identify the ID as ISO EvseID without doubt.\n\nIn case the EvseID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.\n\nExamples ISO: “DE*AB7*E840*6487”, “DEAB7E8406487”\n\nExample DIN: “+49*810*000*438”\n"
+    },
+    "Identification": {
+      "type": "object",
+      "description": "Authentication data\n\n1. The option RFIDIdentification `MUST` not be used in the eRoamingAuthorization process. For RFID Authorization, only the option RFIDMifareFamilyIdentification `SHOULD` be used in the respective eRoamingAuthorization messages.\n2. For the Remote Authorization process, only the option RemoteIdentification MUST be used in the respective messages.\n",
+      "properties": {
+        "RFIDMifareFamilyIdentification": {
+          "$ref": "#/$defs/RFIDMifareFamilyIdentification"
+        },
+        "RFIDIdentification": {
+          "$ref": "#/$defs/RFIDIdentification"
+        },
+        "QRCodeIdentification": {
+          "$ref": "#/$defs/QRCodeIdentification"
+        },
+        "PlugAndChargeIdentification": {
+          "$ref": "#/$defs/PlugAndChargeIdentification"
+        },
+        "RemoteIdentification": {
+          "$ref": "#/$defs/RemoteIdentification"
+        }
+      }
+    },
+    "OperatorID": {
+      "type": "string",
+      "pattern": "^(([A-Za-z]{2}\\*?[A-Za-z0-9]{3})|(\\+?[0-9]{1,3}\\*[0-9]{3}))$",
+      "description": "A string that MUST be valid with respect to the following regular expression: ISO | DIN\n\n^(([A-Za-z]{2}\\*?[A-Za-z0-9]{3})|(\\+?[0-9]{1,3}\\*[0-9]{3}))$\nThe expression validates the string as OperatorID including the preceding country code, which is part of EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118. In case the OperatorID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional.\n\nIn case the OperatorID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.\n\nExamples ISO: “DE*A36”, “DEA36”\n\nExample DIN: “+49*536”\n"
+    },
+    "PlugAndChargeIdentification": {
+      "type": "object",
+      "description": "Authentication required for Plug&Charge (EMAID/EVCOID)\n",
+      "properties": {
+        "EvcoID": {
+          "$ref": "#/$defs/EvcoID"
+        }
+      },
+      "required": [
+        "EvcoID"
+      ]
+    },
+    "ProductID": {
+      "type": "string",
+      "description": "The ProductIDType defines some standard values (see below). The type however also supports custom ProductIDs that can be specified by partners (as a string of 50 characters maximum length).\n| Option | Description |\n|--------|-------------|\n| Standard Price | Standard Price |\n| AC1 | Product for AC 1 Phase charging |\n| AC3 | Product for AC 3 Phase charging |\n| DC | Product for DC charging |\n| CustomProductID | There is no option “CustomProductID”, this sample option is meant to indicates that custom product ID specifications by partners (as a string of 50 characters maximum length) are allowed as well.|\n",
+      "maximum": 50
+    },
+    "ProviderID": {
+      "type": "string",
+      "pattern": "^([A-Za-z]{2}\\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\\*|-]?[A-Za-z0-9]{3})$",
+      "description": "The ProviderID is defined by Hubject and is used to identify the EMP\n\nA string that `MUST` be valid with respect to the following regular expression: ISO | DIN\n\n`^([A-Za-z]{2}\\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\\*|-]?[A-Za-z0-9]{3})$`\n\nThe expression validates the string as ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.\n\nIn case the ProviderID is provided corresponding to ISO, the country code `MUST` be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “-” is optional.\n\nExamples ISO: “DE8EO”, “DE-8EO”\n\nExamples DIN: “DE8EO”, “DE*8EO”, “DE-8EO”\n"
+    },
+    "QRCodeIdentification": {
+      "type": "object",
+      "required": [
+        "EvcoID"
+      ],
+      "properties": {
+        "EvcoID": {
+          "$ref": "#/$defs/EvcoID"
+        },
+        "HashedPIN": {
+          "type": "object",
+          "required": [
+            "Value",
+            "Function"
+          ],
+          "properties": {
+            "Value": {
+              "type": "string",
+              "pattern": "^[0-9A-Za-z\\\\.+/=\\\\$]{10,100}$",
+              "description": "Hash value created by partner\n\nThe expression validates the string as a hash function result value with a length between 10 and 100 characters\n\nExample: “a5ghdhf73h”\n"
+            },
+            "Function": {
+              "type": "string",
+              "enum": [
+                "Bcrypt"
+              ],
+              "description": "Function that was used to generate the hash value."
+            },
+            "LegacyHashData": {
+              "type": "object",
+              "required": [
+                "Function"
+              ],
+              "properties": {
+                "Function": {
+                  "type": "string",
+                  "enum": [
+                    "MD5",
+                    "SHA-1"
+                  ],
+                  "description": "Function used for hashing of the PIN at the partner."
+                },
+                "Salt": {
+                  "type": "string",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "The salt value used by the partner for hashing the PIN."
+                },
+                "Value": {
+                  "type": "string",
+                  "minimum": 0,
+                  "maximum": 20,
+                  "description": "PIN hash at the partner."
+                }
+              }
+            }
+          }
+        },
+        "PIN": {
+          "type": "string"
+        }
+      }
+    },
+    "RFID": {
+      "type": "string",
+      "description": "Defined RFID Type\n",
+      "enum": [
+        "mifareCls",
+        "mifareDes",
+        "calypso",
+        "nfc",
+        "mifareFamily"
+      ]
+    },
+    "RFIDIdentification": {
+      "type": "object",
+      "description": "Authentication data details. The data structure differs depending on the authentication technology\n",
+      "properties": {
+        "UID": {
+          "$ref": "#/$defs/UID"
+        },
+        "EvcoID": {
+          "$ref": "#/$defs/EvcoID"
+        },
+        "RFID": {
+          "$ref": "#/$defs/RFID"
+        },
+        "PrintedNumber": {
+          "type": "string",
+          "maximum": 150,
+          "description": "A number printed on a customer’s card for manual authorization (e.q. via a call center)"
+        },
+        "ExpiryDate": {
+          "type": "string",
+          "description": "Until when this card is valid. Should not be set if card does not have an expiration"
+        }
+      },
+      "required": [
+        "UID",
+        "RFID"
+      ]
+    },
+    "RFIDMifareFamilyIdentification": {
+      "type": "object",
+      "description": "Authentication data details. The data structure differs depending on the authentication technology\n",
+      "properties": {
+        "UID": {
+          "$ref": "#/$defs/UID"
+        }
+      },
+      "required": [
+        "UID"
+      ]
+    },
+    "RemoteIdentification": {
+      "type": "object",
+      "description": "Authentication data details. The data structure differs depending on the authentication technology\n",
+      "properties": {
+        "EvcoID": {
+          "$ref": "#/$defs/EvcoID"
+        }
+      },
+      "required": [
+        "EvcoID"
+      ]
+    },
+    "SessionID": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$",
+      "description": "The Hubject SessionID that identifies the process\n\nA string that `MUST` be valid with respect to the following regular expression:\n\n`^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$`\n\nThe expression validates the string as a GUID.\n\nExample: “b2688855-7f00-0002-6d8e-48d883f6abb6”\n"
+    },
+    "StatusCode": {
+      "type": "object",
+      "description": "The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.\n",
+      "required": [
+        "Code"
+      ],
+      "properties": {
+        "Code": {
+          "type": "string",
+          "description": "| Option | Description | Area of Usage |\n| -------|-------------|---------------|\n| 000 | Success. | General codes |\n| 001 | Hubject system error. | Internal system codes |\n| 002 | Hubject database error. |Internal system codes|\n| 009 |Data transaction error. | Internal system codes|\n|017 |Unauthorized Access. |Internal system codes |\n|018 |Inconsistent EvseID. |Internal system codes |\n|019 |Inconsistent EvcoID. |Internal system codes |\n|021 |System error. |General codes |\n|022 |Data error. |General codes |\n|101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |\n|102 |RFID Authentication failed – invalid UID. |Authentication codes |\n|103 |RFID Authentication failed – card not readable. |Authentication codes |\n|105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |\n|106 |No positive authentication response. |Authentication codes / Internal system codes |\n|110 |QR Code App Authentication failed – time out error. |Authentication codes |\n|120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |\n|121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |\n|122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |\n|200 |EvcoID locked. |Authentication codes |\n|210 |No valid contract. |Session codes |\n|300 |Partner not found. |Session codes |\n|310 |Partner did not respond. |Session codes |\n|320 |Service not available. |Session codes |\n|400 |Session is invalid. |Session codes |\n|501 |Communication to EVSE failed. |EVSE codes |\n|510 |No EV connected to EVSE. |EVSE codes |\n|601 |EVSE already reserved. |EVSE codes |\n|602 |EVSE already in use/ wrong token. |EVSE codes |\n|603 |Unknown EVSE ID. |EVSE codes |\n|604 |EVSE ID is not Hubject compatible. |EVSE codes |\n|700 |EVSE out of service. |EVSE codes |\n"
+        },
+        "Description": {
+          "type": "string",
+          "description": "description",
+          "maximum": 200
+        },
+        "AdditionalInfo": {
+          "type": "string",
+          "description": "More information can be provided here",
+          "maximum": 1000
+        }
+      }
+    },
+    "UID": {
+      "type": "string",
+      "pattern": "^([0-9A-F]{8,8}|[0-9A-F]{14,14}|[0-9A-F]{20,20})$",
+      "description": "Authentication data details. The data structure differs depending on the authentication technology\n\nThe expression validates the string as a unique RFID with a length of 8, 14 or 20 characters.\n\nExamples: “7568290FFF765F”\n"
+    },
+    "eRoamingChargeDetailRecord": {
+      "type": "object",
+      "description": "eRoamingChargeDetailRecord is a message that contains charging process details (e.g. meter values).",
+      "required": [
+        "SessionID",
+        "EvseID",
+        "Identification",
+        "ChargingStart",
+        "ChargingEnd",
+        "SessionStart",
+        "SessionEnd",
+        "ConsumedEnergy"
+      ],
+      "properties": {
+        "SessionID": {
+          "$ref": "#/$defs/SessionID"
+        },
+        "CPOPartnerSessionID": {
+          "type": "string",
+          "maximum": 250,
+          "description": "Optional field containing the session id assigned by the CPO to the related operation."
+        },
+        "EMPPartnerSessionID": {
+          "type": "string",
+          "maximum": 250,
+          "description": "Optional field containing the session id assigned by an EMP to the related operation."
+        },
+        "PartnerProductID": {
+          "$ref": "#/$defs/ProductID"
+        },
+        "EvseID": {
+          "$ref": "#/$defs/EvseID"
+        },
+        "Identification": {
+          "$ref": "#/$defs/Identification"
+        },
+        "ChargingStart": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time at which the charging process started."
+        },
+        "ChargingEnd": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time at which the charging process stoped."
+        },
+        "SessionStart": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time at which the session started, e.g. swipe of RFID or cable connected."
+        },
+        "SessionEnd": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time at which the session started, e.g. swipe of RFID or cable connected."
+        },
+        "MeterValueStart": {
+          "type": "number",
+          "description": "The starting meter value in kWh."
+        },
+        "MeterValueEnd": {
+          "type": "number",
+          "description": "The ending meter value in kWh."
+        },
+        "MeterValueInBetween": {
+          "type": "object",
+          "description": "List of meter values that may have been taken in between (kWh).",
+          "properties": {
+            "meterValues": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "ConsumedEnergy": {
+          "type": "number",
+          "description": "The difference between MeterValueEnd and MeterValueStart in kWh."
+        },
+        "SignedMeteringValues": {
+          "type": "array",
+          "description": "Metering Signature basically contains all metering signature values (these values should be in Transparency software format) for different status of charging session for eg start, end or progress. In total you can provide maximum 10 metering signature values",
+          "items": {
+            "type": "object",
+            "properties": {
+              "SignedMeteringValue": {
+                "type": "string",
+                "description": "Metering signature value (in the Transparency software format)\n\nSignedMeteringValue `SHOULD` be always sent in following order\n1. SignedMeteringValue for Metering Status “Start”\n2. SignedMeteringValue for Metering Status “Progress1”\n3. SignedMeteringValue for Metering Status “Progress2”\n4. …\n5. SignedMeteringValue for Metering Status “Progress8”\n6. SignedMeteringValue for Metering Status “End”\n\nNote:\n\n1. This field `MUST` be provided when the EVSEID in the ChargeDetailRecord contains the \"External\" value in the CalibrationLawDataAvailability field.\n2. The MeteringSignatureValue format provided `MUST` be supported by the Transparency Software used by the CPO\n",
+                "maximum": 3000
+              },
+              "MeteringStatus": {
+                "type": "string",
+                "enum": [
+                  "Start",
+                  "Progress",
+                  "End"
+                ],
+                "description": "| Option | Description |\n| ------ | ----------- |\n| Start | Metering signature value of the beginning of charging process. |\n| Progress | An intermediate metering signature value of the charging process. |\n| End | Metering Signature Value of the end of the charging process. |\n"
+              }
+            }
+          }
+        },
+        "CalibrationLawVerificationInfo": {
+          "type": "object",
+          "description": "This field provides additional information which could help directly or indirectly to verify the signed metering value by using respective Transparency Software",
+          "properties": {
+            "CalibrationLawCertificateID": {
+              "type": "string",
+              "description": "The Calibration Law Compliance ID from respective authority along with the revision and issueing date (Compliance ID : Revision : Date) For eg PTB - X-X-XXXX : V1 : 01Jan2020",
+              "maximum": 100
+            },
+            "PublicKey": {
+              "type": "string",
+              "description": "Unique PublicKey for EVSEID can be provided here",
+              "maximum": 1000
+            },
+            "MeteringSignatureUrl": {
+              "type": "string",
+              "description": "In this field CPO can also provide a url for xml file. This xml file can give the compiled Calibration Law Data information which can be simply added to invoices for Customer of EMP.\n\nThe information can contain for eg Charging Station Details, Charging Session Date/Time, SignedMeteringValues (Transparency Software format), SignedMeterValuesVerificationInstruction etc.\n",
+              "maximum": 200
+            },
+            "MeteringSignatureEncodingFormat": {
+              "type": "string",
+              "description": "Encoding format of the metering signature data as well as the version (e.g. EDL40 Mennekes: V1)",
+              "maximum": 50
+            },
+            "SignedMeteringValuesVerificationInstruction": {
+              "type": "string",
+              "description": "Additional information (e.g. instruction on how to use the transparency software)",
+              "maximum": 400
+            }
+          }
+        },
+        "HubOperatorID": {
+          "$ref": "#/$defs/OperatorID"
+        },
+        "HubProviderId": {
+          "$ref": "#/$defs/ProviderID"
+        }
+      }
+    }
+  }
+}

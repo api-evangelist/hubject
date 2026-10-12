@@ -1,0 +1,22 @@
+generated: '2026-10-13'
+method: derived
+source: openapi/hubject-opcp-ccp-openapi.json, openapi/hubject-opcp-cps-openapi.json, openapi/hubject-opcp-est-openapi.json,
+  openapi/hubject-opcp-pcp-openapi.json, openapi/hubject-opcp-rcp-openapi.json
+summary:
+  types:
+  - oauth2
+  oauth2_flows:
+  - authorizationCode
+schemes:
+- name: MO
+  type: oauth2
+  flows:
+  - flow: authorizationCode
+    scopes: 0
+  description: OAuth2 is used to grant access to the endpoint.
+  sources:
+  - openapi/hubject-opcp-ccp-openapi.json
+  - openapi/hubject-opcp-cps-openapi.json
+  - openapi/hubject-opcp-est-openapi.json
+  - openapi/hubject-opcp-pcp-openapi.json
+  - openapi/hubject-opcp-rcp-openapi.json

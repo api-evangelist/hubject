@@ -1,0 +1,691 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-data-model.py
+source:
+- openapi/hubject-ngp-cpo-evse-swagger.json
+- openapi/hubject-ngp-cpo-service-offers-swagger.json
+- openapi/hubject-ngp-emp-contracts-swagger.json
+- openapi/hubject-oicp-cpo-2.3-openapi.yml
+- openapi/hubject-oicp-emp-2.3-openapi.yml
+- openapi/hubject-opcp-accesstoken-openapi.json
+- openapi/hubject-opcp-ccp-openapi.json
+- openapi/hubject-opcp-cps-openapi.json
+- openapi/hubject-opcp-est-openapi.json
+- openapi/hubject-opcp-pcp-openapi.json
+- openapi/hubject-opcp-rcp-openapi.json
+- openapi/hubject-opcp-webhooks-openapi.json
+notation: has_one = property $ref; has_many = array of $ref; belongs_to = <entity>_id field
+summary:
+  entities: 119
+  entities_in_spec: 119
+  relationships: 91
+entities:
+- name: ActiveNgpOfferDetailsDTO
+  fields: 1
+- name: AddressIso19773
+  fields: 10
+- name: AttachmentDTO
+  fields: 3
+  description: Attachment model
+- name: AttachmentUploadResponse
+  fields: 2
+- name: BillingInfoDTO
+  fields: 10
+- name: ChargingFacility
+  fields: 5
+- name: ContactDetailsDTO
+  fields: 6
+- name: ContractData
+  fields: 5
+  description: Contract Data consisting of the contract certificate and its chain not including the MO Root CA itself.
+    Furthermore the encrypted contract private key and the DH Public Key as descirbed in the ISO 151
+- name: ContractInfoDTO
+  fields: 4
+- name: ContractPricingDTO
+  fields: 4
+- name: CpoGeneralInfoDTO
+  fields: 4
+- name: CreateProductDTO
+  fields: 2
+- name: CreateSignedContractDataRequest
+  fields: 6
+- name: CreateSignedContractDataResponse
+  fields: 7
+  description: Object containing the signed contract data which got sigend from the CPS
+- name: CreateTariffRequestDTO
+  fields: 3
+- name: EndpointRequest
+  fields: 6
+- name: EndpointResponse
+  fields: 13
+- name: EndpointUpdateRequest
+  fields: 6
+- name: EnergySource
+  fields: 2
+  description: energy source that the charging station uses to supply electric energy
+- name: Error
+  fields: 2
+- name: EvseDataRecord
+  fields: 34
+- name: EvseGroupDTO
+  fields: 3
+- name: EvseGroupResponseDTO
+  fields: 4
+- name: EvseNetworkRequestDTO
+  fields: 3
+- name: EvseNetworkResponseDTO
+  fields: 5
+- name: EvsePricingComponent
+  fields: 5
+- name: EvsePricingDay
+  fields: 2
+- name: EvsePricingTariff
+  fields: 4
+- name: FaultBody
+  fields: 3
+  description: FaultBody model
+- name: FieldValidationError
+  fields: 2
+  description: FieldValidationError model
+- name: GenerateSignedContractDataRequest
+  fields: 8
+- name: GeoCoordinates
+  fields: 3
+  description: Important
+- name: GetAllCpsSignerResponse
+  fields: 1
+- name: GetAllRootCertsResponseV1
+  fields: 1
+- name: GetProvisioningCertificateResponse
+  fields: 1
+- name: GetRootCertResponseV1
+  fields: 1
+- name: GetSignedContractDataRequest
+  fields: 3
+- name: GetSignedContractDataResponse
+  fields: 1
+- name: GroupsAssignmentDTO
+  fields: 2
+- name: Identification
+  fields: 5
+  description: Authentication data
+- name: InfoTextType
+  fields: 2
+- name: LocalTime
+  fields: 4
+- name: LookupContractResponse
+  fields: 1
+- name: NGP
+  fields: 20
+  description: Service offer for NGP pricing
+- name: NetworkAssignmentDTO
+  fields: 2
+- name: NetworkDTO
+  fields: 4
+- name: NetworkDetailsDTO
+  fields: 4
+- name: OfferDetailsDTO
+  fields: 14
+- name: OfferInfoDTO
+  fields: 4
+- name: OpeningTimes
+  fields: 2
+- name: OperatorEVSEPricing
+  fields: 3
+- name: PageServiceOfferNetworkGroupEvse
+  fields: 11
+- name: Pageable
+  fields: 6
+- name: PlugAndChargeIdentification
+  fields: 1
+  description: Authentication required for Plug&Charge (EMAID/EVCOID)
+- name: PricingComponentWebDto
+  fields: 4
+- name: PricingDetailsDTO
+  fields: 4
+- name: PricingProductDataRecord
+  fields: 8
+- name: PricingProductDataType
+  fields: 7
+- name: ProductDTO
+  fields: 2
+- name: ProvideContractDataResponse
+  fields: 3
+  description: Contains a prepared certificateInstallationResponse without the checks defined in [V2G2-894]. These
+    checks need to be performed by the OEM before forwarding the response to the vehicle.
+- name: ProviderAuthenticationData
+  fields: 2
+- name: ProvisioningCertificate
+  fields: 6
+  description: Object containing a provisioning certificate handled by the Provisioning Certificate Pool. Used on
+    addOEM operation as request body.
+- name: ProvisioningCertificateData
+  fields: 10
+  description: Object containing provisioning certificate data stored in Provisioning Certificate Pool.
+- name: PullEvseDataRecord
+  fields: 36
+- name: QRCodeIdentification
+  fields: 3
+- name: RFIDIdentification
+  fields: 5
+  description: Authentication data details. The data structure differs depending on the authentication technology
+- name: RFIDMifareFamilyIdentification
+  fields: 1
+  description: Authentication data details. The data structure differs depending on the authentication technology
+- name: RemoteIdentification
+  fields: 1
+  description: Authentication data details. The data structure differs depending on the authentication technology
+- name: RootCertV2
+  fields: 18
+  description: Object containing a root certificate registered in the Root Certificate Pool.
+- name: ServiceOfferDTO
+  fields: 39
+  description: ServiceOffer model
+- name: ServiceOfferInfoDTO
+  fields: 4
+- name: ServiceOfferNetworkGroupEvse
+  fields: 1
+- name: ServiceTypeVersionReferenceDTO
+  fields: 3
+  description: ServiceTypeVersionReference model
+- name: SignedContractDataRequest
+  fields: 6
+- name: SignedContractDataResponse
+  fields: 7
+- name: Sort
+  fields: 3
+- name: StatusCode
+  fields: 3
+  description: The structure consists of a defined code, an optional functional description of the status, and optional
+    additional information. It can be used e.g. to send error details or detailed reasons for a cer
+- name: SubscriptionDTO
+  fields: 28
+  description: Subscription model
+- name: SubscriptionDetailsDTO
+  fields: 8
+- name: TimePlanDTO
+  fields: 2
+- name: TimeSlotDTO
+  fields: 4
+- name: TwoStepData
+  fields: 11
+- name: TwoStepRequiredMasterDataFields
+  fields: 10
+- name: UnlimitedNgpUpdate
+  fields: 5
+  description: Service offer update for unlimited NGP pricing
+- name: User
+  fields: 7
+- name: contract-data
+  fields: 4
+- name: cpsSigner-data
+  fields: 10
+  description: Signing Certificate Data structure
+- name: eRoamingAcknowledgment
+  fields: 5
+  description: The acknowledgement is a message that is sent in response to several requests.
+- name: eRoamingAuthorizationStart
+  fields: 7
+  description: 'Note:'
+- name: eRoamingAuthorizationStop
+  fields: 6
+  description: 'Note:'
+- name: eRoamingAuthorizeRemoteReservationStart
+  fields: 8
+- name: eRoamingAuthorizeRemoteReservationStop
+  fields: 5
+- name: eRoamingAuthorizeRemoteStart
+  fields: 7
+- name: eRoamingAuthorizeRemoteStop
+  fields: 5
+- name: eRoamingAuthorizeStart
+  fields: 7
+  description: 'Best Practices:'
+- name: eRoamingAuthorizeStop
+  fields: 6
+- name: eRoamingChargeDetailRecord
+  fields: 18
+  description: eRoamingChargeDetailRecord is a message that contains charging process details (e.g. meter values).
+- name: eRoamingChargeDetailRecords
+  fields: 11
+  description: eRoamingChargeDetailRecord is a message containing charging process details (such as meter values,
+    etc.).
+- name: eRoamingChargingNotificationEnd
+  fields: 17
+  description: A customer of an EMP has fully charged a vehicle at a charging station of a CPO. The charging process
+    was started with an eRoamingAuthorizeStart or an eRoamingAuthorizeRemoteStart operation. The energ
+- name: eRoamingChargingNotificationError
+  fields: 9
+  description: A customer of EMP Authorizes the charging session at particular charging station (via any means for
+    eg REFID card, Mobile etc). Due to some errors sometime, it is possible that charging does not start
+- name: eRoamingChargingNotificationProgress
+  fields: 15
+  description: A customer of EMP has started the charging session. Just like as that of regular gasoline stations
+    customer would like to know either how much charging Duration have passed or how much energy is consu
+- name: eRoamingChargingNotificationStart
+  fields: 11
+  description: A customer of EMP Authorizes the charging session at particular charging station (via any means for
+    eg REFID card, Mobile etc). The charging session is authorized by Hubject / CPO system. The authoriz
+- name: eRoamingEVSEData
+  fields: 9
+- name: eRoamingEVSEPricing
+  fields: 2
+  description: eRoamingEVSEPricing is sent by the HBS in response to eRoamingPullEVSEPricing requests.
+- name: eRoamingEVSEStatus
+  fields: 2
+  description: eRoamingEVSEStatus is sent in response to eRoamingPullEVSEStatus requests.
+- name: eRoamingEVSEStatusByID
+  fields: 2
+  description: eRoamingEVSEStatusById is sent in response to eRoamingPullEVSEByIDStatus requests.
+- name: eRoamingGetChargeDetailRecords
+  fields: 6
+  description: eRoamingGetChargeDetailRecords is a message to request a list of charge detail records.
+- name: eRoamingPricingProductData
+  fields: 2
+  description: eRoamingPricingProductData is sent in response to eRoamingPullPricingProductData requests.
+- name: eRoamingPullEVSEData
+  fields: 12
+  description: eRoamingPullEVSEData is a message that is sent in order to request the download of EVSE data of operators
+    stored on the Hubject system.
+- name: eRoamingPullEVSEPricing
+  fields: 3
+  description: eRoamingPullEVSEPricing is a message that is sent in order to request the download of (i.e.pull)
+    location/EVSE-specific pricing data uploaded by CPOs for the requesting EMP.
+- name: eRoamingPullEVSEStatus
+  fields: 3
+  description: eRoamingPullEVSEStatus is a message that is sent in order to request the download of EVSE status
+    data stored on the Hubject system
+- name: eRoamingPullEVSEStatusByID
+  fields: 2
+  description: eRoamingPullEVSEStatusByID is a message that is sent in order to request the EVSE status data for
+    specific EVSE IDs.
+- name: eRoamingPullEVSEStatusByOperatorID
+  fields: 2
+  description: eRoamingPullEVSEStatusByOperatorID is a message that is sent in order to request the EVSE status
+    data for specific OperatorsIDs (i.e. CPO(s) specific EVSE status data).
+- name: eRoamingPullPricingProductData
+  fields: 2
+  description: eRoamingPullPricingProductData is a message that is sent in order to request the download of pricing
+    data available in the HBS for an EMP.
+- name: eRoamingPushAuthenticationData
+  fields: 2
+  description: eRoamingPushAuthenticationData is a message that is sent in order to upload authentication data to
+    Hubject.
+- name: eRoamingPushEVSEPricing
+  fields: 2
+  description: eRoamingPushEVSEPricing is a message that is sent in order to upload a list of EVSEs and the pricing
+    products (i.e. tarrifs) applicable for (charging or reservation) sessions at these EVSEs.
+- name: eRoamingPushEvseData
+  fields: 2
+- name: eRoamingPushEvseStatus
+  fields: 2
+  description: eRoamingPushEvseStatus is a message that is sent in order to upload EVSE status data to Hubject.
+- name: eRoamingPushPricingProductData
+  fields: 2
+  description: eRoamingPushPricingProductData is a message that is sent in order to upload data pertaining to a
+    CPO’s pricing products (i.e. tarrifs) to the Hubject system.
+relationships:
+- from: EvseNetworkRequestDTO
+  to: EvseGroupDTO
+  type: has_many
+  via: evseGroups
+- from: EvseNetworkResponseDTO
+  to: EvseGroupResponseDTO
+  type: has_many
+  via: evseGroups
+- from: FaultBody
+  to: FieldValidationError
+  type: has_many
+  via: validationErrors
+- from: NetworkAssignmentDTO
+  to: GroupsAssignmentDTO
+  type: has_many
+  via: GroupsAssignments
+- from: ActiveNgpOfferDetailsDTO
+  to: ServiceOfferInfoDTO
+  type: has_many
+  via: offersInfo
+- from: CreateProductDTO
+  to: ProductDTO
+  type: has_one
+  via: product
+- from: CreateTariffRequestDTO
+  to: PricingComponentWebDto
+  type: has_many
+  via: pricingComponents
+- from: EvsePricingDay
+  to: EvsePricingTariff
+  type: has_many
+  via: Tariffs
+- from: EvsePricingTariff
+  to: LocalTime
+  type: has_one
+  via: EndTime
+- from: EvsePricingTariff
+  to: EvsePricingComponent
+  type: has_many
+  via: PricingComponents
+- from: EvsePricingTariff
+  to: LocalTime
+  type: has_one
+  via: StartTime
+- from: NGP
+  to: ServiceTypeVersionReferenceDTO
+  type: has_one
+  via: serviceTypeVersion
+- from: NGP
+  to: CreateTariffRequestDTO
+  type: has_many
+  via: tariffs
+- from: NGP
+  to: TwoStepRequiredMasterDataFields
+  type: has_one
+  via: twoStepRequiredMasterDataFields
+- from: PricingDetailsDTO
+  to: EvsePricingDay
+  type: has_many
+  via: days
+- from: ProductDTO
+  to: TimePlanDTO
+  type: has_many
+  via: timePlans
+- from: ServiceOfferDTO
+  to: AttachmentDTO
+  type: has_many
+  via: attachments
+- from: ServiceOfferDTO
+  to: ServiceTypeVersionReferenceDTO
+  type: has_one
+  via: serviceTypeVersion
+- from: ServiceOfferDTO
+  to: TwoStepRequiredMasterDataFields
+  type: has_one
+  via: twoStepRequiredMasterDataFields
+- from: ServiceOfferInfoDTO
+  to: NetworkDetailsDTO
+  type: has_one
+  via: network
+- from: ServiceOfferInfoDTO
+  to: PricingDetailsDTO
+  type: has_many
+  via: pricingDetails
+- from: ServiceOfferInfoDTO
+  to: ServiceOfferDTO
+  type: has_one
+  via: serviceOffer
+- from: ServiceOfferInfoDTO
+  to: SubscriptionDTO
+  type: has_many
+  via: subscriptions
+- from: SubscriptionDTO
+  to: TwoStepData
+  type: has_one
+  via: twoStepData
+- from: TimePlanDTO
+  to: TimeSlotDTO
+  type: has_many
+  via: timeSlots
+- from: UnlimitedNgpUpdate
+  to: CreateProductDTO
+  type: has_many
+  via: pricingDetails
+- from: UnlimitedNgpUpdate
+  to: CreateTariffRequestDTO
+  type: has_many
+  via: tariffs
+- from: ContractInfoDTO
+  to: BillingInfoDTO
+  type: has_one
+  via: BillingInformation
+- from: ContractInfoDTO
+  to: ContactDetailsDTO
+  type: has_one
+  via: CPOContactDetails
+- from: ContractInfoDTO
+  to: CpoGeneralInfoDTO
+  type: has_one
+  via: CPOGeneralInformation
+- from: ContractInfoDTO
+  to: OfferInfoDTO
+  type: has_many
+  via: Offers
+- from: ContractPricingDTO
+  to: EvsePricingDay
+  type: has_many
+  via: Days
+- from: OfferInfoDTO
+  to: NetworkDTO
+  type: has_one
+  via: NetworkDetails
+- from: OfferInfoDTO
+  to: OfferDetailsDTO
+  type: has_one
+  via: OfferDetails
+- from: OfferInfoDTO
+  to: ContractPricingDTO
+  type: has_many
+  via: Pricing
+- from: OfferInfoDTO
+  to: SubscriptionDetailsDTO
+  type: has_one
+  via: SubscriptionDetails
+- from: PageServiceOfferNetworkGroupEvse
+  to: ServiceOfferNetworkGroupEvse
+  type: has_many
+  via: content
+- from: PageServiceOfferNetworkGroupEvse
+  to: Pageable
+  type: has_one
+  via: pageable
+- from: PageServiceOfferNetworkGroupEvse
+  to: Sort
+  type: has_one
+  via: sort
+- from: Pageable
+  to: Sort
+  type: has_one
+  via: sort
+- from: Identification
+  to: RFIDMifareFamilyIdentification
+  type: has_one
+  via: RFIDMifareFamilyIdentification
+- from: Identification
+  to: RFIDIdentification
+  type: has_one
+  via: RFIDIdentification
+- from: Identification
+  to: QRCodeIdentification
+  type: has_one
+  via: QRCodeIdentification
+- from: Identification
+  to: PlugAndChargeIdentification
+  type: has_one
+  via: PlugAndChargeIdentification
+- from: Identification
+  to: RemoteIdentification
+  type: has_one
+  via: RemoteIdentification
+- from: eRoamingAuthorizeStart
+  to: Identification
+  type: has_one
+  via: Identification
+- from: eRoamingAuthorizationStart
+  to: StatusCode
+  type: has_one
+  via: StatusCode
+- from: eRoamingAuthorizeStop
+  to: Identification
+  type: has_one
+  via: Identification
+- from: eRoamingAuthorizationStop
+  to: StatusCode
+  type: has_one
+  via: StatusCode
+- from: eRoamingAuthorizeRemoteStart
+  to: Identification
+  type: has_one
+  via: Identification
+- from: eRoamingAcknowledgment
+  to: StatusCode
+  type: has_one
+  via: StatusCode
+- from: eRoamingChargeDetailRecord
+  to: Identification
+  type: has_one
+  via: Identification
+- from: eRoamingAuthorizeRemoteReservationStart
+  to: Identification
+  type: has_one
+  via: Identification
+- from: EvseDataRecord
+  to: InfoTextType
+  type: has_many
+  via: ChargingStationNames
+- from: EvseDataRecord
+  to: AddressIso19773
+  type: has_one
+  via: Address
+- from: EvseDataRecord
+  to: GeoCoordinates
+  type: has_one
+  via: GeoCoordinates
+- from: EvseDataRecord
+  to: ChargingFacility
+  type: has_many
+  via: ChargingFacilities
+- from: EvseDataRecord
+  to: EnergySource
+  type: has_many
+  via: EnergySource
+- from: EvseDataRecord
+  to: InfoTextType
+  type: has_many
+  via: AdditionalInfo
+- from: EvseDataRecord
+  to: InfoTextType
+  type: has_many
+  via: ChargingStationLocationReference
+- from: EvseDataRecord
+  to: GeoCoordinates
+  type: has_one
+  via: GeoChargingPointEntrance
+- from: EvseDataRecord
+  to: OpeningTimes
+  type: has_many
+  via: OpeningTimes
+- from: eRoamingChargingNotificationStart
+  to: Identification
+  type: has_one
+  via: Identification
+- from: eRoamingChargingNotificationProgress
+  to: Identification
+  type: has_one
+  via: Identification
+- from: eRoamingChargingNotificationEnd
+  to: Identification
+  type: has_one
+  via: Identification
+- from: eRoamingChargingNotificationError
+  to: Identification
+  type: has_one
+  via: Identification
+- from: eRoamingChargeDetailRecords
+  to: eRoamingChargeDetailRecord
+  type: has_many
+  via: content
+- from: eRoamingChargeDetailRecords
+  to: StatusCode
+  type: has_one
+  via: StatusCode
+- from: eRoamingPushAuthenticationData
+  to: ProviderAuthenticationData
+  type: has_one
+  via: ProviderAuthenticationData
+- from: PullEvseDataRecord
+  to: InfoTextType
+  type: has_many
+  via: ChargingStationNames
+- from: PullEvseDataRecord
+  to: AddressIso19773
+  type: has_one
+  via: Address
+- from: PullEvseDataRecord
+  to: GeoCoordinates
+  type: has_one
+  via: GeoCoordinates
+- from: PullEvseDataRecord
+  to: ChargingFacility
+  type: has_many
+  via: ChargingFacilities
+- from: PullEvseDataRecord
+  to: EnergySource
+  type: has_many
+  via: EnergySource
+- from: PullEvseDataRecord
+  to: InfoTextType
+  type: has_many
+  via: AdditionalInfo
+- from: PullEvseDataRecord
+  to: InfoTextType
+  type: has_many
+  via: ChargingStationLocationReference
+- from: PullEvseDataRecord
+  to: GeoCoordinates
+  type: has_one
+  via: GeoChargingPointEntrance
+- from: PullEvseDataRecord
+  to: OpeningTimes
+  type: has_many
+  via: OpeningTimes
+- from: eRoamingEVSEData
+  to: PullEvseDataRecord
+  type: has_many
+  via: content
+- from: eRoamingEVSEData
+  to: StatusCode
+  type: has_one
+  via: StatusCode
+- from: eRoamingEVSEStatus
+  to: StatusCode
+  type: has_one
+  via: StatusCode
+- from: eRoamingEVSEStatusByID
+  to: StatusCode
+  type: has_one
+  via: StatusCode
+- from: PricingProductDataType
+  to: PricingProductDataRecord
+  type: has_many
+  via: PricingProductDataRecords
+- from: eRoamingPricingProductData
+  to: PricingProductDataType
+  type: has_many
+  via: PricingProductData
+- from: eRoamingPricingProductData
+  to: StatusCode
+  type: has_one
+  via: StatusCode
+- from: eRoamingEVSEPricing
+  to: OperatorEVSEPricing
+  type: has_many
+  via: EVSEPricing
+- from: eRoamingEVSEPricing
+  to: StatusCode
+  type: has_one
+  via: StatusCode
+- from: CreateSignedContractDataRequest
+  to: contract-data
+  type: has_one
+  via: contractData
+- from: GetAllCpsSignerResponse
+  to: cpsSigner-data
+  type: has_many
+  via: cpsCertificates
+- from: GetProvisioningCertificateResponse
+  to: ProvisioningCertificateData
+  type: has_one
+  via: OEMMessage
+- from: GetRootCertResponseV1
+  to: RootCertV2
+  type: has_one
+  via: RootResponse

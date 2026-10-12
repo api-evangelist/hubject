@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubject/main/json-schema/hubject-e-roaming-charging-notification-error-schema.json",
+  "title": "eRoamingChargingNotificationError",
+  "description": "A customer of EMP Authorizes the charging session at particular charging station (via any means for eg REFID card, Mobile etc). Due to some errors sometime, it is possible that charging does not start or charging process is abruptly stopped or fluctuations in the charging process. It is really important for Customer as well as EMP to know what exactly is happening at the charging process. This notification eventually helps EMPs well informed about the problem occurred with the charging process. This information can be easily passed onto Customer so that he/she can take appropriate action.\n\nThe CPO’s backend system MAY send a ChargingNotification of type “Error” after the CPO gets an information about the error at the charging station. The CPO can transmit one of the ErrorClass defined by Hubject along with the additional information which elaborated the Error. The customer has to take one of the three action EV needs to be charged at some different station, Cables is properly attached or the error is for information only no action required by customer.\n\nThe ChargingNotification of type “Error” is a message that contains information about the charging end of a session (e.g. ErrorClass, ErrorAdditionalInfo).\n",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingChargingNotificationError",
+  "type": "object",
+  "required": [
+    "Type",
+    "SessionID",
+    "EvseID",
+    "ErrorType",
+    "OperatorID"
+  ],
+  "properties": {
+    "Type": {
+      "$ref": "#/$defs/ChargingNotificationType"
+    },
+    "SessionID": {
+      "$ref": "#/$defs/SessionID"
+    },
+    "CPOPartnerSessionID": {
+      "type": "string",
+      "description": "Optional field containing the session ID assigned by the CPO to the related operation.\n\nPartner systems can use this field to link their own session handling to HBS processes.\n",
+      "maximum": 250
+    },
+    "EMPPartnerSessionID": {
+      "type": "string",
+      "description": "Optional field containing the session ID assigned by an EMP to the related operation.\n\nPartner systems can use this field to link their own session handling to HBS processes.\n",
+      "maximum": 250
+    },
+    "Identification": {
+      "$ref": "#/$defs/Identification"
+    },
+    "OperatorID": {
+      "$ref": "#/$defs/OperatorID"
+    },
+    "EvseID": {
+      "$ref": "#/$defs/EvseID"
+    },
+    "ErrorType": {
+      "type": "string",
+      "enum": [
+        "ConnectorError",
+        "CriticalError"
+      ],
+      "description": "| Option | Description |\n| ------ | ----------- |\n| ConnectorError | Charging process cannot be started or stopped. EV driver needs to check if the the Plug is properly inserted or taken out from socket. |\n| CriticalError | Charging process stopped abruptly. Reason: Physical check at the station is required. Station cannot be reset online. <br /> Or <br /> Error with the software or hardware of the station locally. <br /> Or <br /> Communication failure with the vehicle. <br /> Or <br /> The error needs to be investigated <br /> Or <br /> Ground Failure |\n"
+    },
+    "ErrorAdditionalInfo": {
+      "type": "string",
+      "description": "The CPO can put in the additional information about the error",
+      "maximum": 250
+    }
+  },
+  "$defs": {
+    "ChargingNotificationType": {
+      "type": "string",
+      "description": "The type of ChargingNotification",
+      "enum": [
+        "Start",
+        "Progress",
+        "End",
+        "Error"
+      ]
+    },
+    "EvcoID": {
+      "type": "string",
+      "pattern": "^(([A-Za-z]{2}\\-?[A-Za-z0-9]{3}\\-?C[A-Za-z0-9]{8}\\-?[\\d|A-Za-z])|([A-Za-z]{2}[\\*|\\-]?[A-Za-z0-9]{3}[\\*|\\-]?[A-Za-z0-9]{6}[\\*|\\-]?[\\d|X]))$",
+      "description": "A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.\n\n^(([A-Za-z]{2}\\-?[A-Za-z0-9]{3}\\-?C[A-Za-z0-9]{8}\\-?[\\d|A-Za-z])|([A-Za-z]{2}[\\*|\\-]?[A-Za-z0-9]{3}[\\*|\\-]?[A-Za-z0-9]{6}[\\*|\\-]?[\\d|X]))$\nThe expression validates the string as EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.\n\nIn case the EvcoID is provided corresponding to ISO, the instance part MUST be eight characters long and MUST be provided with a prepended “C”. The optional separating character MUST be “-“.\n\nIn case the EvcoID is provided corresponding to DIN, the instance part MUST be six characters long. The optional separating character can either be “*” or “-“.\n\nExamples ISO: “DE-8EO-CAet5e4XY-3”, “DE8EOCAet5e43X1”\n\nExamples DIN: “DE*8EO*Aet5e4*3”, “DE-8EO-Aet5e4-3”, “DE8EOAet5e43”\n"
+    },
+    "EvseID": {
+      "type": "string",
+      "pattern": "^(([A-Za-z]{2}\\*?[A-Za-z0-9]{3}\\*?E[A-Za-z0-9\\*]{1,30})|(\\+?[0-9]{1,3}\\*[0-9]{3}\\*[0-9\\*]{1,32}))$",
+      "description": "The ID that identifies the charging spot.\n\nA string that `MUST` be valid with respect to the following regular expression: ISO | DIN.\n\n`^(([A-Za-z]{2}\\*?[A-Za-z0-9]{3}\\*?E[A-Za-z0-9\\*]{1,30})|(\\+?[0-9]{1,3}\\*[0-9]{3}\\*[0-9\\*]{1,32}))$`\nThe expression validates the string as EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.\n\nIn case the EvseID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional. Furthermore the ID MUST provide an “E” after the OperatorID in order to identify the ID as ISO EvseID without doubt.\n\nIn case the EvseID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.\n\nExamples ISO: “DE*AB7*E840*6487”, “DEAB7E8406487”\n\nExample DIN: “+49*810*000*438”\n"
+    },
+    "Identification": {
+      "type": "object",
+      "description": "Authentication data\n\n1. The option RFIDIdentification `MUST` not be used in the eRoamingAuthorization process. For RFID Authorization, only the option RFIDMifareFamilyIdentification `SHOULD` be used in the respective eRoamingAuthorization messages.\n2. For the Remote Authorization process, only the option RemoteIdentification MUST be used in the respective messages.\n",
+      "properties": {
+        "RFIDMifareFamilyIdentification": {
+          "$ref": "#/$defs/RFIDMifareFamilyIdentification"
+        },
+        "RFIDIdentification": {
+          "$ref": "#/$defs/RFIDIdentification"
+        },
+        "QRCodeIdentification": {
+          "$ref": "#/$defs/QRCodeIdentification"
+        },
+        "PlugAndChargeIdentification": {
+          "$ref": "#/$defs/PlugAndChargeIdentification"
+        },
+        "RemoteIdentification": {
+          "$ref": "#/$defs/RemoteIdentification"
+        }
+      }
+    },
+    "OperatorID": {
+      "type": "string",
+      "pattern": "^(([A-Za-z]{2}\\*?[A-Za-z0-9]{3})|(\\+?[0-9]{1,3}\\*[0-9]{3}))$",
+      "description": "A string that MUST be valid with respect to the following regular expression: ISO | DIN\n\n^(([A-Za-z]{2}\\*?[A-Za-z0-9]{3})|(\\+?[0-9]{1,3}\\*[0-9]{3}))$\nThe expression validates the string as OperatorID including the preceding country code, which is part of EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118. In case the OperatorID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional.\n\nIn case the OperatorID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.\n\nExamples ISO: “DE*A36”, “DEA36”\n\nExample DIN: “+49*536”\n"
+    },
+    "PlugAndChargeIdentification": {
+      "type": "object",
+      "description": "Authentication required for Plug&Charge (EMAID/EVCOID)\n",
+      "properties": {
+        "EvcoID": {
+          "$ref": "#/$defs/EvcoID"
+        }
+      },
+      "required": [
+        "EvcoID"
+      ]
+    },
+    "QRCodeIdentification": {
+      "type": "object",
+      "required": [
+        "EvcoID"
+      ],
+      "properties": {
+        "EvcoID": {
+          "$ref": "#/$defs/EvcoID"
+        },
+        "HashedPIN": {
+          "type": "object",
+          "required": [
+            "Value",
+            "Function"
+          ],
+          "properties": {
+            "Value": {
+              "type": "string",
+              "pattern": "^[0-9A-Za-z\\\\.+/=\\\\$]{10,100}$",
+              "description": "Hash value created by partner\n\nThe expression validates the string as a hash function result value with a length between 10 and 100 characters\n\nExample: “a5ghdhf73h”\n"
+            },
+            "Function": {
+              "type": "string",
+              "enum": [
+                "Bcrypt"
+              ],
+              "description": "Function that was used to generate the hash value."
+            },
+            "LegacyHashData": {
+              "type": "object",
+              "required": [
+                "Function"
+              ],
+              "properties": {
+                "Function": {
+                  "type": "string",
+                  "enum": [
+                    "MD5",
+                    "SHA-1"
+                  ],
+                  "description": "Function used for hashing of the PIN at the partner."
+                },
+                "Salt": {
+                  "type": "string",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "The salt value used by the partner for hashing the PIN."
+                },
+                "Value": {
+                  "type": "string",
+                  "minimum": 0,
+                  "maximum": 20,
+                  "description": "PIN hash at the partner."
+                }
+              }
+            }
+          }
+        },
+        "PIN": {
+          "type": "string"
+        }
+      }
+    },
+    "RFID": {
+      "type": "string",
+      "description": "Defined RFID Type\n",
+      "enum": [
+        "mifareCls",
+        "mifareDes",
+        "calypso",
+        "nfc",
+        "mifareFamily"
+      ]
+    },
+    "RFIDIdentification": {
+      "type": "object",
+      "description": "Authentication data details. The data structure differs depending on the authentication technology\n",
+      "properties": {
+        "UID": {
+          "$ref": "#/$defs/UID"
+        },
+        "EvcoID": {
+          "$ref": "#/$defs/EvcoID"
+        },
+        "RFID": {
+          "$ref": "#/$defs/RFID"
+        },
+        "PrintedNumber": {
+          "type": "string",
+          "maximum": 150,
+          "description": "A number printed on a customer’s card for manual authorization (e.q. via a call center)"
+        },
+        "ExpiryDate": {
+          "type": "string",
+          "description": "Until when this card is valid. Should not be set if card does not have an expiration"
+        }
+      },
+      "required": [
+        "UID",
+        "RFID"
+      ]
+    },
+    "RFIDMifareFamilyIdentification": {
+      "type": "object",
+      "description": "Authentication data details. The data structure differs depending on the authentication technology\n",
+      "properties": {
+        "UID": {
+          "$ref": "#/$defs/UID"
+        }
+      },
+      "required": [
+        "UID"
+      ]
+    },
+    "RemoteIdentification": {
+      "type": "object",
+      "description": "Authentication data details. The data structure differs depending on the authentication technology\n",
+      "properties": {
+        "EvcoID": {
+          "$ref": "#/$defs/EvcoID"
+        }
+      },
+      "required": [
+        "EvcoID"
+      ]
+    },
+    "SessionID": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$",
+      "description": "The Hubject SessionID that identifies the process\n\nA string that `MUST` be valid with respect to the following regular expression:\n\n`^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$`\n\nThe expression validates the string as a GUID.\n\nExample: “b2688855-7f00-0002-6d8e-48d883f6abb6”\n"
+    },
+    "UID": {
+      "type": "string",
+      "pattern": "^([0-9A-F]{8,8}|[0-9A-F]{14,14}|[0-9A-F]{20,20})$",
+      "description": "Authentication data details. The data structure differs depending on the authentication technology\n\nThe expression validates the string as a unique RFID with a length of 8, 14 or 20 characters.\n\nExamples: “7568290FFF765F”\n"
+    }
+  }
+}

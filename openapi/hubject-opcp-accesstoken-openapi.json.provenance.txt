@@ -1,0 +1,6 @@
+generated: '2026-10-13'
+method: searched
+source: https://raw.githubusercontent.com/hubject/opcp/HEAD/OPCP-1.0.0/reference/accessToken.v1.json
+found_on: https://github.com/hubject
+ownership: github.com/hubject is Hubject's own GitHub organization (declares https://www.hubject.com/ as its website)
+note: verbatim

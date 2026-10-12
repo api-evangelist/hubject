@@ -1,0 +1,487 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-vocabulary.py
+source:
+- openapi/hubject-ngp-cpo-evse-swagger.json
+- openapi/hubject-ngp-cpo-service-offers-swagger.json
+- openapi/hubject-ngp-emp-contracts-swagger.json
+- openapi/hubject-oicp-cpo-2.3-openapi.yml
+- openapi/hubject-oicp-emp-2.3-openapi.yml
+vocabulary:
+  name: Hubject Domain Vocabulary
+  description: 'Terms declared by Hubject''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-13'
+  terms:
+  - term: eRoamingAuthorization
+    definition: The service eRoamingAuthorization contains several different operations. It `MUST` be offered by Hubject and the partner systems.
+    tags:
+    - Resource Group
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml
+  - term: eRoamingReservation
+    definition: The service eRoamingReservation contains two operations. It `MUST` be offered by Hubject and MAY be offered by CPO partner systems.
+      The Service `MUST` be enabled by Hubject for the CPO. If the charging station offers reservation services, the CPO can provide this information
+      in the field ValueAddedServices.
+    tags:
+    - Resource Group
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml
+  - term: eRoamingEvseData
+    definition: 'Hubject offers the possibility to upload and download charging spot (EVSE) data and, thus, to exchange data between different
+      partners. See apendix for a detailed business process diagram regarding the EVSE data service. The eRoamingEvseData service offers two operations:
+      eRoamingPushEvseData in order to give CPOs the possibility to upload (push) EVSE master data eRoamingPullEvseData in order to g'
+    tags:
+    - Resource Group
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml
+  - term: eRoamingEvseStatus
+    definition: 'Hubject offers the possibility to upload and download dynamic charging spot (EVSE) status information and thus to exchange the
+      data between different partners. The eRoamingEvseStatus service offers two operations: 1. eRoamingPushEvseStatus in order to give CPOs the
+      possibility to upload (push) EvseStatus data 2. eRoamingPullEvseStatus in order to give EMPs the possibility to download (pull) EVSE s'
+    tags:
+    - Resource Group
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml
+  - term: eRoamingDynamicPricing
+    definition: Since OICP 2.2, HBS offers the possibility to flexibly or dynamically price Authorization services. The service mainly enables
+      pushing (upload) and pulling (download) of pricing data to and from the HBS through webservice requests and/or downloads/uploads in the
+      Hubject portal. Flexible pricing enables CPOs to offer differentiated pricing (in multiple currencies) of charging processes at their cha
+    tags:
+    - Resource Group
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml
+  - term: eRoamingAuthenticationData
+    definition: This service is only offered by Hubject. In addition to the online authorization service that requests customer authentication
+      data on demand from the connected partner systems, Hubject offers the possibility to upload authentication data. If an EMP uploads their
+      data to Hubject, Hubject can authorize requests from other partners (e.g. CPOs) without having to forward the request to the EMP. The eR
+    tags:
+    - Resource Group
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml
+  - term: Authentication
+    definition: Authentication endpoints to issue access token.
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-accesstoken-openapi.json
+  - term: MO
+    definition: API relevant for Mobility Operators
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-ccp-openapi.json
+  - term: OEM
+    definition: API relevant for EV OEMs
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-ccp-openapi.json
+  - term: CPO
+    definition: API relevant for CPOs
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-ccp-openapi.json
+  - term: contract-certificate-pool-controller
+    definition: internal identifier
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-ccp-openapi.json
+  - term: certificate-provisioning-api-controller
+    definition: internal identifier
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-cps-openapi.json
+  - term: EST
+    definition: EST interface
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-est-openapi.json
+  - term: oem-provisioning-certificate-pool-controller
+    definition: internal identifier
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-pcp-openapi.json
+  - term: oem-provisioning-certificate-pool-admin-controller
+    definition: internal identifier
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-pcp-openapi.json
+  - term: RCP
+    definition: Root Certificate Pool
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-rcp-openapi.json
+  - term: root-certificate-pool-controller
+    definition: internal identifier
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-rcp-openapi.json
+  - term: root-certificate-pool-controller-v-2
+    definition: internal identifier
+    tags:
+    - Resource Group
+    source: openapi/hubject-opcp-rcp-openapi.json
+  - term: SessionID
+    definition: 'The Hubject SessionID that identifies the process A string that `MUST` be valid with respect to the following regular expression:
+      `^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$` The expression validates the string as a GUID. Example: “b2688855-7f00-0002-6d8e-48d883f6abb6”'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/SessionID
+  - term: OperatorID
+    definition: 'A string that MUST be valid with respect to the following regular expression: ISO | DIN ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$
+      The expression validates the string as OperatorID including the preceding country code, which is part of EvseID. It supports both definitions
+      DIN SPEC 91286:2011-11 as well as ISO 15118. In case the OperatorID is provided corresponding to ISO, the cou'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/OperatorID
+  - term: EvseID
+    definition: 'The ID that identifies the charging spot. A string that `MUST` be valid with respect to the following regular expression: ISO
+      | DIN. `^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$` The expression validates the
+      string as EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1. In case the EvseID is provided correspondin'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/EvseID
+  - term: UID
+    definition: 'Authentication data details. The data structure differs depending on the authentication technology The expression validates the
+      string as a unique RFID with a length of 8, 14 or 20 characters. Examples: “7568290FFF765F”'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/UID
+  - term: RFIDMifareFamilyIdentification
+    definition: Authentication data details. The data structure differs depending on the authentication technology
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/RFIDMifareFamilyIdentification
+  - term: EvcoID
+    definition: 'A string that `MUST` be valid with respect to the following regular expression: ISO | DIN. ^(([A-Za-z]{2}\-?[A-Za-z0-9]{3}\-?C[A-Za-z0-9]{8}\-?[\d|A-Za-z])|([A-Za-z]{2}[\*|\-]?[A-Za-z0-9]{3}[\*|\-]?[A-Za-z0-9]{6}[\*|\-]?[\d|X]))$
+      The expression validates the string as EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1. In case the EvcoID
+      is provided corresponding to'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/EvcoID
+  - term: RFID
+    definition: Defined RFID Type
+    tags:
+    - Enumeration
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/RFID
+  - term: RFIDIdentification
+    definition: Authentication data details. The data structure differs depending on the authentication technology
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/RFIDIdentification
+  - term: QRCodeIdentification
+    definition: 'Object declared by the contract with fields: EvcoID, HashedPIN, PIN.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/QRCodeIdentification
+  - term: PlugAndChargeIdentification
+    definition: Authentication required for Plug&Charge (EMAID/EVCOID)
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/PlugAndChargeIdentification
+  - term: RemoteIdentification
+    definition: Authentication data details. The data structure differs depending on the authentication technology
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/RemoteIdentification
+  - term: Identification
+    definition: Authentication data 1. The option RFIDIdentification `MUST` not be used in the eRoamingAuthorization process. For RFID Authorization,
+      only the option RFIDMifareFamilyIdentification `SHOULD` be used in the respective eRoamingAuthorization messages. 2. For the Remote Authorization
+      process, only the option RemoteIdentification MUST be used in the respective messages.
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/Identification
+  - term: ProductID
+    definition: The ProductIDType defines some standard values (see below). The type however also supports custom ProductIDs that can be specified
+      by partners (as a string of 50 characters maximum length). | Option | Description | |--------|-------------| | Standard Price | Standard
+      Price | | AC1 | Product for AC 1 Phase charging | | AC3 | Product for AC 3 Phase charging | | DC | Product for DC charging | | Custo
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/ProductID
+  - term: eRoamingAuthorizeStart
+    definition: 'Best Practices: * The EVSE ID is optional for this message which is e.g. defined after the RFID authorization at a charge point.
+      If the Evse ID can be provided, we recommend to include the EVSE ID in this message; it will help for support matters. * If an authorization
+      process could not successfully be executed, please set an error code by refering to the error code list mentioned in the OICP docu'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingAuthorizeStart
+  - term: ProviderID
+    definition: 'The ProviderID is defined by Hubject and is used to identify the EMP A string that `MUST` be valid with respect to the following
+      regular expression: ISO | DIN `^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$` The expression validates the string as
+      ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well '
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/ProviderID
+  - term: StatusCode
+    definition: The structure consists of a defined code, an optional functional description of the status, and optional additional information.
+      It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field
+      can be used in order to provide further individual (non-standardized) information.
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/StatusCode
+  - term: eRoamingAuthorizationStart
+    definition: 'Note: * To `RECEIVE` * Implementation: `MANDATORY` eRoamingAuthorizationStart is a message that authorizes a user to charge a
+      car. NOTE: This message describes the response which has to be receive in response to the eRoamingAuthorizeStart.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingAuthorizationStart
+  - term: eRoamingAuthorizeStop
+    definition: 'Object declared by the contract with fields: SessionID, CPOPartnerSessionID, EMPPartnerSessionID, OperatorID, EvseID, Identification.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingAuthorizeStop
+  - term: eRoamingAuthorizationStop
+    definition: 'Note: * To `RECEIVE` * Implementation: `OPTIONAL` eRoamingAuthorizeStop is a message to request an authorization for stopping
+      a charging process. Note: This message describes the response which has to be received in return to the eRoamingAuthorizeStop request.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingAuthorizationStop
+  - term: eRoamingAuthorizeRemoteStart
+    definition: 'Object declared by the contract with fields: SessionID, CPOPartnerSessionID, EMPPartnerSessionID, ProviderID, EvseID, Identification,
+      PartnerProductID.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingAuthorizeRemoteStart
+  - term: eRoamingAcknowledgment
+    definition: 'The acknowledgement is a message that is sent in response to several requests. * To `SEND` and `RECEIVE` * Implementation: `MANDATORY`'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingAcknowledgment
+  - term: eRoamingAuthorizeRemoteStop
+    definition: 'Object declared by the contract with fields: SessionID, CPOPartnerSessionID, EMPPartnerSessionID, ProviderID, EvseID.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingAuthorizeRemoteStop
+  - term: eRoamingChargeDetailRecord
+    definition: eRoamingChargeDetailRecord is a message that contains charging process details (e.g. meter values).
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingChargeDetailRecord
+  - term: eRoamingAuthorizeRemoteReservationStart
+    definition: 'Object declared by the contract with fields: SessionID, CPOPartnerSessionID, EMPPartnerSessionId, ProviderID, EvseID, Identification,
+      PartnerProductID, Duration.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingAuthorizeRemoteReservationStart
+  - term: eRoamingAuthorizeRemoteReservationStop
+    definition: 'Object declared by the contract with fields: SessionID, CPOPartnerSessionID, EMPPartnerSessionId, ProviderID, EvseID.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingAuthorizeRemoteReservationStop
+  - term: ChargingPoolID
+    definition: 'VSEs may be grouped by using a charging pool id according to emi³ standard definition. The Evse Pool ID MUST match the following
+      structure (the notation corresponds to the augmented Backus-Naur Form (ABNF) as defined in RFC5234): = with: = 2 ALPHA ; two character country
+      code according to ISO-3166-1 (Alpha-2-Code). = 3 (ALPHA / DIGIT); three alphanumeric characters. = “P”; one character “P” indica'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/ChargingPoolID
+  - term: InfoTextType
+    definition: 'Object declared by the contract with fields: lang, value.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/InfoTextType
+  - term: AddressIso19773
+    definition: 'Object declared by the contract with fields: Country, City, Street, PostalCode, HouseNum, Floor, Region, ParkingFacility, ParkingSpot,
+      TimeZone.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/AddressIso19773
+  - term: GeoCoordinates
+    definition: Important __One of the following three options `MUST` be provided__
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/GeoCoordinates
+  - term: Plug
+    definition: '| Option | Description | |Small Paddle Inductive | Defined plug type. | | Large Paddle Inductive | Defined plug type.| | AVCON
+      Connector | Defined plug type.| | Tesla Connector | Defined plug type.| | NEMA 5-20 | Defined plug type.| | Type E French Standard | CEE
+      7/5. | | Type F Schuko | CEE 7/4. | | Type G British Standard | BS 1363. | | Type J Swiss Standard | SEV 1011. | | Type 1 Connector (Cab'
+    tags:
+    - Enumeration
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/Plug
+  - term: ChargingFacility
+    definition: 'Object declared by the contract with fields: PowerType, Voltage, Amperage, Power, ChargingModes.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/ChargingFacility
+  - term: EnergySource
+    definition: energy source that the charging station uses to supply electric energy
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/EnergySource
+  - term: AuthenticationMode
+    definition: '| Option | Description | | NFC RFID Classic | Defined authentication. | | NFC RFID DESFire | Defined authentication. | | PnC
+      | ISO/IEC 15118. | | REMOTE | App, QR-Code, Phone. | | Direct Payment | Remote use via direct payment. E.g. intercharge direct | | No Authentication
+      Required | Not Authentication Method Required |'
+    tags:
+    - Enumeration
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/AuthenticationMode
+  - term: PaymentOption
+    definition: '| Option | Description | | ------ | ----------- | | No payment | Free. | | Direct | e. g. Cash, Card, SMS, ... | | Contract |
+      i. e. Subscription | Note `No Payment` can not be combined with other payment option'
+    tags:
+    - Enumeration
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/PaymentOption
+  - term: ValueAddedService
+    definition: '| Option | Description | | ------ | ----------- | | Reservation | Can an EV driver reserve the charging sport via remote services?
+      | | DynamicPricing | Does the EVSE ID support dynamic pricing? | | ParkingSensors | Is dynamic status info on the parking area in front
+      of the EVSE-ID available? | | MaximumPowerCharging | Does the EVSE-ID offer a dynamic maximum power charging? | | PredictiveChargePoi'
+    tags:
+    - Enumeration
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/ValueAddedService
+  - term: Accessibility
+    definition: Specifies how the charging station can be accessed. | Option | Description | | ------ | ----------- | | Free publicly accessible
+      | EV Driver can reach the charging point without paying a fee, e.g. street, free public place, free parking lot, etc. | | Restricted access
+      | EV Driver needs permission to reach the charging point, e.g. Campus, building complex, etc. | | Paying publicly accessible | EV D
+    tags:
+    - Enumeration
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/Accessibility
+  - term: OpeningTimes
+    definition: 'Object declared by the contract with fields: Period, on.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/OpeningTimes
+  - term: EvseDataRecord
+    definition: 'Object declared by the contract with fields: deltaType, lastUpdate, EvseID, ChargingPoolID, ChargingStationId, ChargingStationNames,
+      HardwareManufacturer, ChargingStationImage, SubOperatorName, Address, GeoCoordinates, Plugs. (22 more)'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/EvseDataRecord
+  - term: eRoamingPushEvseData
+    definition: 'Object declared by the contract with fields: ActionType, OperatorEvseData.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingPushEvseData
+  - term: eRoamingPushEvseStatus
+    definition: eRoamingPushEvseStatus is a message that is sent in order to upload EVSE status data to Hubject.
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingPushEvseStatus
+  - term: ProviderIDAsterisk
+    definition: 'The ProviderID is defined by Hubject and is used to identify the EMP A string that `MUST` be valid with respect to the following
+      regular expression: ISO | DIN `^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$` The expression validates the string as
+      ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well '
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/ProviderIDAsterisk
+  - term: CurrencyID
+    definition: 'The ProductPriceCurrencyType allows for the list of active codes of the official ISO 4217 currency names. For the full list of
+      active codes of the official ISO 4217 currencies, see: [https://www.iso.org/iso-4217-currency-codes.html](https://www.iso.org/iso-4217-currency-codes.html)
+      Examples: | Option | Description | | ------ | ----------- | | EUR | Euro | | CHF | Swiss franc | | CAD | Canadian Dol'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/CurrencyID
+  - term: ReferenceUnit
+    definition: Default Reference Unit in time or kWh | Option | Description | | ------ | ----------- | | HOUR | Defined Reference Unit Type |
+      | KILOWATT_HOUR | Defined Reference Unit Type | | MINUTE | Defined Reference Unit Type |
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/ReferenceUnit
+  - term: PricingProductDataRecord
+    definition: 'Object declared by the contract with fields: ProductID, ReferenceUnit, ProductPriceCurrency, PricePerReferenceUnit, MaximumProductChargingPower,
+      IsValid24hours, ProductAvailabilityTimes, AdditionalReferences.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/PricingProductDataRecord
+  - term: eRoamingPushPricingProductData
+    definition: eRoamingPushPricingProductData is a message that is sent in order to upload data pertaining to a CPO’s pricing products (i.e.
+      tarrifs) to the Hubject system.
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingPushPricingProductData
+  - term: eRoamingPushEVSEPricing
+    definition: eRoamingPushEVSEPricing is a message that is sent in order to upload a list of EVSEs and the pricing products (i.e. tarrifs) applicable
+      for (charging or reservation) sessions at these EVSEs.
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingPushEVSEPricing
+  - term: ChargingNotificationType
+    definition: The type of ChargingNotification
+    tags:
+    - Enumeration
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/ChargingNotificationType
+  - term: eRoamingChargingNotificationStart
+    definition: A customer of EMP Authorizes the charging session at particular charging station (via any means for eg REFID card, Mobile etc).
+      The charging session is authorized by Hubject / CPO system. The authorization of charging process and plugging the cable in EV does not
+      guarantee that energy flow into the Vehicle is initiated. It is really important for for EMP and its end consumer to know if the chargin
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingChargingNotificationStart
+  - term: eRoamingChargingNotificationProgress
+    definition: A customer of EMP has started the charging session. Just like as that of regular gasoline stations customer would like to know
+      either how much charging Duration have passed or how much energy is consumed by the EV so far. This information will help Customer to decide
+      if he/she wants to stop the charging session as per their affordability or journey planning. The CPO’s backend system MAY send a Cha
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingChargingNotificationProgress
+  - term: eRoamingChargingNotificationEnd
+    definition: A customer of an EMP has fully charged a vehicle at a charging station of a CPO. The charging process was started with an eRoamingAuthorizeStart
+      or an eRoamingAuthorizeRemoteStart operation. The energy flow has ended, but the process has not yet been stopped and the vehicle is blocking
+      the charging station. The CPO’s backend system MAY send a ChargingNotification of type “End” after the CPO consid
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingChargingNotificationEnd
+  - term: eRoamingChargingNotificationError
+    definition: A customer of EMP Authorizes the charging session at particular charging station (via any means for eg REFID card, Mobile etc).
+      Due to some errors sometime, it is possible that charging does not start or charging process is abruptly stopped or fluctuations in the
+      charging process. It is really important for Customer as well as EMP to know what exactly is happening at the charging process. This not
+    tags:
+    - Object
+    source: openapi/hubject-oicp-cpo-2.3-openapi.yml#/components/schemas/eRoamingChargingNotificationError
+  - term: eRoamingGetChargeDetailRecords
+    definition: 'eRoamingGetChargeDetailRecords is a message to request a list of charge detail records. Important: * This message is only mandatory
+      for offline EMPs.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/eRoamingGetChargeDetailRecords
+  - term: eRoamingChargeDetailRecords
+    definition: eRoamingChargeDetailRecord is a message containing charging process details (such as meter values, etc.).
+    tags:
+    - Object
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/eRoamingChargeDetailRecords
+  - term: ProviderAuthenticationData
+    definition: 'Object declared by the contract with fields: ProviderID, AuthenticationDataRecord.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/ProviderAuthenticationData
+  - term: eRoamingPushAuthenticationData
+    definition: 'eRoamingPushAuthenticationData is a message that is sent in order to upload authentication data to Hubject. Note: * This message
+      is only for EMPs onboarded to the Hubject platform as offline EMPs.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/eRoamingPushAuthenticationData
+  - term: GeoCoordinatesResponseFormat
+    definition: Defines the format of geo coordinates that shall be provided with the response.
+    tags:
+    - Enumeration
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/GeoCoordinatesResponseFormat
+  - term: CountryCode
+    definition: The CountryCodeType allows for Alpha-3 country codes only as of OICP 2.2 and OICP 2.3 For Alpha-3 (three-letter) country codes
+      as defined in ISO 3166-1. __Examples:__ | Option | Description | | ------ | ----------- | | AUT | Austria | | DEU | Germany | | FRA | France
+      | | USA | United States |
+    tags:
+    - Object
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/CountryCode
+  - term: eRoamingPullEVSEData
+    definition: eRoamingPullEVSEData is a message that is sent in order to request the download of EVSE data of operators stored on the Hubject
+      system.
+    tags:
+    - Object
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/eRoamingPullEVSEData
+  - term: PullEvseDataRecord
+    definition: 'Object declared by the contract with fields: deltaType, lastUpdate, EvseID, ChargingPoolID, ChargingStationId, ChargingStationNames,
+      HardwareManufacturer, ChargingStationImage, SubOperatorName, Address, GeoCoordinates, Plugs. (24 more)'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/PullEvseDataRecord
+  - term: eRoamingEVSEData
+    definition: 'Object declared by the contract with fields: content, number, size, totalElements, last, totalPages, first, numberOfElements,
+      StatusCode.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/eRoamingEVSEData
+  - term: EvseStatus
+    definition: '| Option | Description | | ------ | ----------- | | Available | Charging Spot is available for charging. | | Reserved | Charging
+      Spot is reserved and not available for charging. | | Occupied | Charging Spot is busy. | | OutOfService | Charging Spot is out of service
+      and not available for charging. | | EvseNotFound | The requested EvseID and EVSE status does not exist within the Hubject database. |'
+    tags:
+    - Enumeration
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/EvseStatus
+  - term: eRoamingPullEVSEStatus
+    definition: 'eRoamingPullEVSEStatus is a message that is sent in order to request the download of EVSE status data stored on the Hubject system
+      Tip: * In case not all but a specific EVSE status is needed, Hubject offers the service eRoamingPullEVSEStatusByID and eRoamingPullEVSEStatusByOperatorID.
+      * We recommend a to send the request with a frequency from 1 to 5 minutes.'
+    tags:
+    - Object
+    source: openapi/hubject-oicp-emp-2.3-openapi.yml#/components/schemas/eRoamingPullEVSEStatus

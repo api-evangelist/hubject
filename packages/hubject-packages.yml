@@ -1,0 +1,34 @@
+generated: '2026-10-13'
+method: probed
+generator: harvest-packages.py
+source: registry metadata endpoints (registry.npmjs.org, pypi.org, rubygems.org, api.nuget.org, packagist.org, crates.io) ; github.com/hubject
+ownership_rule: 'official: true only when the registry metadata (homepage, repository, author, URLs) names the provider''s domain (authentication/hubject-authentication.yml,
+  hubject.com, scopes/hubject-scopes.yml, security/hubject-domain-security.yml, stoplight.io) or its accepted GitHub org (hubject).'
+packages:
+- name: NGP-Automation-APIs
+  registry: github
+  url: https://github.com/hubject/NGP-Automation-APIs
+  language: ''
+  official: true
+  version: null
+  published: '2026-08-07'
+  source_repo: https://github.com/hubject/NGP-Automation-APIs
+  evidence: repository in github.com/hubject, whose profile names the provider's domain
+- name: oicp-cpo-2.3-api-doc
+  registry: github
+  url: https://github.com/hubject/oicp-cpo-2.3-api-doc
+  language: HTML
+  official: true
+  version: null
+  published: '2026-05-08'
+  source_repo: https://github.com/hubject/oicp-cpo-2.3-api-doc
+  evidence: repository in github.com/hubject, whose profile names the provider's domain
+- name: oicp-emp-2.3-api-doc
+  registry: github
+  url: https://github.com/hubject/oicp-emp-2.3-api-doc
+  language: HTML
+  official: true
+  version: null
+  published: '2025-03-03'
+  source_repo: https://github.com/hubject/oicp-emp-2.3-api-doc
+  evidence: repository in github.com/hubject, whose profile names the provider's domain
