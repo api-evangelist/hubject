@@ -204,7 +204,6 @@ apis:
     url: openapi/hubject-ngp-cpo-evse-swagger.json
   - type: Swagger
     url: openapi/hubject-ngp-emp-contracts-swagger.json
-
 x-enrichment:
   status: enriched
   pass: local-v5
