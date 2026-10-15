@@ -1,5 +1,79 @@
-generated: '2026-10-13'
+generated: '2026-10-14'
 method: none
-source: openapi/hubject-opcp-ccp-openapi.json, openapi/hubject-opcp-cps-openapi.json, openapi/hubject-opcp-est-openapi.json, openapi/hubject-opcp-pcp-openapi.json, openapi/hubject-opcp-rcp-openapi.json
-note: The OPCP specifications declare OAuth2 authorizationCode schemes (MO, OEM, CPO, ...) but name no scopes; checked, nothing to record.
+source: openapi/hubject-opcp-ccp-openapi.json, openapi/hubject-opcp-cps-openapi.json, openapi/hubject-opcp-est-openapi.json,
+  openapi/hubject-opcp-pcp-openapi.json, openapi/hubject-opcp-rcp-openapi.json
+schemes:
+- name: MO
+  source: openapi/hubject-opcp-ccp-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the endpoint.
+- name: OEM
+  source: openapi/hubject-opcp-ccp-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the endpoint.
+- name: CPO
+  source: openapi/hubject-opcp-ccp-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the endpoint.
+- name: CPS
+  source: openapi/hubject-opcp-ccp-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the endpoint.
+- name: MO_without_PKI
+  source: openapi/hubject-opcp-cps-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the endpoint. In the case of "MO without PKI"
+    role, the MO is using Hubject V2G PKI to sign certificates.
+- name: MO_with_own_PKI
+  source: openapi/hubject-opcp-cps-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the endpoint.
+- name: CPO
+  source: openapi/hubject-opcp-est-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the CPO related endpoint.
+- name: MO_with_V2G_PKI
+  source: openapi/hubject-opcp-est-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the MO related endpoint.
+- name: OEM_with_V2G_PKI
+  source: openapi/hubject-opcp-est-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the OEM related endpoint.
+- name: CPS
+  source: openapi/hubject-opcp-est-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the CPS Operator related endpoint.
+- name: MO
+  source: openapi/hubject-opcp-pcp-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the endpoint.
+- name: OEM
+  source: openapi/hubject-opcp-pcp-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the endpoint.
+- name: All_roles
+  source: openapi/hubject-opcp-rcp-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the endpoint.
+- name: Admin
+  source: openapi/hubject-opcp-rcp-openapi.json
+  flows:
+  - flow: authorizationCode
+  description: OAuth2 is used to grant access to the endpoint.
 scopes: []
+note: The OAuth2 security scheme(s) in the OpenAPI declare no scopes, and no security requirement
+  references one.
