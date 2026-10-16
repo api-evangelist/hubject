@@ -44,6 +44,8 @@ maintainers:
   email: info@apis.io
 
 common:
+- type: OAuthScopes
+  url: scopes/hubject-scopes.yml
 - type: AgenticAccess
   url: agentic-access/hubject-agentic-access.yml
 - type: Spectral
