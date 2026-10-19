@@ -1,0 +1,206 @@
+openapi: 3.2.0
+info:
+  version: v1
+  title: Evsenetwork API
+tags:
+- name: Evsenetwork
+paths:
+  /api/evsenetwork/v1/operators/{externalOperatorId}/network:
+    put:
+      summary: Assign EVSEs to groups
+      parameters:
+      - name: externalOperatorId
+        in: path
+        description: externalOperatorId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkAssignmentDTO'
+        '201':
+          description: Evses has been assigned to a groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkAssignmentDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaultBody'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Data not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaultBody'
+      deprecated: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NetworkAssignmentDTO'
+        description: networkAssignmentDTO
+        required: true
+      tags:
+      - Evsenetwork
+      operationId: putApiEvsenetworkV1OperatorsByExternalOperatorIdNetwork
+      x-operation-id-source: derived
+  /api/evsenetwork/v1/operators/{externalOperatorId}/networks:
+    post:
+      summary: Create EVSE Network
+      parameters:
+      - name: externalOperatorId
+        in: path
+        description: externalOperatorId
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvseNetworkResponseDTO'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      deprecated: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvseNetworkRequestDTO'
+        description: createRequestDTO
+        required: true
+      tags:
+      - Evsenetwork
+      operationId: postApiEvsenetworkV1OperatorsByExternalOperatorIdNetworks
+      x-operation-id-source: derived
+components:
+  schemas:
+    NetworkAssignmentDTO:
+      type: object
+      required:
+      - GroupsAssignments
+      - NetworkName
+      properties:
+        GroupsAssignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupsAssignmentDTO'
+        NetworkName:
+          type: string
+      title: NetworkAssignmentDTO
+    FieldValidationError:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+        fieldReference:
+          type: string
+      title: FieldValidationError
+      description: FieldValidationError model
+    FaultBody:
+      type: object
+      properties:
+        extendedInfo:
+          type: string
+        message:
+          type: string
+        validationErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationError'
+      title: FaultBody
+      description: FaultBody model
+    EvseNetworkRequestDTO:
+      type: object
+      properties:
+        evseGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/EvseGroupDTO'
+        evseNetworkDescription:
+          type: string
+          minLength: 0
+          maxLength: 250
+        evseNetworkName:
+          type: string
+          minLength: 0
+          maxLength: 50
+      title: EvseNetworkRequestDTO
+    EvseGroupResponseDTO:
+      type: object
+      properties:
+        evseIds:
+          type: array
+          items:
+            type: string
+        groupDescription:
+          type: string
+        groupName:
+          type: string
+        id:
+          type: string
+      title: EvseGroupResponseDTO
+    EvseNetworkResponseDTO:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        evseGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/EvseGroupResponseDTO'
+        evseNetworkDescription:
+          type: string
+        evseNetworkName:
+          type: string
+        id:
+          type: string
+      title: EvseNetworkResponseDTO
+    EvseGroupDTO:
+      type: object
+      properties:
+        evseIds:
+          type: array
+          items:
+            type: string
+        groupDescription:
+          type: string
+          minLength: 0
+          maxLength: 250
+        groupName:
+          type: string
+          minLength: 0
+          maxLength: 50
+      title: EvseGroupDTO
+    GroupsAssignmentDTO:
+      type: object
+      required:
+      - Evses
+      - GroupName
+      properties:
+        Evses:
+          type: array
+          items:
+            type: string
+        GroupName:
+          type: string
+      title: GroupsAssignmentDTO

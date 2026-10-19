@@ -1,0 +1,965 @@
+openapi: 3.2.0
+info:
+  title: Hubject E Roaming Dynamic Pricing API
+  version: 2.3.0
+  contact:
+    name: API Support
+    url: https://support.hubject.com
+    email: support@hubject.com
+  description: 'Operations tagged eRoamingDynamicPricing across 2 of this provider''s published API definitions: hubject-oicp-cpo-2.3-openapi.yml, hubject-oicp-emp-2.3-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://service-qa.hubject.com/api/oicp
+  description: QA environment
+- url: https://service.hubject.com/api/oicp
+  description: Production environment
+tags:
+- name: eRoamingDynamicPricing
+  description: 'Since OICP 2.2, HBS offers the possibility to flexibly or dynamically price Authorization services. The service mainly enables pushing (upload) and pulling (download) of pricing data to and from the HBS through webservice requests and/or downloads/uploads in the Hubject portal.
+
+
+    Flexible pricing enables CPOs to offer differentiated pricing (in multiple currencies) of charging processes at their charging stations. The differentiation of prices can be done along relevant dimensions such as charging facility characteristics (e.g. maximum charging power), EVSE location and time. OICP 2.2 and OICP 2.3 offers the possibility to exchange this flexible price differentiation over webservice communication between CPOs and EMPs.
+
+
+    In addition to the above flexible pricing capability, OICP 2.2 and OICP 2.3 enables more frequent and near real-time update and exchange of pricing information between CPOs and EMPs. This is achieved whereby a CPO continuously pushes valid prices to the HBS for specific EMPs to pull these prices.
+
+
+    With OICP 2.2 and OICP 2.3 , the HBS offers an extensive breadth of technical capabilities for flexible and dynamic pricing of charging services for CPOs. Please refer to the supplementary document “Dynamic Pricing - Functional Guide for Service Implementation” for more details and a holistic view (technical and business perspectives) of how to best capitalize on the capabilities offered by the eRoamingDynamicPricing service.
+
+
+    The eRoamingDynamicPricing service offers four operations, namely the:
+
+    1. eRoamingPushPricingProductData operation which gives CPOs the possibility to upload (push) pricing product information. Pricing products refer to the different tariffs offered by a CPO based on the differentiation dimensions mentioned above.
+
+    2. eRoamingPushEVSEPricing operation which gives CPOs the possibility to assign their various pricing products to individual EVSEs and thereby upload (push) location/EVSE-specific pricing data.
+
+    3. eRoamingPullPricingProductData operation which gives EMPs the possibility to download (pull) pricing product information uploaded by a CPO for the respective EMP.
+
+    4. eRoamingPullEVSEPricing operation which gives EMPs the possibility to download (pull) location/EVSE-specific pricing data uploaded by CPOs for the respective EMP.'
+paths:
+  /dynamicpricing/v10/operators/{operatorID}/pricing-products:
+    post:
+      summary: eRoamingPushPricingProductData_V1.0
+      operationId: eRoamingPushPricingProductData_V1.0
+      description: '__Note:__
+
+        * To `SEND`
+
+        * Implementation: `OPTIONAL`
+
+
+        When a CPO sends an eRoamingPushPricingProductData request, Hubject checks whether there is a valid flexible/dynamic pricing service offer (for the service type Authorization) created by the CPO. If so, the operation allows the upload of pricing product data to Hubject. In addition, it is also possible to update or delete pricing data previously pushed with an upload operation request. How the transferred data is to be processed `MUST` be defined in the “ActionType” field of the request. Four processing options (i.e. Action Types) exist, details of which can be seen in eRoamingPushPricingProductData message
+
+
+        The pricing product data to be processed `MUST` be provided in the “PricingProductData” field, which consists of “PricingProductDataRecord” structures. Hubject keeps a history of all updated and changed data records. Every successful push operation – irrespective of the performed action – leads to a new version of currently valid data records. Furthermore, every operation is logged with the current timestamp. Thus, Hubject can reconstruct the status of pricing data for every point in time in the past.'
+      tags:
+      - eRoamingDynamicPricing
+      parameters:
+      - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPushPricingProductData'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+  /dynamicpricing/v10/operators/{operatorID}/evse-pricing:
+    post:
+      summary: eRoamingPushEVSEPricing_V1.0
+      operationId: eRoamingPushEVSEPricing_V1.0
+      description: '__Note:__
+
+        * To `SEND`
+
+        * Implementation: `OPTIONAL`
+
+        When a CPO sends an eRoamingPushEVSEPricing request, Hubject checks whether there is a valid flexible/dynamic pricing service offer (for the service type Authorization) created by the CPO. If so, the operation allows the upload of a list containing pricing product assignment to EvseIDs to Hubject. In addition, it is also possible to update or delete EVSE pricing data previously pushed with an upload operation request. How the transferred data is to be processed `MUST` be defined in the “ActionType” field of the request. Four processing options (i.e. Action Types) exist, details of which can be seen in section eRoamingPushEVSEPricing).
+
+
+        The EVSE pricing data to be processed `MUST` be provided in the “EVSEPricing” field, which consists of “EvseIDProductList” structures. Hubject keeps a history of all updated and changed data records. Every successful push operation – irrespective of the performed action – leads to a new version of currently valid data records. Furthermore, every operation is logged with the current timestamp. Thus, Hubject can reconstruct the status of EVSE pricing data for every point in time in the past.
+
+
+        EVSE consistency:
+
+
+        EvseIDs contain the ID of the corresponding CPO (With every EVSE pricing data upload operation, Hubject checks whether the given CPO’s OperatorID or Sub-OperatorIDs if necessary) matches every given EvseID sent in the request. If not, Hubject refuses the data upload and responds with the status code 018.
+
+
+        Note
+
+
+        The eRoamingPushEVSEPricing operation `MUST` always be used sequentially.'
+      tags:
+      - eRoamingDynamicPricing
+      parameters:
+      - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPushEVSEPricing'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+  /dynamicpricing/v10/providers/{providerID}/pricing-products:
+    post:
+      summary: eRoamingPullPricingProductData_V1.0
+      operationId: eRoamingPullPricingProductData_V1.0
+      description: '__Note:__
+
+        * To `SEND`
+
+        * Implementation: `OPTIONAL`
+
+
+        When an EMP sends an eRoamingPullPricingProductData request, Hubject checks whether there is a valid flexible/dynamic pricing business contract (for the service type Authorization) between the EMP and the CPOs whose OperatorIDs are sent in the request. If so, the operation allows the download of pricing product data pushed to the HBS by these CPOs for the requesting EMP. When this request is received from an EMP, currently valid pricing products data available in the HBS for the requesting EMP (and pushed by CPOs whose OperatorIDs are supplied in the request) are grouped by OperatorID and sent in response to the request.
+
+
+        The operation also allows the use of the LastCall filter. When the LastCall filter is used, only pricing product data changes that have taken place after the date/time value provided in the “LastCall" field of the request are sent to the EMP.'
+      tags:
+      - eRoamingDynamicPricing
+      parameters:
+      - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPullPricingProductData'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingPricingProductData'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+  /dynamicpricing/v10/providers/{providerID}/evse-pricing:
+    post:
+      summary: eRoamingPullEVSEPricing_V1.0
+      operationId: eRoamingPullEVSEPricing_V1.0
+      description: '__Note:__
+
+        * To `SEND`
+
+        * Implementation: `OPTIONAL`
+
+
+        When an EMP sends an eRoamingPullPricingProductData request, Hubject checks whether there is a valid flexible/dynamic pricing business contract (for the service type Authorization) between the EMP and the CPOs whose OperatorIDs are sent in the request. If so, the operation allows the download of EVSE pricing data pushed to the HBS by these CPOs for the requesting EMP. When this request is received from an EMP, currently valid EVSE pricing data available in the HBS for the requesting EMP are grouped by OperatorID and sent in response to the request.
+
+
+        The operation also allows the use of the LastCall filter. When the LastCall filter is used, only EVSE pricing data changes that have taken place after the date/time value provided in the “LastCall" field of the request are sent to the EMP.'
+      tags:
+      - eRoamingDynamicPricing
+      parameters:
+      - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPullEVSEPricing'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingEVSEPricing'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+components:
+  parameters:
+    operatorID:
+      name: operatorID
+      in: path
+      required: true
+      description: The id of the operator
+      schema:
+        type: string
+    providerID:
+      name: providerID
+      in: path
+      required: true
+      description: The id of the provider
+      schema:
+        type: string
+  schemas:
+    OperatorID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$
+      description: 'A string that MUST be valid with respect to the following regular expression: ISO | DIN
+
+
+        ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$
+
+        The expression validates the string as OperatorID including the preceding country code, which is part of EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118. In case the OperatorID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional.
+
+
+        In case the OperatorID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+
+        Examples ISO: “DE*A36”, “DEA36”
+
+
+        Example DIN: “+49*536”
+
+        '
+      example: +49*536
+    eRoamingPushPricingProductData:
+      type: object
+      description: eRoamingPushPricingProductData is a message that is sent in order to upload data pertaining to a CPO’s pricing products (i.e. tarrifs) to the Hubject system.
+      required:
+      - ActionType
+      - PricingProductData
+      properties:
+        ActionType:
+          type: string
+          enum:
+          - fullLoad
+          - update
+          - insert
+          - delete
+          description: Describes the action that has to be performed by Hubject with the provided data.
+        PricingProductData:
+          type: object
+          required:
+          - OperatorID
+          - ProviderID
+          - PricingDefaultPrice
+          - PricingDefaultPriceCurrency
+          - PricingDefaultReferenceUnit
+          - PricingProductDataRecords
+          description: Details of pricing products offered by a particular operator for a specific provider
+          properties:
+            OperatorID:
+              $ref: '#/components/schemas/OperatorID'
+            OperatorName:
+              type: string
+              description: Free text for operator
+              maximum: 100
+            ProviderID:
+              $ref: '#/components/schemas/ProviderIDAsterisk'
+            PricingDefaultPrice:
+              type: number
+              description: A default price for pricing sessions at undefined EVSEs
+            PricingDefaultPriceCurrency:
+              $ref: '#/components/schemas/CurrencyID'
+            PricingDefaultReferenceUnit:
+              $ref: '#/components/schemas/ReferenceUnit'
+            PricingProductDataRecords:
+              type: array
+              description: A list of pricing products
+              items:
+                $ref: '#/components/schemas/PricingProductDataRecord'
+      example:
+        ActionType: fullLoad
+        PricingProductData:
+          OperatorID: DE*ABC
+          OperatorName: ABC technologies
+          PricingDefaultPrice: 0
+          PricingDefaultPriceCurrency: EUR
+          PricingDefaultReferenceUnit: HOUR
+          PricingProductDataRecords:
+          - AdditionalReferences:
+            - AdditionalReference: PARKING FEE
+              AdditionalReferenceUnit: HOUR
+              PricePerAdditionalReferenceUnit: 2
+            IsValid24hours: false
+            MaximumProductChargingPower: 22
+            PricePerReferenceUnit: 1
+            ProductAvailabilityTimes:
+            - Periods:
+              - begin: 09:00
+                end: '18:00'
+              'on': Everyday
+            ProductID: AC 1
+            ProductPriceCurrency: EUR
+            ReferenceUnit: HOUR
+          ProviderID: '*'
+    ProviderIDAsterisk:
+      type: string
+      pattern: ^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})|\*$
+      description: "The ProviderID is defined by Hubject and is used to identify the EMP\n\nA string that `MUST` be valid with respect to the following regular expression: ISO | DIN\n\n`^([A-Za-z]{2}\\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\\*|-]?[A-Za-z0-9]{3})$`\n\nThe expression validates the string as ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.\n\nIn case the ProviderID is provided corresponding to ISO, the country code `MUST` be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “-” is optional.\n\nExamples ISO: “DE8EO”, “DE-8EO”\n\nExamples DIN: “DE8EO”, “DE*8EO”, “DE-8EO”\n\n In case the data is to be made available for all EMPs (e.g. for Offer-to-All prices), the asterix character (*) can be set as the value in this field.\n \n"
+      example: DE-8EO
+    StatusCode:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: some description
+        AdditionalInfo: some additional info
+    PricingProductDataRecord:
+      type: object
+      required:
+      - ProductID
+      - ReferenceUnit
+      - ProductPriceCurrency
+      - PricePerReferenceUnit
+      - MaximumProductChargingPower
+      - IsValid24hours
+      - ProductAvailabilityTimes
+      properties:
+        ProductID:
+          $ref: '#/components/schemas/ProductID'
+        ReferenceUnit:
+          $ref: '#/components/schemas/ReferenceUnit'
+        ProductPriceCurrency:
+          $ref: '#/components/schemas/CurrencyID'
+        PricePerReferenceUnit:
+          type: number
+          description: A price per reference unit
+        MaximumProductChargingPower:
+          type: number
+          description: A value in kWh
+        IsValid24hours:
+          type: boolean
+          description: 'Set to TRUE if the respective pricing product is applicable 24 hours a day.
+
+            If FALSE, the respective applicability times `SHOULD` be provided in the field “ProductAvailabilityTimes”.
+
+            '
+        ProductAvailabilityTimes:
+          type: array
+          description: A list indicating when the pricing product is applicable
+          items:
+            type: object
+            required:
+            - Periods
+            - 'on'
+            properties:
+              Periods:
+                type: array
+                items:
+                  type: object
+                  description: 'The starting and end time for pricing product applicability in the specified period
+
+                    '
+                  required:
+                  - begin
+                  - end
+                  properties:
+                    begin:
+                      type: string
+                      description: The opening time
+                      pattern: '[0-9]{2}:[0-9]{2}'
+                    end:
+                      type: string
+                      description: The closing time
+                      pattern: '[0-9]{2}:[0-9]{2}'
+              'on':
+                type: string
+                enum:
+                - Everyday
+                - Workdays
+                - Weekend
+                - Monday
+                - Tuesday
+                - Wednesday
+                - Thursday
+                - Friday
+                - Saturday
+                - Sunday
+                description: Day values to be used in specifying periods on which the product is available. Workdays = Monday – Friday, Weekend = Saturday – Sunday
+        AdditionalReferences:
+          type: array
+          description: A list of additional reference units and their respective prices
+          items:
+            type: object
+            required:
+            - AdditionalReference
+            - AdditionalReferenceUnit
+            - PricePerAdditionalReferenceUnit
+            properties:
+              AdditionalReference:
+                type: string
+                enum:
+                - START FEE
+                - FIXED FEE
+                - PARKING FEE
+                - MINIMUM FEE
+                - MAXIMUM FEE
+                description: 'Additional pricing components to be considered in addition to the base pricing
+
+
+                  | Option | Description |
+
+                  | ------ | ----------- |
+
+                  | START FEE | Can be used in case a fixed fee is charged for the initiation of the charging session. This is a fee charged on top of the main base price defined in the field "PricePerReferenceUnit" for any particular pricing product. |
+
+                  | FIXED FEE | Can be used if a single price is charged irrespective of charging duration or energy consumption (for instance if all sessions are to be charged a single fixed fee). When used, the value set in the field "PricePerReferenceUnit" for the main base price of respective pricing product SHOULD be set to zero. |
+
+                  | PARKING FEE | Can be used in case sessions are to be charged for both parking and charging. When used, it needs to be specified in the corresponding service offer on the HBS Portal when parking applies (e.g. from session start to charging start and charging end to session end or for the entire session duration, or x-minutes after charging end, etc) |
+
+                  | MINIMUM FEE | Can be used in case there is a minimum fee to be paid for all charging sessions. When used, this implies that the eventual price to be paid cannot be less than this minimum fee but can however be a price above/greater than the minimum fee. |
+
+                  | MAXIMUM FEE | Can be used in case there is a maximum fee to be charged for all charging sessions. When used, this implies that the eventual price to be paid cannot be more than this maximum fee but can however be a price below/lower than the maximum fee. |
+
+                  '
+              AdditionalReferenceUnit:
+                $ref: '#/components/schemas/ReferenceUnit'
+              PricePerAdditionalReferenceUnit:
+                type: number
+                description: A price in the given currency
+    CurrencyID:
+      type: string
+      description: 'The ProductPriceCurrencyType allows for the list of active codes of the official ISO 4217 currency names.
+
+
+        For the full list of active codes of the official ISO 4217 currencies, see: [https://www.iso.org/iso-4217-currency-codes.html](https://www.iso.org/iso-4217-currency-codes.html)
+
+
+        Examples:
+
+
+        | Option | Description |
+
+        | ------ | ----------- |
+
+        | EUR | Euro |
+
+        | CHF | Swiss franc |
+
+        | CAD | Canadian Dollar |
+
+        | GBP | Pound sterling
+
+        '
+      example: EUR
+    eRoamingPushEVSEPricing:
+      type: object
+      description: eRoamingPushEVSEPricing is a message that is sent in order to upload a list of EVSEs and the pricing products (i.e. tarrifs) applicable for (charging or reservation) sessions at these EVSEs.
+      required:
+      - ActionType
+      - EVSEPricing
+      properties:
+        ActionType:
+          type: string
+          enum:
+          - fullLoad
+          - update
+          - insert
+          - delete
+          description: Describes the action that has to be performed by Hubject with the provided data.
+        EVSEPricing:
+          type: array
+          description: A list of EVSEs and their respective pricing product relation
+          items:
+            type: object
+            required:
+            - EvseID
+            - ProviderID
+            - EvseIDProductList
+            properties:
+              EvseID:
+                $ref: '#/components/schemas/EvseID'
+              ProviderID:
+                $ref: '#/components/schemas/ProviderIDAsterisk'
+              EvseIDProductList:
+                type: array
+                description: A list of pricing products applicable per EvseID
+                items:
+                  $ref: '#/components/schemas/ProductID'
+      example:
+        ActionType: fullLoad
+        EVSEPricing:
+        - EvseID: DE*XYZ*ETEST1
+          EvseIDProductList:
+          - AC 1
+          ProviderID: '*'
+    eRoamingAcknowledgment:
+      type: object
+      description: 'The acknowledgement is a message that is sent in response to several requests.
+
+
+        * To `SEND` and `RECEIVE`
+
+        * Implementation: `MANDATORY`
+
+        '
+      required:
+      - Result
+      - StatusCode
+      properties:
+        Result:
+          type: boolean
+          description: 'If result is true, the message was received and the respective operation was performed successfully.
+
+
+            If result is false, the message was received and the respective operation was not performed successfully.
+
+            '
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+      example:
+        Result: true
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: Success
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+    ProductID:
+      type: string
+      description: 'The ProductIDType defines some standard values (see below). The type however also supports custom ProductIDs that can be specified by partners (as a string of 50 characters maximum length).
+
+        | Option | Description |
+
+        |--------|-------------|
+
+        | Standard Price | Standard Price |
+
+        | AC1 | Product for AC 1 Phase charging |
+
+        | AC3 | Product for AC 3 Phase charging |
+
+        | DC | Product for DC charging |
+
+        | CustomProductID | There is no option “CustomProductID”, this sample option is meant to indicates that custom product ID specifications by partners (as a string of 50 characters maximum length) are allowed as well.|
+
+        '
+      example: AC1
+      maximum: 50
+    ReferenceUnit:
+      type: string
+      description: 'Default Reference Unit in time or kWh
+
+
+        | Option | Description |
+
+        | ------ | ----------- |
+
+        | HOUR | Defined Reference Unit Type |
+
+        | KILOWATT_HOUR | Defined Reference Unit Type |
+
+        | MINUTE | Defined Reference Unit Type |
+
+        '
+      example: HOUR
+    SessionID:
+      type: string
+      pattern: ^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$
+      description: 'The Hubject SessionID that identifies the process
+
+
+        A string that `MUST` be valid with respect to the following regular expression:
+
+
+        `^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$`
+
+
+        The expression validates the string as a GUID.
+
+
+        Example: “b2688855-7f00-0002-6d8e-48d883f6abb6”
+
+        '
+      example: b2688855-7f00-0002-6d8e-48d883f6abb6
+    EvseID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$
+      description: 'The ID that identifies the charging spot.
+
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.
+
+
+        `^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$`
+
+        The expression validates the string as EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the EvseID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional. Furthermore the ID MUST provide an “E” after the OperatorID in order to identify the ID as ISO EvseID without doubt.
+
+
+        In case the EvseID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+
+        Examples ISO: “DE*AB7*E840*6487”, “DEAB7E8406487”
+
+
+        Example DIN: “+49*810*000*438”
+
+        '
+      example: +49*810*000*438
+    PricingProductDataType:
+      type: object
+      required:
+      - OperatorID
+      - ProviderID
+      - PricingDefaultPrice
+      - PricingDefaultPriceCurrency
+      - PricingDefaultReferenceUnit
+      - PricingProductDataRecords
+      properties:
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        OperatorName:
+          type: string
+          description: Free text for operator
+          maximum: 100
+        ProviderID:
+          $ref: '#/components/schemas/ProviderIDAsterisk'
+        PricingDefaultPrice:
+          type: number
+          description: A default price for pricing sessions at undefined EVSEs
+        PricingDefaultPriceCurrency:
+          $ref: '#/components/schemas/CurrencyID'
+        PricingDefaultReferenceUnit:
+          $ref: '#/components/schemas/ReferenceUnit'
+        PricingProductDataRecords:
+          type: array
+          description: A list of pricing products
+          items:
+            $ref: '#/components/schemas/PricingProductDataRecord'
+    StatusCode_2:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: Success
+        AdditionalInfo: Success
+    eRoamingPricingProductData:
+      type: object
+      description: "eRoamingPricingProductData is sent in response to eRoamingPullPricingProductData requests.\n\nNote:\n  * This message describes the response which has to be sent in reply to the eRoamingPullPricingProductData request.\n"
+      required:
+      - PricingProductData
+      properties:
+        PricingProductData:
+          type: array
+          description: List of pricing products offered by operators for a specific provider
+          items:
+            $ref: '#/components/schemas/PricingProductDataType'
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode_2'
+    eRoamingPullEVSEPricing:
+      type: object
+      description: eRoamingPullEVSEPricing is a message that is sent in order to request the download of (i.e.pull) location/EVSE-specific pricing data uploaded by CPOs for the requesting EMP.
+      required:
+      - ProviderID
+      - OperatorIDs
+      properties:
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        LastCall:
+          type: string
+          format: date-time
+          description: In case that this field is set, Hubject does not return the entire set of currently valid pricing products data but just the changes that have taken places since the last call date/time value.
+        OperatorIDs:
+          type: array
+          description: A list of Operator Ids in ISO or DIN standard to download pricing data pushed by one or more operators.
+          items:
+            $ref: '#/components/schemas/OperatorID'
+      example:
+        LastCall: '2020-09-23T14:33:03.126Z'
+        OperatorIDs:
+        - DE*ABC
+        ProviderID: DE-DCB
+    OperatorEVSEPricing:
+      type: object
+      required:
+      - OperatorID
+      - EVSEPricing
+      properties:
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        OperatorName:
+          type: string
+          description: Free text for operator
+          maximum: 100
+        EVSEPricing:
+          type: array
+          description: List of EVSE pricings offered by the operator.
+          items:
+            type: object
+            required:
+            - EvseID
+            - ProviderID
+            - EvseIDProductList
+            properties:
+              EvseID:
+                $ref: '#/components/schemas/EvseID'
+              ProviderID:
+                $ref: '#/components/schemas/ProviderID'
+              EvseIDProductList:
+                type: array
+                description: A list of pricing products applicable per EvseID
+                items:
+                  $ref: '#/components/schemas/ProductID'
+    ProviderID:
+      type: string
+      pattern: ^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$
+      description: 'The ProviderID is defined by Hubject and is used to identify the EMP
+
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN
+
+
+        `^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$`
+
+
+        The expression validates the string as ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the ProviderID is provided corresponding to ISO, the country code `MUST` be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “-” is optional.
+
+
+        Examples ISO: “DE8EO”, “DE-8EO”
+
+
+        Examples DIN: “DE8EO”, “DE*8EO”, “DE-8EO”
+
+        '
+      example: DE-8EO
+    eRoamingEVSEPricing:
+      type: object
+      description: "eRoamingEVSEPricing is sent by the HBS in response to eRoamingPullEVSEPricing requests.\n\nNote:\n  * This message describes the response which has to be sent in reply to the eRoamingPullEVSEPricing request.\n"
+      required:
+      - EVSEPricing
+      properties:
+        EVSEPricing:
+          type: array
+          description: A list of EVSE pricing data blocks for specific operators
+          items:
+            $ref: '#/components/schemas/OperatorEVSEPricing'
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode_2'
+      example:
+        EVSEPricing:
+        - EVSEPricing:
+          - EvseID: DE*XYZ*ETEST1
+            EvseIDProductList:
+            - AC 1
+            ProviderID: DE-DCB
+          OperatorID: DE*ABC
+          OperatorName: ABC technologies
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: string
+    eRoamingPullPricingProductData:
+      type: object
+      description: eRoamingPullPricingProductData is a message that is sent in order to request the download of pricing data available in the HBS for an EMP.
+      required:
+      - OperatorIDs
+      properties:
+        LastCall:
+          type: string
+          format: date-time
+          description: In case that this field is set, Hubject does not return the entire set of currently valid pricing products data but just the changes that have taken places since the last call date/time value.
+        OperatorIDs:
+          type: array
+          description: A list of Operator Ids in ISO or DIN standard to download pricing data pushed by one or more operators.
+          items:
+            $ref: '#/components/schemas/OperatorID'
+      example:
+        LastCall: '2020-09-23T14:33:42.246Z'
+        OperatorIDs:
+        - DE*ABC
+x-refined-from:
+- hubject-oicp-cpo-2.3-openapi.yml
+- hubject-oicp-emp-2.3-openapi.yml

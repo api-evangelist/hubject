@@ -96,22 +96,32 @@ common:
   url: https://www.hubject.com/community
 
 apis:
-- aid: hubject:oicp-cpo
-  name: Open InterCharge Protocol (OICP) 2.3 - CPO
-  description: 'OICP 2.3 operations for charge point operators on the Hubject Business System: authorize start/stop, remote start/stop, charge
-    detail records, push EVSE data and status, push pricing product and EVSE pricing, reservations and charging notifications.'
+- aid: hubject:ngp-automation
+  name: Next Generation Pricing (NGP) Automation APIs
+  description: >-
+    Swagger 2.0 partner APIs for Hubject's Next Generation Pricing: CPO service offers and EVSE assignment,
+    and EMP contracts. No base URL is published in the specifications.
+  humanURL: https://github.com/hubject/NGP-Automation-APIs
+  tags:
+  - Pricing
+  - EV Charging
+  properties:
+  - type: Swagger
+    url: openapi/hubject-ngp-cpo-service-offers-swagger.json
+  - type: Swagger
+    url: openapi/hubject-ngp-cpo-evse-swagger.json
+  - type: Swagger
+    url: openapi/hubject-ngp-emp-contracts-swagger.json
+- aid: hubject:hubject-authentication-api
+  name: Hubject Authentication API
+  description: Authentication endpoints to issue access token.
   humanURL: https://www.hubject.com/products/intercharge-cpo
   baseURL: https://service.hubject.com/api/oicp
   tags:
-  - eRoaming
-  - EV Charging
-  - CPO
+  - Authentication
   properties:
   - type: OpenAPI
-    url: openapi/hubject-oicp-cpo-2.3-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://github.com/hubject/oicp-cpo-2.3-api-doc/blob/master/src/openapi.yaml
+    url: openapi/hubject-authentication-api-openapi.yml
   - type: JSONSchema
     url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
   - type: JSONSchema
@@ -124,59 +134,10 @@ apis:
     url: json-schema/hubject-e-roaming-push-evse-data-schema.json
   - type: JSONSchema
     url: json-schema/hubject-e-roaming-authorization-start-schema.json
-- aid: hubject:oicp-emp
-  name: Open InterCharge Protocol (OICP) 2.3 - EMP
-  description: 'OICP 2.3 operations for e-mobility providers: push authentication data, authorize and remote start/stop, pull EVSE data, status
-    and pricing, get charge detail records, reservations and charging notifications.'
-  humanURL: https://www.hubject.com/products/intercharge-emp
-  baseURL: https://service.hubject.com/api/oicp
-  tags:
-  - eRoaming
-  - EV Charging
-  - EMP
-  properties:
-  - type: OpenAPI
-    url: openapi/hubject-oicp-emp-2.3-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://github.com/hubject/oicp-emp-2.3-api-doc/blob/master/src/openapi.yaml
-  - type: JSONSchema
-    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
   - type: JSONSchema
     url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
   - type: JSONSchema
-    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
-  - type: JSONSchema
-    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
-  - type: JSONSchema
-    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
-  - type: JSONSchema
     url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
-- aid: hubject:open-plug-and-charge
-  name: Open Plug&Charge Protocol (OPCP) 1.0
-  description: 'ISO 15118 Plug&Charge interfaces: access token, contract certificate pool (CCP), certificate provisioning service (CPS), enrollment
-    (EST), provisioning certificate pool (PCP), root certificate pool (RCP) and webhooks, testable in Hubject''s hosted Open Plug&Charge testing
-    environment. No production base URL is published in the specifications.'
-  humanURL: https://hubject.stoplight.io/docs/open-plugncharge
-  tags:
-  - Plug and Charge
-  - ISO 15118
-  - PKI
-  properties:
-  - type: OpenAPI
-    url: openapi/hubject-opcp-ccp-openapi.json
-  - type: OpenAPI
-    url: openapi/hubject-opcp-cps-openapi.json
-  - type: OpenAPI
-    url: openapi/hubject-opcp-pcp-openapi.json
-  - type: OpenAPI
-    url: openapi/hubject-opcp-rcp-openapi.json
-  - type: OpenAPI
-    url: openapi/hubject-opcp-est-openapi.json
-  - type: OpenAPI
-    url: openapi/hubject-opcp-accesstoken-openapi.json
-  - type: OpenAPI
-    url: openapi/hubject-opcp-webhooks-openapi.json
   - type: Sandbox
     url: https://hubject.stoplight.io/
   - type: Documentation
@@ -191,21 +152,862 @@ apis:
     url: json-schema/hubject-signed-contract-data-request-schema.json
   - type: JSONSchema
     url: json-schema/hubject-get-signed-contract-data-request-schema.json
-- aid: hubject:ngp-automation
-  name: Next Generation Pricing (NGP) Automation APIs
-  description: 'Swagger 2.0 partner APIs for Hubject''s Next Generation Pricing: CPO service offers and EVSE assignment, and EMP contracts. No
-    base URL is published in the specifications.'
-  humanURL: https://github.com/hubject/NGP-Automation-APIs
+- aid: hubject:hubject-cacerts-api
+  name: Hubject Cacerts API
+  description: The Cacerts API from Hubject — 1 operation(s) for cacerts.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
   tags:
-  - Pricing
-  - EV Charging
+  - Cacerts
   properties:
-  - type: Swagger
-    url: openapi/hubject-ngp-cpo-service-offers-swagger.json
-  - type: Swagger
-    url: openapi/hubject-ngp-cpo-evse-swagger.json
-  - type: Swagger
-    url: openapi/hubject-ngp-emp-contracts-swagger.json
+  - type: OpenAPI
+    url: openapi/hubject-cacerts-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-ccp-api
+  name: Hubject Ccp API
+  description: The Ccp API from Hubject — 1 operation(s) for ccp.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - Ccp
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-ccp-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-contract-certificate-pool-controller-api
+  name: Hubject Contract Certificate Pool Controller API
+  description: internal identifier
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - contract-certificate-pool-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-contract-certificate-pool-controller-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-cps-api
+  name: Hubject Cps API
+  description: The Cps API from Hubject — 2 operation(s) for cps.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - Cps
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-cps-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-eroamingauthenticationdata-api
+  name: Hubject E Roaming Authentication Data API
+  description: >-
+    This service is only offered by Hubject.
+
+
+    In addition to the online authorization service that requests customer authentication data on demand
+    from the connected partner systems, Hubject offers the possibility to upload authentication data.
+
+
+    If an EMP uploads their data to Hubject, Hubject can authorize requests from other partners (e.g.
+    CPOs) without having to forward the request to the EMP. The eRoamingPushAuthenticationData operation
+    gives EMPs the possibility to upload (push) authentication data to the HBS.
+
+
+    Furthermore, Hub EMPs may also push authentication data of sub-EMPs. Hubject does not distinguish
+    between authentication records of hub providers and their related sub providers.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - eRoamingAuthenticationData
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-eroamingauthenticationdata-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-eroamingauthorization-api
+  name: Hubject E Roaming Authorization API
+  description: >-
+    The service eRoamingAuthorization contains several different operations. It `MUST` be offered by Hubject
+    and the partner systems.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - eRoamingAuthorization
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-eroamingauthorization-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-eroamingchargingnotifications-api
+  name: Hubject E Roaming Charging Notifications API
+  description: >-
+    The eRoamingChargingNotifications API from Hubject — 1 operation(s) for eroamingchargingnotifications.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - eRoamingChargingNotifications
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-eroamingchargingnotifications-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-eroamingdynamicpricing-api
+  name: Hubject E Roaming Dynamic Pricing API
+  description: >-
+    Since OICP 2.2, HBS offers the possibility to flexibly or dynamically price Authorization services.
+    The service mainly enables pushing (upload) and pulling (download) of pricing data to and from the
+    HBS through webservice requests and/or downloads/uploads in the Hubject portal.
+
+
+    Flexible pricing enables CPOs to offer differentiated pricing (in multiple currencies) of charging
+    processes at their charging stations. The differentiation of prices can be done along relevant dimensions
+    such as charging facility characteristics (e.g. maximum charging power), EVSE location and time. OICP
+    2.2 and OICP 2.3 offers the possibility to exchange this flexible price differentiation over webservice
+    communication between CPOs and EMPs.
+
+
+    In addition to the above flexible pricing capability, OICP 2.2 and OICP 2.3 enables more frequent
+    and near real-time update and exchange of pricing information between CPOs and EMPs. This is achieved
+    whereby a CPO continuously pushes valid prices to the HBS for specific EMPs to pull these prices.
+
+
+    With OICP 2.2 and OICP 2.3 , the HBS offers an extensive breadth of technical capabilities for flexible
+    and dynamic pricing of charging services for CPOs. Please refer to the supplementary document [“Dynamic
+    Pricing - Functional Guide for Service Implementation”](https://support.hubject.com/hc/en-us/articles/360002042838-Introduction-to-Flexible-Dynamic-Pricing)
+    for more details and a holistic view (technical and business perspectives) of how to best capitalize
+    on the capabilities offered by the eRoamingDynamicPricing service.
+
+
+    The eRoamingDynamicPricing service offers four operations, namely the:
+
+    1. eRoamingPushPricingProductData operation which gives CPOs the possibility to upload (push) pricing
+    product information. Pricing products refer to the different tariffs offered by a CPO based on the
+    differentiation dimensions mentioned above.
+
+    2. eRoamingPushEVSEPricing operation which gives CPOs the possibility to assign their various pricing
+    products to individual EVSEs and thereby upload (push) location/EVSE-specific pricing data.
+
+    3. eRoamingPullPricingProductData operation which gives EMPs the possibility to download (pull) pricing
+    product information uploaded by a CPO for the respective EMP.
+
+    4. eRoamingPullEVSEPricing operation which gives EMPs the possibility to download (pull) location/EVSE-specific
+    pricing data uploaded by CPOs for the respective EMP.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - eRoamingDynamicPricing
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-eroamingdynamicpricing-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-eroamingevsedata-api
+  name: Hubject E Roaming Evse Data API
+  description: >-
+    Hubject offers the possibility to upload and download charging spot (EVSE) data and, thus, to exchange
+    data between different partners.
+
+
+    See apendix for a detailed business process diagram regarding the EVSE data service.
+
+
+    The eRoamingEvseData service offers two operations:
+
+
+    eRoamingPushEvseData in order to give CPOs the possibility to upload (push) EVSE master data
+
+
+    eRoamingPullEvseData in order to give EMPs the possibility to download (pull) EVSE data from partner
+    operators via Hubject.
+
+
+    Hub CPOs may also push EVSE data of sub operators. Hubject does not distinguish between EVSE records
+    of hub operators and related sub operators.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - eRoamingEvseData
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-eroamingevsedata-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-eroamingevsestatus-api
+  name: Hubject E Roaming Evse Status API
+  description: >-
+    Hubject offers the possibility to upload and download dynamic charging spot (EVSE) status information
+    and thus to exchange the data between different partners.
+
+
+    The eRoamingEvseStatus service offers two operations:
+
+
+    1. eRoamingPushEvseStatus in order to give CPOs the possibility to upload (push) EvseStatus data
+
+
+    2. eRoamingPullEvseStatus in order to give EMPs the possibility to download (pull) EVSE status data
+    from partner operators via Hubject
+
+
+    Hub CPOs may also push EVSE status records of sub operators. Hubject does not distinguish between
+    EvseStatus records of hub operators and related sub operators.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - eRoamingEvseStatus
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-eroamingevsestatus-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-eroamingreservation-api
+  name: Hubject E Roaming Reservation API
+  description: >-
+    The service eRoamingReservation contains two operations.
+
+    It `MUST` be offered by Hubject and MAY be offered by CPO partner systems.
+
+    The Service `MUST` be enabled by Hubject for the CPO. If the charging station offers reservation services,
+    the CPO can provide this information in the field ValueAddedServices.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - eRoamingReservation
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-eroamingreservation-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-evsenetwork-api
+  name: Hubject Evsenetwork API
+  description: The Evsenetwork API from Hubject — 2 operation(s) for evsenetwork.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - Evsenetwork
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-evsenetwork-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-mo-api
+  name: Hubject MO API
+  description: API relevant for Mobility Operators
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - MO
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-mo-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-oem-api
+  name: Hubject OEM API
+  description: Electric Vehicle Manufacturer
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - OEM
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-oem-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-partner-api
+  name: Hubject Partner API
+  description: The Partner API from Hubject — 5 operation(s) for partner.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - Partner
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-partner-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-premium-api
+  name: Hubject Premium API
+  description: The Premium API from Hubject — 2 operation(s) for premium.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - Premium
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-premium-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-root-api
+  name: Hubject Root API
+  description: The Root API from Hubject — 3 operation(s) for root.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - Root
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-root-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-webhook-api
+  name: Hubject Webhook API
+  description: The Webhook API from Hubject — 2 operation(s) for webhook.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - Webhook
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-webhook-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
+- aid: hubject:hubject-well-known-api
+  name: Hubject .well Known API
+  description: The .well Known API from Hubject — 1 operation(s) for .well known.
+  humanURL: https://www.hubject.com/products/intercharge-cpo
+  baseURL: https://service.hubject.com/api/oicp
+  tags:
+  - .well Known
+  properties:
+  - type: OpenAPI
+    url: openapi/hubject-well-known-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-record-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-progress-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-end-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charging-notification-error-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-push-evse-data-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-authorization-start-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-charge-detail-records-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-e-roaming-pull-evsedata-schema.json
+  - type: Sandbox
+    url: https://hubject.stoplight.io/
+  - type: Documentation
+    url: https://www.hubject.com/products/plug-and-charge
+  - type: JSONSchema
+    url: json-schema/hubject-lookup-contract-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-provide-contract-data-response-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-signed-contract-data-request-schema.json
+  - type: JSONSchema
+    url: json-schema/hubject-get-signed-contract-data-request-schema.json
 x-enrichment:
   status: enriched
   pass: local-v5

@@ -1,0 +1,572 @@
+openapi: 3.2.0
+info:
+  version: 2.3.0
+  title: EMP OICP-2.3 E Roaming Authentication Data API
+  description: '## Introduction
+
+
+    ### The Hubject Platform
+
+
+    The goal of the “Hubject B2B Service Platform (HBS)” is to enable the electric mobility market by providing an information and transactional gateway for businesses such as charging infrastructure providers, mobility service providers and vehicle manufacturers. !Hubject Process
+
+
+    The platform enabler functions include:
+
+
+    - Ensuring the interoperability of the public and semi-public infrastructure by promoting accepted standards within the network and open business user interfaces to the platform
+
+    - Simplification of authentication and authorization procedures through a trustworthy instance as well as safekeeping of sensitive data through the uncoupling of personal data and anonymous user data
+
+    - Automation of contract-based business relationships between power suppliers, car manufacturers, infrastructure service providers as well as further mobility business partners. - B2B information service for the realization of advanced services within the areas of energy management, traffic management, vehicle reservations, intelligent charging, car sharing and intermodal mobility
+
+
+    ### The Emobility Service Provider (EMP)
+
+    As an EMP you profit from our solution CONNECT. It allows you to offer EV drivers access to public charging infrastructure across national borders. Your customers will be able to identify any available charging point through our easily recognizable compatibility symbol, the intercharge logo. By getting connected to the intercharge network your customers will be able to use every charge point of all participating CPOs via eRoaming. For this purpose, you need to be onboarded to the eRoaming platform HBS (Hubject Brokering System). The HBS functions as an open emobility market place, which creates an open synergetic network that everyone profits from in the end. In general, there are two different possibilities to be connected to the HBS as an EMP. ##### Offline EMP:
+
+    The so called offline EMP has no real-time connection for authorization to the Hubject platform. This means that authentication data for the authorization MUST be sent and stored on the Hubject platform via the eRoamingPushAuthenticationData. The HBS will authorize charging sessions locally on the platform. Nevertheless, there can be a real-time connection for pulling dynamic POI data. Furthermore, the CDRs, resulting from each charging session, will not be directly forwarded to the EMP but will also be stored on the HBS. The EMP can then download these CDRs on demand via the eRoamingGetChargeDetailRecords service. ##### Online EMP:
+
+    The so called online EMP is fully connected to the HBS via a real-time interface. This means that authorization requests are forwarded to the EMP’s system in real-time. To ensure the online authorization, the EMP MUST implement the holistic authorization web service. Furthermore, the CDRs created for each charging session will be directly forwarded to the EMP’s system. Therefore, online EMP’s MUST implement the eRoamingChargeDetailRecord service. ### Scope
+
+
+    The information exchange between Hubject and CPO systems is entirely based on web service communication. This document describes the relevant service interfaces for CPO. The Open InterCharge Protocol (OICP) is the most widely implemented communication standard between EMP and CPO systems. The information exchange is, in most cases, based on contractual relationships between EMPs and CPOs. In these cases, Hubject only processes service requests if there is a valid contract for the requested service. How EMPs and CPOs manage their service contracts is out of the scope of this document because the contract management aspects of the platform are used via a GUI-based system component. ### Conventions
+
+
+    The key words `MUST`, `MUST NOT`, `REQUIRED`, `SHALL`, `SHALL NOT`, `SHOULD`, `SHOULD NOT`, `RECOMMENDED`, `MAY` and `OPTIONAL` in this document are to be interpreted as described in RFC 2119.'
+  contact:
+    name: API Support
+    url: https://support.hubject.com
+    email: support@hubject.com
+servers:
+- url: https://service-qa.hubject.com/api/oicp
+  description: QA environment
+- url: https://service.hubject.com/api/oicp
+  description: Production environment
+tags:
+- name: eRoamingAuthenticationData
+  description: 'This service is only offered by Hubject.
+
+
+    In addition to the online authorization service that requests customer authentication data on demand from the connected partner systems, Hubject offers the possibility to upload authentication data.
+
+
+    If an EMP uploads their data to Hubject, Hubject can authorize requests from other partners (e.g. CPOs) without having to forward the request to the EMP. The eRoamingPushAuthenticationData operation gives EMPs the possibility to upload (push) authentication data to the HBS.
+
+
+    Furthermore, Hub EMPs may also push authentication data of sub-EMPs. Hubject does not distinguish between authentication records of hub providers and their related sub providers.'
+paths:
+  /authdata/v21/providers/{providerID}/push-request:
+    post:
+      summary: eRoamingPushAuthenticationData_V2.1
+      operationId: eRoamingPushAuthenticationData_V2.1
+      description: '__Note:__
+
+        * To `SEND`
+
+        * Implementation: `MANDATORY`
+
+
+        !Push authentication data diagram
+
+
+        When an EMP sends an eRoamingPushAuthenticationData request, Hubject checks whether there is a valid contract between Hubject and the EMP for the service type (Hubject must be the subscriber). If so, the operation allows uploading authentication data to Hubject. Furthermore, it is possible to update authentication data that has been pushed with an earlier operation request. How Hubject handles the transferred data `MUST` be defined in the request field “ActionType”, which offers four options (see below).
+
+
+        The authentication data to be inserted or updated `MUST` be provided with the “ProviderAuthenticationData” field, which consists of “AuthenticationDataRecord” structures. Hubject keeps a history of all updated and changed data records. Every successful push operation – irrespective of the performed action – leads to a new version of currently valid data records. Furthermore, each operation is logged with the current timestamp. Thus, Hubject can reconstruct the status of authentication data for every point in time in the past.
+
+
+        __Action types:__
+
+
+        * __fullLoad:__ The EMP uploads the full set of current authentication data. Hubject does not compare the new data to old (earlier pushed) data. It keeps a history of old data records and handles the newly provided data as valid. In order to allow an easy deletion of all records, it is possible to perform a fullLoad with an empty list of records.
+
+
+        * __insert:__ The EMP adds further authentication data records to the current set of data. Hubject verifies that the provided data records do not already exist in the currently valid data status. If so, the transaction will be aborted, no data will be inserted, and the request will be answered with an error message. Error details will be provided with the “AdditionalInfo” field.
+
+
+        * __update:__ The EMP updates data records of the current set of data. Hubject verifies that the provided data records do exist in the currently valid data status. If not, the transaction will be aborted, no data will be updated, and the request will be answered with an error message.
+
+
+        * __delete:__ The EMP deletes data records of the current set of data.
+
+
+        __PIN security:__
+
+
+        The authentication data records that are uploaded to Hubject contain one of the defined identification types. The identification type “QRCodeIdentificationType” contains – besides an “EvcoID” field – a “PIN” field or a “HashedPIN” field (only one of the two options must be provided). For security reasons, Hubject generally does not store PINs in clear text, but always as encrypted hash values. When uploading authentication data to Hubject, the EMPs can directly provide hashed PIN values (using the field “HashedPIN”). In case that the PINs are provided in clear text (field “PIN”), Hubject will generate a hash value for every PIN and will store only the hashes. Hubject by default generates a hash using Bcrypt as a hashing function.
+
+
+        In case that an EMP provides already hashed PINs, he `MUST` also specify the corresponding hash generation algorithm so that Hubject can reproduce the hash generation when processing a request for authorization. For this reason, the “HashedPIN” field contains detailed information concerning the hash function and the hash salt value (for salted hash functions) that must be used for hash generation.
+
+
+        __EVCO consistency:__
+
+
+        EvcoIDs contain the ID of the corresponding EMP. With every data upload operation Hubject checks whether the given EMP’s ProviderID (or Sub-ProviderIDs if necessary) matches every given EvcoID. If not, Hubject refuses the data upload and responds with the status code 019.
+
+
+        Note:
+
+
+        The eRoamingPushAuthenticationData operation `MUST` always be used sequentially.'
+      tags:
+      - eRoamingAuthenticationData
+      parameters:
+      - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPushAuthenticationData'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+components:
+  schemas:
+    StatusCode:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: Success
+        AdditionalInfo: Success
+    RFIDMifareFamilyIdentification:
+      type: object
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+        '
+      properties:
+        UID:
+          $ref: '#/components/schemas/UID'
+      required:
+      - UID
+      example:
+        UID: 7568290FFF765F
+    Identification:
+      type: object
+      description: 'Authentication data
+
+
+        1. The option RFIDIdentification `MUST` not be used in the eRoamingAuthorization process. For RFID Authorization, only the option RFIDMifareFamilyIdentification `SHOULD` be used in the respective eRoamingAuthorization messages.
+
+        2. For the Remote Authorization process, only the option RemoteIdentification MUST be used in the respective messages.
+
+        '
+      properties:
+        RFIDMifareFamilyIdentification:
+          $ref: '#/components/schemas/RFIDMifareFamilyIdentification'
+        RFIDIdentification:
+          $ref: '#/components/schemas/RFIDIdentification'
+        QRCodeIdentification:
+          $ref: '#/components/schemas/QRCodeIdentification'
+        PlugAndChargeIdentification:
+          $ref: '#/components/schemas/PlugAndChargeIdentification'
+        RemoteIdentification:
+          $ref: '#/components/schemas/RemoteIdentification'
+    UID:
+      type: string
+      pattern: ^([0-9A-F]{8,8}|[0-9A-F]{14,14}|[0-9A-F]{20,20})$
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+
+        The expression validates the string as a unique RFID with a length of 8, 14 or 20 characters.
+
+
+        Examples: “7568290FFF765F”
+
+        '
+      example: 7568290FFF765F
+    ProviderAuthenticationData:
+      type: object
+      required:
+      - ProviderID
+      - AuthenticationDataRecord
+      properties:
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        AuthenticationDataRecord:
+          type: array
+          items:
+            type: object
+            required:
+            - Identification
+            properties:
+              Identification:
+                $ref: '#/components/schemas/Identification'
+    ProviderID:
+      type: string
+      pattern: ^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$
+      description: 'The ProviderID is defined by Hubject and is used to identify the EMP
+
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN
+
+
+        `^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$`
+
+
+        The expression validates the string as ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the ProviderID is provided corresponding to ISO, the country code `MUST` be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “-” is optional.
+
+
+        Examples ISO: “DE8EO”, “DE-8EO”
+
+
+        Examples DIN: “DE8EO”, “DE*8EO”, “DE-8EO”
+
+        '
+      example: DE-8EO
+    eRoamingPushAuthenticationData:
+      type: object
+      description: 'eRoamingPushAuthenticationData is a message that is sent in order to upload authentication data to Hubject.
+
+
+        Note:
+
+        * This message is only for EMPs onboarded to the Hubject platform as offline EMPs.
+
+        '
+      required:
+      - ActionType
+      - ProviderAuthenticationData
+      properties:
+        ActionType:
+          type: string
+          enum:
+          - fullLoad
+          - update
+          - insert
+          - delete
+          description: Describes the action that has to be performed by Hubject with the provided data.
+        ProviderAuthenticationData:
+          $ref: '#/components/schemas/ProviderAuthenticationData'
+      example:
+        ActionType: fullLoad
+        ProviderAuthenticationData:
+          AuthenticationDataRecord:
+          - Identification:
+              RFIDMifareFamilyIdentification:
+                UID: 1234ABCD
+            QRCodeIdentification:
+              EvcoID: DE-DCB-C12345678-X
+              HashedPIN:
+                Function: Bcrypt
+                LegacyHashData:
+                  Function: MD5
+                  Salt: string
+                  Value: string
+                Value: string
+              PIN: '1234'
+            PlugAndChargeIdentification:
+              EvcoID: DE-DCB-C12345678-X
+            RemoteIdentification:
+              EvcoID: DE-DCB-C12345678-X
+            RFIDIdentification:
+              EvcoID: DE-DCB-C12345678-X
+              ExpiryDate: '2021-01-23T14:21:23.744Z'
+              PrintedNumber: '9876655'
+              RFID: mifareCls
+              UID: 1234ABCD
+          ProviderID: DE-DCB
+    RFIDIdentification:
+      type: object
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+        '
+      properties:
+        UID:
+          $ref: '#/components/schemas/UID'
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+        RFID:
+          $ref: '#/components/schemas/RFID'
+        PrintedNumber:
+          type: string
+          maximum: 150
+          description: A number printed on a customer’s card for manual authorization (e.q. via a call center)
+        ExpiryDate:
+          type: string
+          description: Until when this card is valid. Should not be set if card does not have an expiration
+      required:
+      - UID
+      - RFID
+      example:
+        UID: 7568290FFF765F
+        RFID: mifareCls
+    eRoamingAcknowledgment:
+      type: object
+      description: 'The acknowledgement is a message that is sent in response to several requests.
+
+
+        * To `SEND` and `RECEIVE`
+
+        * Implementation: `MANDATORY`
+
+        '
+      required:
+      - Result
+      - StatusCode
+      properties:
+        Result:
+          type: boolean
+          description: 'If result is true, the message was received and the respective operation was performed successfully.
+
+
+            If result is false, the message was received and the respective operation was not performed successfully.
+
+            '
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+      example:
+        Result: true
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: Success
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+    EvcoID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\-?[A-Za-z0-9]{3}\-?C[A-Za-z0-9]{8}\-?[\d|A-Za-z])|([A-Za-z]{2}[\*|\-]?[A-Za-z0-9]{3}[\*|\-]?[A-Za-z0-9]{6}[\*|\-]?[\d|X]))$
+      description: 'A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.
+
+
+        ^(([A-Za-z]{2}\-?[A-Za-z0-9]{3}\-?C[A-Za-z0-9]{8}\-?[\d|A-Za-z])|([A-Za-z]{2}[\*|\-]?[A-Za-z0-9]{3}[\*|\-]?[A-Za-z0-9]{6}[\*|\-]?[\d|X]))$
+
+        The expression validates the string as EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the EvcoID is provided corresponding to ISO, the instance part MUST be eight characters long and MUST be provided with a prepended “C”. The optional separating character MUST be “-“.
+
+
+        In case the EvcoID is provided corresponding to DIN, the instance part MUST be six characters long. The optional separating character can either be “*” or “-“.
+
+
+        Examples ISO: “DE-8EO-CAet5e4XY-3”, “DE8EOCAet5e43X1”
+
+
+        Examples DIN: “DE*8EO*Aet5e4*3”, “DE-8EO-Aet5e4-3”, “DE8EOAet5e43”
+
+        '
+      example: DE*8EO*Aet5e4*3
+    RFID:
+      type: string
+      description: 'Defined RFID Type
+
+        '
+      enum:
+      - mifareCls
+      - mifareDes
+      - calypso
+      - nfc
+      - mifareFamily
+    PlugAndChargeIdentification:
+      type: object
+      description: 'Authentication required for Plug&Charge (EMAID/EVCOID)
+
+        '
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+      required:
+      - EvcoID
+      example:
+        EvcoID: DE*8EO*Aet5e4*3
+    SessionID:
+      type: string
+      pattern: ^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$
+      description: 'The Hubject SessionID that identifies the process
+
+
+        A string that `MUST` be valid with respect to the following regular expression:
+
+
+        `^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$`
+
+
+        The expression validates the string as a GUID.
+
+
+        Example: “b2688855-7f00-0002-6d8e-48d883f6abb6”
+
+        '
+      example: b2688855-7f00-0002-6d8e-48d883f6abb6
+    RemoteIdentification:
+      type: object
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+        '
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+      required:
+      - EvcoID
+      example:
+        EvcoID: DE*8EO*Aet5e4*3
+    QRCodeIdentification:
+      type: object
+      required:
+      - EvcoID
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+        HashedPIN:
+          type: object
+          required:
+          - Value
+          - Function
+          properties:
+            Value:
+              type: string
+              pattern: ^[0-9A-Za-z\\.+/=\\$]{10,100}$
+              description: 'Hash value created by partner
+
+
+                The expression validates the string as a hash function result value with a length between 10 and 100 characters
+
+
+                Example: “a5ghdhf73h”
+
+                '
+              example: a5ghdhf73h
+            Function:
+              type: string
+              enum:
+              - Bcrypt
+              description: Function that was used to generate the hash value.
+              example: Bcrypt
+            LegacyHashData:
+              type: object
+              required:
+              - Function
+              properties:
+                Function:
+                  type: string
+                  enum:
+                  - MD5
+                  - SHA-1
+                  description: Function used for hashing of the PIN at the partner.
+                  example: SHA-1
+                Salt:
+                  type: string
+                  minimum: 0
+                  maximum: 100
+                  description: The salt value used by the partner for hashing the PIN.
+                  example: example-salt
+                Value:
+                  type: string
+                  minimum: 0
+                  maximum: 20
+                  description: PIN hash at the partner.
+                  example: a5ghdhf73h
+        PIN:
+          type: string
+  parameters:
+    providerID:
+      name: providerID
+      in: path
+      required: true
+      description: The id of the provider
+      schema:
+        type: string

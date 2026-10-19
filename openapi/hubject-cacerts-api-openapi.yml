@@ -1,0 +1,159 @@
+openapi: 3.2.0
+info:
+  title: EST Cacerts API
+  version: '1.0'
+  description: 'The EST interface receives CSRs from CPOs, MOs, OEMs abd CPSs, signs them and delivers an ISO 15118 leaf certificate. The PKI Gateway/Certificate Manager creates the leaf certificates from the Sub 2 CA of the respective role.
+
+
+    This interface can create leaf certificates for CPOs (SECC Certificate), MOs (Contract Certificate), OEMs (Provisioning Certificate) and CPSs (Provisioning Signing Certificates)
+
+
+    An EST interface is a standard implementation, which is described in the RFC7030. For further information, please see https://tools.ietf.org/html/rfc7030
+
+
+    Each CA in the V2G PKI Service has its own Protocol Gateway handler, which need to be addressed in the URL postfix of the requests. The postfix is displayed below for the default named CAs:'
+  contact:
+    name: Hubject GmbH
+    url: https://hubject.com
+    email: support@pnc.hubject.com
+  termsOfService: https://www.hubject.com/pki/
+  license:
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+    name: Attribution-ShareAlike 4.0 International
+servers: []
+tags:
+- name: Cacerts
+paths:
+  /{ca}/cacerts/{iso-version}/{algorithm}/:
+    parameters:
+    - schema:
+        type: string
+        pattern: ^(\w+-)?(mo|cpo|oem|veh|cps)$
+        example: cpo
+        enum:
+        - cpo
+        - oem
+        - cps
+        - veh
+        - mo
+      name: ca
+      in: path
+      required: true
+      description: 'The Sub-CA identifier the certificate is requested from. '
+    - schema:
+        type: string
+        default: ISO15118-2
+        enum:
+        - ISO15118-20
+        - ISO15118-2
+        example: ISO15118-20
+      name: iso-version
+      in: path
+      description: The ISO version which shall be used. If not set, ISO15118:2 will be used as default
+    - schema:
+        type: string
+        enum:
+        - secp256r1
+        - secp521r1
+        - ed448
+        default: secp256r1
+        example: secp521r1
+      name: algorithm
+      in: path
+      description: 'Defines the algorithm for the PKI which shall be used. '
+    get:
+      summary: Obtaining CA Certificates
+      tags:
+      - Cacerts
+      responses:
+        '200':
+          description: OK
+          headers:
+            content-transfer-encoding:
+              schema:
+                type: string
+              description: base64
+            content-type:
+              schema:
+                type: string
+              description: application/pkcs7-mime; smime-type=certs-only
+          content:
+            application/pkcs10:
+              schema:
+                type: string
+                description: The CA certificates
+            application/pkcs7:
+              schema:
+                type: string
+                description: The CA certificates
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        5XX:
+          description: Internal Server Error
+      operationId: cacerts
+      parameters:
+      - schema:
+          type: string
+        in: header
+        name: Content-Transfer-Encoding
+        description: application/pkcs10
+        required: true
+      description: 'The distribution of CA certificates is provided by role.
+
+        | role | CA | Chain||
+
+        | ---- | --- |--- |--- |
+
+        | CPO | cpo | CPO/CPMS from V2G PKI |
+
+        | MO | mo | MO from V2G PKI|
+
+        | OEM | oem | Provisioning Certificate chain from V2G PKI|
+
+        | OEM | veh | Vehicle Certificate chain from V2G PKI secp256r1 (ISO15118:20)|
+
+        | CPS | cps | Provisioning Signing Certificate (CPS) chain from V2G PKI |'
+      security:
+      - CPO: []
+      - MO_with_V2G_PKI: []
+      - OEM_with_V2G_PKI: []
+components:
+  securitySchemes:
+    CPO:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+      description: 'OAuth2 is used to grant access to the CPO related endpoint.  '
+    MO_with_V2G_PKI:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+      description: 'OAuth2 is used to grant access to the MO related endpoint. '
+    OEM_with_V2G_PKI:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+      description: 'OAuth2 is used to grant access to the OEM related endpoint. '
+    CPS:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+      description: 'OAuth2 is used to grant access to the CPS Operator related endpoint. '

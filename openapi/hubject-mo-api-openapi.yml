@@ -1,0 +1,1002 @@
+openapi: 3.2.0
+info:
+  title: Hubject MO API
+  version: '1.0'
+  contact:
+    name: Hubject GmbH
+    url: https://hubject.com
+    email: support@pnc.hubject.com
+  license:
+    name: Attribution-ShareAlike 4.0 International
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  termsOfService: https://www.hubject.com/pki/
+  description: 'Operations tagged MO across 3 of this provider''s published API definitions: hubject-opcp-ccp-openapi.json, hubject-opcp-cps-openapi.json, hubject-opcp-pcp-openapi.json. Each path carries the servers of the definition it was published in.'
+tags:
+- name: MO
+  description: API relevant for Mobility Operators
+paths:
+  /v1/ccp/signedContractData/{emaid}:
+    parameters:
+    - schema:
+        type: string
+        pattern: ^[A-Za-z]{2}[-]?\w{3}[-]?\w{9}[-]?(\w{1})?$
+        minLength: 14
+        maxLength: 15
+      name: emaid
+      in: path
+      required: true
+      description: Contract identifier of contract certificate
+    delete:
+      summary: Delete Signed Contract Data
+      operationId: deleteSignedContractData
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Invalid EMAID:
+                  value:
+                    errorMessages:
+                    - 'emaid : must match "^[A-Za-z]{2}[-]?\w{3}[-]?\w{9}[-]?(\w{1})?$"'
+                    traceId: a079010e-4766-4f4a-9f4c-ccd0f0ddae1e
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                EMAID not found:
+                  value:
+                    errorMessages:
+                    - The contract for the given EMAID not found.
+                    traceId: bc81a20d-e517-4b5d-b6d7-e6d1888a9662
+        '500':
+          description: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '503':
+          description: Service Unavailable
+      tags:
+      - MO
+      description: 'The deletion of signed contract data from the CCP can be used to de-publish it by the MO. A revoked or expired contract certificate will be cleaned from the pool automatically. See the section Data Cleansing in the CCP description.
+
+
+        The PCP calls this method when a Provisioning Certificate has been deleted. See `DELETE /oem/provCerts/{pcid}` for more details.
+
+
+        ### Data validation steps
+
+
+        The Contract Certificate Pool performs the following validation steps before deleting signed contract data.
+
+
+        | Target | Check |
+
+        |--------------------------|----------------------------- |
+
+        | Authorization | Sender must be allowed to delete contract data for the given EMAID. |
+
+        | Request Parameter | The EMAID must be provided.
+
+        | Request Parameter | The EMAID must match the specification |
+
+        | Request Parameter | The EMAID must reference an existing contract data package. |
+
+
+        ## Automatic revocation
+
+
+        > If the Contract Certificate has been issued by a Operator-operated MO CA, the certificate will be revoked automatically. This functionality can be turned of by setting the `X-Skip-Revocation` header to `true`. This is not recommended and should just be used for test cases!
+
+
+        The procedure for this functionality is:
+
+
+        1. CCP receives a DELETE for a EMAID.
+
+        2. The CCP checks if the related Contract Certificated has been issued by a Operator MO V2G CA
+
+        3. If so, the CCP sends a revocation request to the issuing CA.
+
+        4. On successful revocation the Contract Data will be deleted from the pool. On error the Contract Data remains in the pool and an error message is returned.'
+      parameters:
+      - schema:
+          type: boolean
+          enum:
+          - true
+          - false
+          default: false
+        in: header
+        name: X-Skip-Revocation
+        description: Do not revoke the contract certificate.
+      security:
+      - MO: []
+  /v1/ccp/lookupContract/{emaid}:
+    parameters:
+    - schema:
+        type: string
+        pattern: ^[A-Za-z]{2}[-]?\w{3}[-]?\w{9}[-]?(\w{1})?$
+      name: emaid
+      in: path
+      required: true
+      description: Contract identifier of contract certificate
+    get:
+      summary: Lookup Contract
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupContractResponse'
+              examples:
+                example-1:
+                  value:
+                    XMLContracts:
+                    - pcid: huboemprovcqa0615
+                      emaid: EMP99CQATEST001
+                      xsdMsgDefNamespace: urn:iso:15118:2:2013:MsgDef
+                      contractCertificate: MIIB7jCCAZSgAwIBAgIQQihl/GZf3VrjEbtD8OftBDAKBggqhkjOPQQDAjBYMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMR0wGwYDVQQDExRNTyBTdWIyIENBIFFBIEcxLjEuMTETMBEGCgmSJomT8ixkARkWA1YyRzAeFw0yMjAyMDcyMzE3MzdaFw0yMjEyMTAxMTQyNTlaMDExFTATBgNVBAoTDEh1YmplY3QgR21iSDEYMBYGA1UEAxMPRU1QOTlDUUFURVNUMDAxMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEDB59w53BxLuMBDDYTzDqpJLoJqIZEJoZWlYti+n97erJYD8JHaA0630uzghrNnjVa8sZKqBv8XX6V9H6H+gYS6NnMGUwEQYDVR0OBAoECEPJRNHvPWNdMBMGA1UdIwQMMAqACEf6f9verOzVMDsGCCsGAQUFBwEBBC8wLTArBggrBgEFBQcwAYYfaHR0cDovL29jc3AtcWEuaHViamVjdC5jb206ODA4MDAKBggqhkjOPQQDAgNIADBFAiEA3S6DrF1uTpyZW/eF3XPeykX2L6ubl/2fiNujT4ENX1cCIF/D/ftiHiIKcuDLrHRVFxpcXeQfQ8NmUHhThtNZRDRC
+                      priority: 1
+                      certValidFrom: '2022-02-07T23:17:37Z'
+                      certValidTo: '2022-12-10T11:42:59Z'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Invalid EMAID:
+                  value:
+                    errorMessages:
+                    - 'emaid : must match "^[A-Za-z]{2}[-]?\w{3}[-]?\w{9}[-]?(\w{1})?$"'
+                    traceId: 02be5c05-298b-4503-a685-8126951e0233
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '503':
+          description: Service Unavailable
+      operationId: lookupContract
+      description: The MO sends a request to the Contract Certificate Pool (CCP) to check the availability of the contract for the requested EMAID.
+      tags:
+      - MO
+      security:
+      - OEM: []
+      - CPO: []
+      parameters:
+      - schema:
+          type: string
+          default: urn:iso:15118:2:2013:MsgDef
+          example: urn:iso:15118:2:2013:MsgDef
+        in: query
+        name: xsdMsgDefNamespace
+        description: to receive contract data for a specific ISO version
+      - schema:
+          type: string
+          pattern: ^[0-9a-fA-F]{8}\-([0-9a-fA-F]{4}\-){3}[0-9a-fA-F]{12}$
+          example: 896b6655-180e-4304-b642-606bb00df8f0
+        in: query
+        description: The SHA256 Fingerprint of the desired V2G root CA which shall was used to sign these data with the regarding CPS signing certificate. Its optional. If not given, the CPS will decide which CPS signing V2G PKI will be renurned
+        name: cpsV2GRootCertificateFingerprint
+  /v1/cps/forward/signedContractData:
+    parameters: []
+    put:
+      summary: Create and forward Signed Contract Data
+      operationId: createAndForwardSignedContractData
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                Invalid PrivateKey:
+                  value:
+                    errorMessages:
+                    - 'contractData.contractSignatureEncryptedPrivateKey : must match "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"'
+                    traceId: 3cf35ee3-13ac-4387-b37e-6a72af668727
+                Invalid DH-Public-Key:
+                  value:
+                    errorMessages:
+                    - 'contractData.dHpublickey : must match "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"'
+                    traceId: e0e6eaa3-f2ce-4bfd-b067-50fd88a88bfd
+                Invalid ContractCert:
+                  value:
+                    errorMessages:
+                    - 'contractData.contractSignatureCertChain.contractSignatureCertChainCertificate : must match "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"'
+                    traceId: fa6f880b-6b96-4499-8a99-036083377006
+                Invalid Contract CA:
+                  value:
+                    errorMessages:
+                    - Invalid certificate format on contractSignatureCertChainSubCertificates list
+                    traceId: ef689caa-7c3b-4be0-bcb5-c667782480fd
+                Invalid PCID:
+                  value:
+                    errorMessages:
+                    - 'pcid : must match "^[a-zA-Z0-9]{17,18}$"'
+                    traceId: 634cdfa3-4fe7-419d-9963-bb412929b0f3
+                Invalid Emaid:
+                  value:
+                    errorMessages:
+                    - 'emaid : must match "^[A-Za-z]{2}[-]?\w{3}[-]?\w{9}[-]?(\w{1})?$"'
+                    traceId: 57a24dd5-08e2-4d78-8a77-b49b9db411f2
+                EMAID already used:
+                  value:
+                    errorMessages:
+                    - Invalid Tupple - EMAID is already used by other PCID.
+                    traceId: 3e002e2a-580b-48e4-88a5-6b782cae636b
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '503':
+          description: Service Unavailable
+      tags:
+      - MO
+      description: 'This interface signs Contract Data in the CPS and stores them in the CCP.
+
+
+        > #### Deprecated!
+
+        > Please be aware that this method is deprecated. Please use /v1/cps/contractData/signed'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSignedContractDataRequest'
+        description: Expects a [Contract Data V1](models/contract-data.v1.json) object.
+      security:
+      - MO_with_own_PKI: []
+      deprecated: true
+  /v1/cps/signedContractData:
+    parameters: []
+    put:
+      summary: Create Signed Contract Data
+      operationId: createSignedContractData
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSignedContractDataResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '503':
+          description: Service Unavailable
+      description: 'This interface signs Contract Data in the CPS and sends it as Signed Contract Data back to the MO. By using this method Signed Contract Data is not stored in the Contract Certificate Pool, and it is not made available for the OEM and CPO backend. After using this method, the _Add Signed Contract Data_ method of the Contract Certificate Pool could be used to store the Signed Contract Data in CCP or its getting stored in another CCP
+
+
+        > #### Deprecated!
+
+        > Please be aware that this method is deprecated. Please use /v1/cps/contractData/signed'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSignedContractDataRequest'
+      tags:
+      - MO
+      security:
+      - MO_with_own_PKI: []
+      deprecated: true
+  /v1/cps/generate/signedContractData:
+    parameters: []
+    put:
+      summary: Generate Signed Contract Data
+      operationId: generateSignedContractData
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                EMAID already used:
+                  value:
+                    errorMessages:
+                    - Invalid Tupple - EMAID is already used by other PCID.
+                    traceId: 3e002e2a-580b-48e4-88a5-6b782cae636b
+                Invalid EMAID:
+                  value:
+                    errorMessages:
+                    - 'emaid : must match "^[A-Za-z]{2}[-]?\w{3}[-]?\w{9}[-]?(\w{1})?$"'
+                    traceId: 57a24dd5-08e2-4d78-8a77-b49b9db411f2
+                Invalid PCID:
+                  value:
+                    errorMessages:
+                    - 'pcid : must match "^[a-zA-Z0-9]{17,18}$"'
+                    traceId: a29a7734-0599-4394-9300-d912a6bfd914
+                Invalid Date:
+                  value:
+                    errorMessages:
+                    - The given contractEnds date is in the past.
+                    traceId: 8185b433-8598-463e-a83f-9dbfea8a33e0
+                PCID not Available:
+                  value:
+                    errorMessages:
+                    - The OEM provisioning certificate with the given PCID is not available.
+                    traceId: fb683590-7de9-4c3e-ae41-a83ccb578628
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '503':
+          description: Service Unavailable
+      tags:
+      - MO
+      description: 'This service creates and signs contractData for delivered contract information. The contract certificate will be signed by the MO SUB CA2 which is derived from the V2G Root CA
+
+
+        The created and signed contractData is stored in the contract certificate pool for provisioning to the OEM- and CPO-backend.
+
+
+        To update a contractData, the interface must be called again with the same PCID and EMAID. The system will replace the old contractData with the new one.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateSignedContractDataRequest'
+          application/xml:
+            schema:
+              description: ''
+              type: object
+              properties:
+                contractBegins:
+                  type: string
+                  minLength: 1
+                contractEnds:
+                  type: string
+                  minLength: 1
+                pcid:
+                  type: string
+                  minLength: 1
+                emaid:
+                  type: string
+                  minLength: 1
+                xsdMsgDefNamespace:
+                  type: string
+                  minLength: 1
+              required:
+              - contractBegins
+              - contractEnds
+              - pcid
+              - emaid
+              - xsdMsgDefNamespace
+              x-examples:
+                example-1:
+                  contractBegins: '2021-05-11T00:00:00Z'
+                  contractEnds: '2022-12-10T11:42:59Z'
+                  pcid: huboemprovcqa0615
+                  emaid: EMP99CQATest001
+                  xsdMsgDefNamespace: urn:iso:15118:2:2013:MsgDef
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GenerateSignedContractDataRequest'
+        description: ''
+      security:
+      - MO_without_PKI: []
+  /v1/oem/provCerts/{pcid}:
+    parameters:
+    - schema:
+        type: string
+        pattern: ^[a-zA-Z0-9]{17,18}$
+      name: pcid
+      in: path
+      required: true
+    get:
+      summary: Get Provisioning Certificate
+      tags:
+      - MO
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProvisioningCertificateResponse'
+              examples:
+                example:
+                  value:
+                    OEMMessage:
+                      subCA1Certificate: MIICcDCCAhagAwIBAgIQXMXiFXMtVoQuJEiVS6/hkDAKBggqhkjOPQQDAjBaMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMSHViamVjdCBJbmMuMRMwEQYKCZImiZPyLGQBGRYDVjJHMR8wHQYDVQQDExZVUyBWMkcgUm9vdCBDQSBURVNUIEcyMB4XDTIwMDQwMTIxNTk1OVoXDTMwMDQwMTIxNTk1OVowZTELMAkGA1UEBhMCVVMxHjAcBgNVBAoTFUVsZWN0cmlmeSBBbWVyaWNhIExMQzETMBEGCgmSJomT8ixkARkWA1YyRzEhMB8GA1UEAxMYVVMgT0VNIFN1YjEgQ0EgVEVTVCBHMi4xMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEsXy1jgnjOaAlV8XPoawTX6xVi5of7FpNCUvCT7MylIogG1wuNefIM4M5pmP2jwUqhFpnKqppUvWKj8QiTSxJj6OBsjCBrzASBgNVHRMBAf8ECDAGAQH/AgEBMBEGA1UdDgQKBAhKDP6+ZPsRazAZBgNVHSAEEjAQMA4GDCsGAQQBg64NAQIBAjATBgNVHSMEDDAKgAhPEzNrrjPLHDBGBggrBgEFBQcBAQQ6MDgwNgYIKwYBBQUHMAGGKmh0dHA6Ly9vY3NwLXRlc3QuZWxlY3RyaWZ5YW1lcmljYS5jb206ODA4MDAOBgNVHQ8BAf8EBAMCAQYwCgYIKoZIzj0EAwIDSAAwRQIgFbsW5u11EgVDNKlhWBPZXsy8USfHKrScrUMyRxyWJ2cCIQCvXRhAXn9SWLSoRtgU3ssFc/z++vCIO6RLTV/VMZAXiw==
+                      subCA2Certificate: MIICfTCCAiOgAwIBAgIQV8r0UuTi+jfwY8ifpELM7jAKBggqhkjOPQQDAjBlMQswCQYDVQQGEwJVUzEeMBwGA1UEChMVRWxlY3RyaWZ5IEFtZXJpY2EgTExDMRMwEQYKCZImiZPyLGQBGRYDVjJHMSEwHwYDVQQDExhVUyBPRU0gU3ViMSBDQSBURVNUIEcyLjEwHhcNMjAwNDAxMjE1OTU5WhcNMzAwNDAxMjE1OTU5WjBnMQswCQYDVQQGEwJVUzEeMBwGA1UEChMVRWxlY3RyaWZ5IEFtZXJpY2EgTExDMRMwEQYKCZImiZPyLGQBGRYDVjJHMSMwIQYDVQQDExpVUyBPRU0gU3ViMiBDQSBURVNUIEcyLjEuMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABDHsKEUHVmO1CnNsocXz8/Ix9nom93is1nIe2RvuCNNOTSQF15skyBu2tObjg5atZe+4D0FXll+pqafanYkHEhmjgbIwga8wEgYDVR0TAQH/BAgwBgEB/wIBADARBgNVHQ4ECgQISX1zCMOyu74wGQYDVR0gBBIwEDAOBgwrBgEEAYOuDQECAQIwEwYDVR0jBAwwCoAISgz+vmT7EWswRgYIKwYBBQUHAQEEOjA4MDYGCCsGAQUFBzABhipodHRwOi8vb2NzcC10ZXN0LmVsZWN0cmlmeWFtZXJpY2EuY29tOjgwODAwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIAvUXtdhtkSs31QApigXViBfI7GR7iZGN7dSQcSTEh/MAiEA22ao571oT6g1z81hdXe5o1dEOdp7dDLv8hfwhHKhDR4=
+                      vehicleCertificate: MIICiDCCAi2gAwIBAgIQQmpXsT0VMde403UbiKILKzAKBggqhkjOPQQDAjBnMQswCQYDVQQGEwJVUzEeMBwGA1UEChMVRWxlY3RyaWZ5IEFtZXJpY2EgTExDMRMwEQYKCZImiZPyLGQBGRYDVjJHMSMwIQYDVQQDExpVUyBPRU0gU3ViMiBDQSBURVNUIEcyLjEuMTAeFw0yMDA1MjcxNjI4MzdaFw0yNDA1MjcxNjI4MzdaMIGPMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMRowGAYDVQQDExFodWJVc0VhVGVzdDAwMDAwMzEPMA0GA1UEBxMGQmVybGluMSswKQYJKoZIhvcNAQkBFhxzdXBwb3J0LmlzbzE1MTE4QGh1YmplY3QuY29tMQ8wDQYDVQQIEwZCZXJsaW4wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQfGur5wYXPC04O+cCM8Q/eOtqBjLA03z1g0yax9LPAtPk7rJ/k6GFxh1aMSeiVyyYTEqBpG+xM1fR5PR2MZxjPo4GRMIGOMBEGA1UdDgQKBAhLtQDVP/7MZjAcBgNVHREEFTATghFodWJVc0VhVGVzdDAwMDAwMzATBgNVHSMEDDAKgAhJfXMIw7K7vjBGBggrBgEFBQcBAQQ6MDgwNgYIKwYBBQUHMAGGKmh0dHA6Ly9vY3NwLXRlc3QuZWxlY3RyaWZ5YW1lcmljYS5jb206ODA4MDAKBggqhkjOPQQDAgNJADBGAiEA+UvYYcovadAA0RI1mAnQ72oL64jibCifbuKB3+0bJloCIQDW+r8yV5IZq1rHx0RtMYXWlsdMcM9fB002Fcj4WVrUcg==
+                      rootAuthorityKeyIdentifier: 4F:13:33:6B:AE:33:CB:1C
+                      rootIssuerDistinguishedName: CN=US V2G Root CA TEST G2, DC=V2G, O=Hubject Inc., C=US
+                      rootIssuerSerialNumber: 413de92d304ea90af4c9710392b437cf
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: ./cps.v1.json#/components/schemas/Error
+              examples:
+                INVALID PCID:
+                  value:
+                    errorMessages:
+                    - 'pcid : must match "^[a-zA-Z0-9]{17,18}$"'
+                    traceId: 1c8c56cb-b71f-46a5-8788-5ddcedc88e2a
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                NOT FOUND:
+                  value:
+                    errorMessages:
+                    - The OEM provisioning certificate with given PCID is not found.
+                    traceId: 807838e3-b058-447c-b6f8-233638cefc18
+        '500':
+          description: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '503':
+          description: Service Unavailable
+      operationId: getOEMProvCert
+      description: 'This method is used by the MO to request Provisioning Certificates.
+
+
+        Before the delivery of OEM provisioning certificate from the PCP, it proceeds with the following steps:
+
+
+        1. Verifies the certificate status of each OEM certificate from the OCSP responders or CRL of an OEM.
+
+        2. Verifies trust chain with OEM root certificate
+
+
+        For each step, which cannot be validated, the PCP sends an error code to the MO.
+
+        Returns a Provisioning Certificate V1 object if PCID/Prov Certificate was in the pool.'
+      security:
+      - MO: []
+      - OEM: []
+      parameters:
+      - schema:
+          type: boolean
+          default: 'false'
+          example: 'true'
+        in: header
+        description: 'if set to true - this call is not getting forwarded to other Ecosystems '
+        name: broadcast
+  /v1/oem/provCerts/lookupVehicle/{pcid}:
+    parameters:
+    - schema:
+        type: string
+        pattern: ^[a-zA-Z0-9]{17,18}$
+        minLength: 17
+        maxLength: 18
+      name: pcid
+      in: path
+      required: true
+    get:
+      summary: Lookup Vehicle
+      tags:
+      - MO
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                INVALID PCID:
+                  value:
+                    errorMessages:
+                    - 'pcid : must match "^[a-zA-Z0-9]{17,18}$"'
+                    traceId: 1c8c56cb-b71f-46a5-8788-5ddcedc88e2a
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                NOT FOUND:
+                  value:
+                    errorMessages:
+                    - The OEM provisioning certificate with given PCID is not found.
+                    traceId: 807838e3-b058-447c-b6f8-233638cefc18
+        '500':
+          description: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '503':
+          description: Service Unavailable
+      operationId: lookupVehicle
+      description: 'This method is used by the MO to test if there is a certificate available for a given PCID.
+
+
+        > ### Change notice
+
+        >
+
+        > This method will be changed to the form `HEAD /{pcid}` in future versions to make the API more consistent.'
+      security:
+      - MO: []
+      - OEM: []
+components:
+  schemas:
+    LookupContractResponse:
+      type: object
+      title: LookupContractResponse
+      x-examples:
+        example-1:
+          XMLContracts:
+          - pcid: WMIP12345678901234
+            emaid: EMP99C123456789
+            xsdMsgDefNamespace: urn:iso:15118:2:2013:MsgDef
+            contractCertificate: string
+            defaultContract: true
+            certValidFrom: '2019-08-24T14:15:22Z'
+            certValidTo: '2019-08-24T14:15:22Z'
+            cpsRootCertificateId: '"CN=V2G Root CA QA G1, DC=V2G, O=Hubject GmbH, C=DE"'
+            cpsRootDistinguishedName: 896b6655-180e-4304-b642-606bb00df8f0
+      properties:
+        XMLContracts:
+          type: array
+          items:
+            type: object
+            properties:
+              pcid:
+                type: string
+                description: PCID of vehicle certificate
+                pattern: ^[a-zA-Z0-9]{17,18}$
+                minLength: 17
+                maxLength: 18
+              emaid:
+                type: string
+                description: contract identifier of contract certificate
+                pattern: ^[A-Za-z]{2}[-]?\w{3}[-]?\w{9}[-]?(\w{1})?$
+                minLength: 14
+                maxLength: 15
+              xsdMsgDefNamespace:
+                type: string
+                example: urn:iso:15118:2:2013:MsgDef
+                description: ISO Version
+              contractCertificate:
+                type: string
+                description: Contract Certificate in base64 encoded DER form
+                pattern: ^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$
+                maxLength: 800
+              defaultContract:
+                type: boolean
+                description: If set to true it will get delivered as certificateInstallationResponse. the value is defined by the OEM/User if multiple contracts are stored in the CCP for one PCID.
+                example: true
+                enum:
+                - true
+                - false
+              certValidFrom:
+                type: string
+                format: date-time
+                example: '2019-08-24T14:15:22Z'
+                description: Valid From Date and Time of contract certificate
+              certValidTo:
+                type: string
+                format: date-time
+                example: '2019-08-24T14:15:22Z'
+                description: Valid to Date and Time of contract certificate
+              cpsRootCertificateDN:
+                type: string
+                example: 896b6655-180e-4304-b642-606bb00df8f0
+                pattern: ^[0-9a-fA-F]{8}\-([0-9a-fA-F]{4}\-){3}[0-9a-fA-F]{12}$
+                description: The DN of the desired V2G root CA
+                x-stoplight:
+                  id: i0q8u31ihz6re
+              cpsV2GRootCertificateFingerprint:
+                type: string
+                description: The SHA256 Fingerprint of the desired V2G root CA which shall was used to sign these data with the regarding CPS signing certificate. Its optional. If not given, the CPS will decide which CPS signing V2G PKI will be renurned
+                pattern: ^((CN|OU|O|C|DC|ST)=[^,]+,? ?)+$
+                example: CN=V2G Root CA QA G1, DC=V2G, O=Hubject GmbH, C=DE
+                x-stoplight:
+                  id: vl0bfmhcp30fg
+    Error:
+      title: Error
+      type: object
+      properties:
+        errorMessages:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+        traceId:
+          type: string
+          format: uuid
+    GenerateSignedContractDataRequest:
+      type: object
+      title: CPS generateSignedContractDataRequest (V1)
+      x-examples:
+        example:
+          contractBegins: '2021-05-11T00:00:00Z'
+          contractEnds: '2022-12-10T11:42:59Z'
+          pcid: huboemprovcqa0615
+          emaid: EMP99CQATest001
+          xsdMsgDefNamespace: urn:iso:15118:2:2013:MsgDef
+      properties:
+        contractBegins:
+          type: string
+          description: Timestamp the contract will begin at.
+          x-constraint: '@ValidDateTime'
+          x-constraint-message: The contractBegins does not match the specification
+        contractEnds:
+          type: string
+          description: Timestamp until the contract is active.
+          x-constraint: '@ValidDateTime'
+          x-constraint-message: The contractEnds does not match the specification
+        emaid:
+          type: string
+          pattern: ^[A-Za-z]{2}[-]?\w{3}[-]?\w{9}[-]?(\w{1})?$
+          description: contract identifier of contract certificate
+        pcid:
+          type: string
+          pattern: ^[a-zA-Z0-9]{17,18}$
+          description: PCID of vehicle certificate
+        xsdMsgDefNamespace:
+          type: string
+          example: urn:iso:15118:2:2013:MsgDef
+          x-constraint: '@ValidXsdMsgDefNamespace'
+          default: urn:iso:15118:2:2013:MsgDef
+          description: ISO Version which shall be used for the signature
+        subscriptionUrl:
+          type: string
+          example: https://testmo.com/subscriptions/v2g
+          pattern: ^(https?|http)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]
+          description: URL which could be given by MO to allow extended information exchange for a given contract
+        cpsV2GRootCertificateFingerprint:
+          type: string
+          description: 'The SHA256 Fingerprint of the desired V2G root CA which shall be used to sign these data with the regarding CPS signing certificate. Its optional. If not given, the CPS will decide which CPS signing V2G PKI will be used
+
+            '
+          pattern: ^[0-9a-fA-F]{8}\-([0-9a-fA-F]{4}\-){3}[0-9a-fA-F]{12}$
+          example: 896b6655-180e-4304-b642-606bb00df8f0
+          x-stoplight:
+            id: nnb9mb40w0ojj
+        metaData:
+          type: string
+          description: Placeholder for future adaption
+      required:
+      - contractBegins
+      - contractEnds
+      - emaid
+      - pcid
+      - xsdMsgDefNamespace
+    CreateSignedContractDataRequest:
+      type: object
+      title: CPS createSignedContractDataRequest (V1)
+      x-examples:
+        example-1:
+          contractData:
+            contractSignatureCertChain:
+              contractSignatureCertChainCertificate: MIIB7jCCAZSgAwIBAgIQQihl/GZf3VrjEbtD8OftBDAKBggqhkjOPQQDAjBYMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMR0wGwYDVQQDExRNTyBTdWIyIENBIFFBIEcxLjEuMTETMBEGCgmSJomT8ixkARkWA1YyRzAeFw0yMjAyMDcyMzE3MzdaFw0yMjEyMTAxMTQyNTlaMDExFTATBgNVBAoTDEh1YmplY3QgR21iSDEYMBYGA1UEAxMPRU1QOTlDUUFURVNUMDAxMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEDB59w53BxLuMBDDYTzDqpJLoJqIZEJoZWlYti+n97erJYD8JHaA0630uzghrNnjVa8sZKqBv8XX6V9H6H+gYS6NnMGUwEQYDVR0OBAoECEPJRNHvPWNdMBMGA1UdIwQMMAqACEf6f9verOzVMDsGCCsGAQUFBwEBBC8wLTArBggrBgEFBQcwAYYfaHR0cDovL29jc3AtcWEuaHViamVjdC5jb206ODA4MDAKBggqhkjOPQQDAgNIADBFAiEA3S6DrF1uTpyZW/eF3XPeykX2L6ubl/2fiNujT4ENX1cCIF/D/ftiHiIKcuDLrHRVFxpcXeQfQ8NmUHhThtNZRDRC
+              contractSignatureCertChainSubCertificates:
+              - MIICgDCCAiagAwIBAgIQV3xs5x1SZUQzUaM1BxVzNDAKBggqhkjOPQQDAjBWMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMRMwEQYKCZImiZPyLGQBGRYDVjJHMRswGQYDVQQDExJNTyBTdWIxIENBIFFBIEcxLjEwHhcNMTkwNTAyMDgwOTQwWhcNMjkwNTAyMDgwOTQwWjBYMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMR0wGwYDVQQDExRNTyBTdWIyIENBIFFBIEcxLjEuMTETMBEGCgmSJomT8ixkARkWA1YyRzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABKJ4aspMPXpAx1ZDFMLASHPproU8C7PMUzZt0dxyO318KZBXaKsUI0ReE1bAAOmxxeOHnNs1kiiUPWM6KKg0fHyjgdMwgdAwEgYDVR0TAQH/BAgwBgEB/wIBADARBgNVHQ4ECgQIR/p/296s7NUwRQYDVR0gBD4wPDA6BgwrBgEEAYLENQECAQAwKjAoBggrBgEFBQcCARYcaHR0cHM6Ly93d3cuaHViamVjdC5jb20vcGtpLzATBgNVHSMEDDAKgAhInhY/vHd0mjA7BggrBgEFBQcBAQQvMC0wKwYIKwYBBQUHMAGGH2h0dHA6Ly9vY3NwLXFhLmh1YmplY3QuY29tOjgwODAwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIQCyh1nEBXQAQeJbz/6FK+vzr62IDu1kZHOSJexZPgDh/AIgLtAet8c9uX79c3skG+hmv4eu/ZPH1yr48fAWq2uKl0E=
+              - MIICfTCCAiOgAwIBAgIQWt/tqVhH27TWNDXDvucEejAKBggqhkjOPQQDAjBVMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMRMwEQYKCZImiZPyLGQBGRYDVjJHMRowGAYDVQQDExFWMkcgUm9vdCBDQSBRQSBHMTAeFw0xOTA0MjYwOTA0MDFaFw0zOTA0MjYwOTA0MDFaMFYxCzAJBgNVBAYTAkRFMRUwEwYDVQQKEwxIdWJqZWN0IEdtYkgxEzARBgoJkiaJk/IsZAEZFgNWMkcxGzAZBgNVBAMTEk1PIFN1YjEgQ0EgUUEgRzEuMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABNDMXgBjwC/fVHNBhQkXMNHzTEnJDMJ+KQ9Sm0L2uPM6fA8M2yk29dvTwzI6mLCR+xoVnZy75z2iUCkBqSTPVDajgdMwgdAwEgYDVR0TAQH/BAgwBgEB/wIBATARBgNVHQ4ECgQISJ4WP7x3dJowRQYDVR0gBD4wPDA6BgwrBgEEAYLENQECAQAwKjAoBggrBgEFBQcCARYcaHR0cHM6Ly93d3cuaHViamVjdC5jb20vcGtpLzATBgNVHSMEDDAKgAhLRf+CJfwQljA7BggrBgEFBQcBAQQvMC0wKwYIKwYBBQUHMAGGH2h0dHA6Ly9vY3NwLXFhLmh1YmplY3QuY29tOjgwODAwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIQCXW26pWJ3LZ2GTnQYXEHBqrR2BLeyl1PEbYfzYK3pAVgIgYE1kZzYxj6tQUjrFV8sD+1J9YWeVU3d4/kmUvwMoUdo=
+            contractSignatureEncryptedPrivateKey: PD5/v8Z005yianHegxvs2vE/uRPOjBaP4byhAVwyj6APg6BFOZexCpCacHTxgELr
+            dHpublickey: BC//bjmXFWisWCxnJeoA2kMBZmEHfx9h/ZKlTMhbJUvm6cdc/WBuKwPlC5qVHnxguI5RouU59fc9P3y2qU0Qu0c=
+            emaid: EMP99CQATEST001
+          emaid: EMP99CQATEST001
+          pcid: huboemprovcqa0615
+          xsdMsgDefNamespace: urn:iso:15118:2:2013:MsgDef
+      minProperties: 4
+      properties:
+        xsdMsgDefNamespace:
+          type: string
+          x-constraint: '@ValidXsdMsgDefNamespace'
+          example: urn:iso:15118:2:2013:MsgDef
+          default: urn:iso:15118:2:2013:MsgDef
+        contractData:
+          $ref: '#/components/schemas/contract-data'
+        metaData:
+          type: string
+          description: could be used for further application/information exchange
+        pcid:
+          type: string
+          pattern: ^[a-zA-Z0-9]{17,18}$
+          description: PCID of the Provisioning certificate which need to fit to the common Name of the provisiong cetificate which shall be used for the validation.
+        emaid:
+          type: string
+          pattern: ^[A-Za-z]{2}[-]?\w{3}[-]?\w{9}[-]?(\w{1})?$
+          description: EMAID of the contract which need to fit to the common Name of the contract certificate itself
+        cpsV2GRootCertificateFingerprint:
+          type: string
+          description: The SHA256 Fingerprint of the desired V2G root CA which shall be used to sign these data with the regarding CPS signing certificate. Its optional. If not given, the CPS will decide which CPS signing V2G PKI will be used
+          pattern: ^[0-9a-fA-F]{8}\-([0-9a-fA-F]{4}\-){3}[0-9a-fA-F]{12}$
+          example: 896b6655-180e-4304-b642-606bb00df8f0
+          x-stoplight:
+            id: 381vrwdjhrzsl
+      required:
+      - xsdMsgDefNamespace
+      - contractData
+      - pcid
+      - emaid
+    contract-data:
+      description: ''
+      type: object
+      x-examples:
+        example-1:
+          contractSignatureCertChain:
+            contractSignatureCertChainCertificate: MIIB7jCCAZSgAwIBAgIQQihl/GZf3VrjEbtD8OftBDAKBggqhkjOPQQDAjBYMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMR0wGwYDVQQDExRNTyBTdWIyIENBIFFBIEcxLjEuMTETMBEGCgmSJomT8ixkARkWA1YyRzAeFw0yMjAyMDcyMzE3MzdaFw0yMjEyMTAxMTQyNTlaMDExFTATBgNVBAoTDEh1YmplY3QgR21iSDEYMBYGA1UEAxMPRU1QOTlDUUFURVNUMDAxMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEDB59w53BxLuMBDDYTzDqpJLoJqIZEJoZWlYti+n97erJYD8JHaA0630uzghrNnjVa8sZKqBv8XX6V9H6H+gYS6NnMGUwEQYDVR0OBAoECEPJRNHvPWNdMBMGA1UdIwQMMAqACEf6f9verOzVMDsGCCsGAQUFBwEBBC8wLTArBggrBgEFBQcwAYYfaHR0cDovL29jc3AtcWEuaHViamVjdC5jb206ODA4MDAKBggqhkjOPQQDAgNIADBFAiEA3S6DrF1uTpyZW/eF3XPeykX2L6ubl/2fiNujT4ENX1cCIF/D/ftiHiIKcuDLrHRVFxpcXeQfQ8NmUHhThtNZRDRC
+            contractSignatureCertChainSubCertificates:
+            - MIICgDCCAiagAwIBAgIQV3xs5x1SZUQzUaM1BxVzNDAKBggqhkjOPQQDAjBWMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMRMwEQYKCZImiZPyLGQBGRYDVjJHMRswGQYDVQQDExJNTyBTdWIxIENBIFFBIEcxLjEwHhcNMTkwNTAyMDgwOTQwWhcNMjkwNTAyMDgwOTQwWjBYMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMR0wGwYDVQQDExRNTyBTdWIyIENBIFFBIEcxLjEuMTETMBEGCgmSJomT8ixkARkWA1YyRzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABKJ4aspMPXpAx1ZDFMLASHPproU8C7PMUzZt0dxyO318KZBXaKsUI0ReE1bAAOmxxeOHnNs1kiiUPWM6KKg0fHyjgdMwgdAwEgYDVR0TAQH/BAgwBgEB/wIBADARBgNVHQ4ECgQIR/p/296s7NUwRQYDVR0gBD4wPDA6BgwrBgEEAYLENQECAQAwKjAoBggrBgEFBQcCARYcaHR0cHM6Ly93d3cuaHViamVjdC5jb20vcGtpLzATBgNVHSMEDDAKgAhInhY/vHd0mjA7BggrBgEFBQcBAQQvMC0wKwYIKwYBBQUHMAGGH2h0dHA6Ly9vY3NwLXFhLmh1YmplY3QuY29tOjgwODAwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIQCyh1nEBXQAQeJbz/6FK+vzr62IDu1kZHOSJexZPgDh/AIgLtAet8c9uX79c3skG+hmv4eu/ZPH1yr48fAWq2uKl0E=
+            - MIICfTCCAiOgAwIBAgIQWt/tqVhH27TWNDXDvucEejAKBggqhkjOPQQDAjBVMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMRMwEQYKCZImiZPyLGQBGRYDVjJHMRowGAYDVQQDExFWMkcgUm9vdCBDQSBRQSBHMTAeFw0xOTA0MjYwOTA0MDFaFw0zOTA0MjYwOTA0MDFaMFYxCzAJBgNVBAYTAkRFMRUwEwYDVQQKEwxIdWJqZWN0IEdtYkgxEzARBgoJkiaJk/IsZAEZFgNWMkcxGzAZBgNVBAMTEk1PIFN1YjEgQ0EgUUEgRzEuMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABNDMXgBjwC/fVHNBhQkXMNHzTEnJDMJ+KQ9Sm0L2uPM6fA8M2yk29dvTwzI6mLCR+xoVnZy75z2iUCkBqSTPVDajgdMwgdAwEgYDVR0TAQH/BAgwBgEB/wIBATARBgNVHQ4ECgQISJ4WP7x3dJowRQYDVR0gBD4wPDA6BgwrBgEEAYLENQECAQAwKjAoBggrBgEFBQcCARYcaHR0cHM6Ly93d3cuaHViamVjdC5jb20vcGtpLzATBgNVHSMEDDAKgAhLRf+CJfwQljA7BggrBgEFBQcBAQQvMC0wKwYIKwYBBQUHMAGGH2h0dHA6Ly9vY3NwLXFhLmh1YmplY3QuY29tOjgwODAwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIQCXW26pWJ3LZ2GTnQYXEHBqrR2BLeyl1PEbYfzYK3pAVgIgYE1kZzYxj6tQUjrFV8sD+1J9YWeVU3d4/kmUvwMoUdo=
+          contractSignatureEncryptedPrivateKey: PD5/v8Z005yianHegxvs2vE/uRPOjBaP4byhAVwyj6APg6BFOZexCpCacHTxgELr
+          dHpublickey: BC//bjmXFWisWCxnJeoA2kMBZmEHfx9h/ZKlTMhbJUvm6cdc/WBuKwPlC5qVHnxguI5RouU59fc9P3y2qU0Qu0c=
+          emaid: EMP99CQATEST001
+      properties:
+        contractSignatureCertChain:
+          type: object
+          required:
+          - contractSignatureCertChainCertificate
+          - contractSignatureCertChainSubCertificates
+          properties:
+            contractSignatureCertChainCertificate:
+              type: string
+              description: Contract Certificate in base64 encoded DER form
+              pattern: ^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$
+              maxLength: 800
+            contractSignatureCertChainSubCertificates:
+              type: array
+              description: Contract Certificate SUB CAs in base64 encoded DER form, array starting with SUB MO CA2 followed by MO SUB CA1
+              maxItems: 2
+              minItems: 1
+              items:
+                type: string
+        contractSignatureEncryptedPrivateKey:
+          type: string
+          minLength: 1
+          description: Encryted contract certificate private key
+        dHpublickey:
+          type: string
+          minLength: 1
+          description: DH Public Key as defined in the ISO15118
+        emaid:
+          type: string
+          minLength: 1
+          description: contract identifier of contract certificate. Needs to fit to the common name in the contract certificate
+      required:
+      - contractSignatureCertChain
+      - contractSignatureEncryptedPrivateKey
+      - dHpublickey
+      - emaid
+    CreateSignedContractDataResponse:
+      title: Signed Contract Data (V1)
+      type: object
+      description: 'Object containing the signed contract data which got sigend from the CPS
+
+
+        Deprecated: Use SignedContractDataResponse'
+      x-examples:
+        example:
+          pcid: huboemprovcqa0615
+          emaid: EMP99CQATest001
+          xsdMsgDefNamespace: urn:iso:15118:2:2013:MsgDef
+          signedData: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxuczY6VjJHX01lc3NhZ2UgeG1sbnM6bnM2PSJ1cm46aXNvOjE1MTE4OjI6MjAxMzpNc2dEZWYiIHhtbG5zOm5zNT0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnIyIgeG1sbnM6bnM3PSJ1cm46aXNvOjE1MTE4OjI6MjAxMzpNc2dCb2R5IiB4bWxuczpuczI9InVybjppc286MTUxMTg6MjoyMDEwOkFwcFByb3RvY29sIiB4bWxuczpuczQ9InVybjppc286MTUxMTg6MjoyMDEzOk1zZ0RhdGFUeXBlcyIgeG1sbnM6bnMzPSJ1cm46aXNvOjE1MTE4OjI6MjAxMzpNc2dIZWFkZXIiPjxuczY6SGVhZGVyPjxuczU6U2lnbmF0dXJlPjxuczU6U2lnbmVkSW5mbz48bnM1OkNhbm9uaWNhbGl6YXRpb25NZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy9UUi9jYW5vbmljYWwtZXhpLyIvPjxuczU6U2lnbmF0dXJlTWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8wNC94bWxkc2lnLW1vcmUjZWNkc2Etc2hhMjU2Ii8+PG5zNTpSZWZlcmVuY2UgVVJJPSIjSUQyIj48bnM1OlRyYW5zZm9ybXM+PG5zNTpUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy9UUi9jYW5vbmljYWwtZXhpLyIvPjwvbnM1OlRyYW5zZm9ybXM+PG5zNTpEaWdlc3RNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGVuYyNzaGEyNTYiLz48bnM1OkRpZ2VzdFZhbHVlPjIwQkdnS1A3SGE0cHNUcUlvcFh5N0hoRTd0SjJQeVBtVlJXR1JuenpuL3M9PC9uczU6RGlnZXN0VmFsdWU+PC9uczU6UmVmZXJlbmNlPjxuczU6UmVmZXJlbmNlIFVSST0iI0lEMSI+PG5zNTpUcmFuc2Zvcm1zPjxuczU6VHJhbnNmb3JtIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvVFIvY2Fub25pY2FsLWV4aS8iLz48L25zNTpUcmFuc2Zvcm1zPjxuczU6RGlnZXN0TWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8wNC94bWxlbmMjc2hhMjU2Ii8+PG5zNTpEaWdlc3RWYWx1ZT4yOWtVeUppWVBkM1AwaW16TEFGRFdPQXdFWU9pNExRalF0SlZyb1pJZ0pjPTwvbnM1OkRpZ2VzdFZhbHVlPjwvbnM1OlJlZmVyZW5jZT48bnM1OlJlZmVyZW5jZSBVUkk9IiNJRDQiPjxuczU6VHJhbnNmb3Jtcz48bnM1OlRyYW5zZm9ybSBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnL1RSL2Nhbm9uaWNhbC1leGkvIi8+PC9uczU6VHJhbnNmb3Jtcz48bnM1OkRpZ2VzdE1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMDQveG1sZW5jI3NoYTI1NiIvPjxuczU6RGlnZXN0VmFsdWU+QUdPT3V3NjA3QkhSL01hS3B3QUFzb3pYQXpFZUpicEFraFpGY1krUU9kMD08L25zNTpEaWdlc3RWYWx1ZT48L25zNTpSZWZlcmVuY2U+PG5zNTpSZWZlcmVuY2UgVVJJPSIjSUQzIj48bnM1OlRyYW5zZm9ybXM+PG5zNTpUcmFuc2Zvcm0gQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy9UUi9jYW5vbmljYWwtZXhpLyIvPjwvbnM1OlRyYW5zZm9ybXM+PG5zNTpEaWdlc3RNZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGVuYyNzaGEyNTYiLz48bnM1OkRpZ2VzdFZhbHVlPmJjcWxvUy9ONDBqMnE2WHViYWFMdlB2dDc0L25kTXRSOWRLNjR0d0kwNXM9PC9uczU6RGlnZXN0VmFsdWU+PC9uczU6UmVmZXJlbmNlPjwvbnM1OlNpZ25lZEluZm8+PG5zNTpTaWduYXR1cmVWYWx1ZT5DWlNocEpHRW9TM2dZcUpGS1QyNk5BNjUzY0NXQWIyOWI4QWc1c3lMTG9vOVMxMFp5cDAxTVJWZ055RXgrbUZ3THBNcXRHYTlBeVNKVnJkVTVRUjNwZz09PC9uczU6U2lnbmF0dXJlVmFsdWU+PC9uczU6U2lnbmF0dXJlPjwvbnM2OkhlYWRlcj48bnM2OkJvZHk+PG5zNzpDZXJ0aWZpY2F0ZUluc3RhbGxhdGlvblJlcz48bnM3OlJlc3BvbnNlQ29kZT5PSzwvbnM3OlJlc3BvbnNlQ29kZT48bnM3OlNBUHJvdmlzaW9uaW5nQ2VydGlmaWNhdGVDaGFpbj48bnM0OkNlcnRpZmljYXRlPk1JSUNJRENDQWNlZ0F3SUJBZ0lRWS9VdzFaVnVJRWp5NlBsNmZKTzN6REFLQmdncWhrak9QUVFEQWpCYU1Rc3dDUVlEVlFRR0V3SkVSVEVWTUJNR0ExVUVDaE1NU0hWaWFtVmpkQ0JIYldKSU1SOHdIUVlEVlFRREV4WlFjbTkySUZOMVlqSWdRMEVnVVVFZ1J6RXVNUzR4TVJNd0VRWUtDWkltaVpQeUxHUUJHUllEVmpKSE1CNFhEVEl5TURJd056SXpNREF3T1ZvWERUSXpNRFF5TmpBNE5EY3dNRm93VVRFTE1Ba0dBMVVFQmhNQ1JWVXhGVEFUQmdOVkJBb1RERWgxWW1wbFkzUWdSMjFpU0RFV01CUUdBMVVFQXhNTlExQlRJREl3TWpJdU1pQlJRVEVUTUJFR0NnbVNKb21UOGl4a0FSa1dBME5RVXpCWk1CTUdCeXFHU000OUFnRUdDQ3FHU000OUF3RUhBMElBQktWMjkzTXZJaTJGZTdzSktVZ2NJbHVzdHV4NlZCYkZnZXdFbnlGWldIYlI0TUhVWVlRTUZsMEE4VzdMbkhmZW02MmxOT25JUmYyUzFtVUdzbXZoaTVLamVEQjJNQThHQTFVZEV3RUIvd1FGTUFNQkFRQXdFUVlEVlIwT0JBb0VDRTUvTDErV1lGUy9NQk1HQTFVZEl3UU1NQXFBQ0UvY0EzZ0tFcWdGTURzR0NDc0dBUVVGQndFQkJDOHdMVEFyQmdnckJnRUZCUWN3QVlZZmFIUjBjRG92TDI5amMzQXRjV0V1YUhWaWFtVmpkQzVqYjIwNk9EQTRNREFLQmdncWhrak9QUVFEQWdOSEFEQkVBaUJuWGtSMi9DU09uclFZcDNKVjZIbTJEajIxQjN1eFdVbG12eHp4QW1TaktRSWdZMjdnbGhHMU95UnpjTTlBNEdNZm5pVkVpYWNRR0hvcjJ5REFrbUh2NTBnPTwvbnM0OkNlcnRpZmljYXRlPjxuczQ6U3ViQ2VydGlmaWNhdGVzPjxuczQ6Q2VydGlmaWNhdGU+TUlJQ2hEQ0NBaXFnQXdJQkFnSVFhaUxJeExySFRUS1pwcEFGYkEwdGtUQUtCZ2dxaGtqT1BRUURBakJZTVFzd0NRWURWUVFHRXdKRVJURVZNQk1HQTFVRUNoTU1TSFZpYW1WamRDQkhiV0pJTVJNd0VRWUtDWkltaVpQeUxHUUJHUllEVmpKSE1SMHdHd1lEVlFRREV4UlFjbTkySUZOMVlqRWdRMEVnVVVFZ1J6RXVNVEFlRncweE9UQTFNREl3T0RFeU1UTmFGdzB5TXpBME1qWXdPRFEzTURCYU1Gb3hDekFKQmdOVkJBWVRBa1JGTVJVd0V3WURWUVFLRXd4SWRXSnFaV04wSUVkdFlrZ3hIekFkQmdOVkJBTVRGbEJ5YjNZZ1UzVmlNaUJEUVNCUlFTQkhNUzR4TGpFeEV6QVJCZ29Ka2lhSmsvSXNaQUVaRmdOV01rY3dXVEFUQmdjcWhrak9QUUlCQmdncWhrak9QUU1CQndOQ0FBUkpONUh3dTE1alFIQnFyUmk4RGVpaXR5d1ljSUV2aUIwdEFPSzY1czl3OUJtbGd6a2ljb2dlUmxKdVg3SFNoVGdNRkx5S1pMQkE5TnFWQUtqaTYwQTNvNEhUTUlIUU1CSUdBMVVkRXdFQi93UUlNQVlCQWY4Q0FRQXdFUVlEVlIwT0JBb0VDRS9jQTNnS0VxZ0ZNRVVHQTFVZElBUStNRHd3T2dZTUt3WUJCQUdDeERVQkFnRUFNQ293S0FZSUt3WUJCUVVIQWdFV0hHaDBkSEJ6T2k4dmQzZDNMbWgxWW1wbFkzUXVZMjl0TDNCcmFTOHdFd1lEVlIwakJBd3dDb0FJU1BpL0I5YWJicE13T3dZSUt3WUJCUVVIQVFFRUx6QXRNQ3NHQ0NzR0FRVUZCekFCaGg5b2RIUndPaTh2YjJOemNDMXhZUzVvZFdKcVpXTjBMbU52YlRvNE1EZ3dNQTRHQTFVZER3RUIvd1FFQXdJQkJqQUtCZ2dxaGtqT1BRUURBZ05JQURCRkFpRUF1cFRaMXh6SzhsS0xNdzR4Z1R1SEZZU0lZK1h5QVRXZVhxbGk3czFmTlJFQ0lIV041TWFoV1VaaENkaGpTckVNV0hsdGhqQUVZRW10NGpiS1AvVmwxNVZxPC9uczQ6Q2VydGlmaWNhdGU+PG5zNDpDZXJ0aWZpY2F0ZT5NSUlDZnpDQ0FpV2dBd0lCQWdJUU83c2ZnaUo3OFlxMDhxd0lOc2VaMkRBS0JnZ3Foa2pPUFFRREFqQlZNUXN3Q1FZRFZRUUdFd0pFUlRFVk1CTUdBMVVFQ2hNTVNIVmlhbVZqZENCSGJXSklNUk13RVFZS0NaSW1pWlB5TEdRQkdSWURWakpITVJvd0dBWURWUVFERXhGV01rY2dVbTl2ZENCRFFTQlJRU0JITVRBZUZ3MHhPVEEwTWpZd09EUTNNREJhRncweU16QTBNall3T0RRM01EQmFNRmd4Q3pBSkJnTlZCQVlUQWtSRk1SVXdFd1lEVlFRS0V3eElkV0pxWldOMElFZHRZa2d4RXpBUkJnb0praWFKay9Jc1pBRVpGZ05XTWtjeEhUQWJCZ05WQkFNVEZGQnliM1lnVTNWaU1TQkRRU0JSUVNCSE1TNHhNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUVWTVpaalNmWGJmTHJMUWV1YmJsN2dUaS8xSUlYeTRod0Nzb1c3MDEzTC9aRHpia1JRWkxVL0F5emI1Z2VwR1MyOUtUa1BJQVpLSmdPMDc2dEhiSlNncU9CMHpDQjBEQVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQkVHQTFVZERnUUtCQWhJK0w4SDFwdHVrekJGQmdOVkhTQUVQakE4TURvR0RDc0dBUVFCZ3NRMUFRSUJBREFxTUNnR0NDc0dBUVVGQndJQkZoeG9kSFJ3Y3pvdkwzZDNkeTVvZFdKcVpXTjBMbU52YlM5d2Eya3ZNQk1HQTFVZEl3UU1NQXFBQ0V0Ri80SWwvQkNXTURzR0NDc0dBUVVGQndFQkJDOHdMVEFyQmdnckJnRUZCUWN3QVlZZmFIUjBjRG92TDI5amMzQXRjV0V1YUhWaWFtVmpkQzVqYjIwNk9EQTRNREFPQmdOVkhROEJBZjhFQkFNQ0FRWXdDZ1lJS29aSXpqMEVBd0lEU0FBd1JRSWdPd1FXMEZFT3FKclpBRHIwcDhYL3RMakExT1BvWGc5bzY0Y3oySWMybWkwQ0lRQ29rRUtmNkh2TGxBZ1Y3Si9SVVp6NjBzWWtvditFMjFLTjhodDlETzRXL1E9PTwvbnM0OkNlcnRpZmljYXRlPjwvbnM0OlN1YkNlcnRpZmljYXRlcz48L25zNzpTQVByb3Zpc2lvbmluZ0NlcnRpZmljYXRlQ2hhaW4+PG5zNzpDb250cmFjdFNpZ25hdHVyZUNlcnRDaGFpbiBuczQ6SWQ9IklEMSI+PG5zNDpDZXJ0aWZpY2F0ZT5NSUlCN2pDQ0FaU2dBd0lCQWdJUVFpaGwvR1pmM1ZyakVidEQ4T2Z0QkRBS0JnZ3Foa2pPUFFRREFqQllNUXN3Q1FZRFZRUUdFd0pFUlRFVk1CTUdBMVVFQ2hNTVNIVmlhbVZqZENCSGJXSklNUjB3R3dZRFZRUURFeFJOVHlCVGRXSXlJRU5CSUZGQklFY3hMakV1TVRFVE1CRUdDZ21TSm9tVDhpeGtBUmtXQTFZeVJ6QWVGdzB5TWpBeU1EY3lNekUzTXpkYUZ3MHlNakV5TVRBeE1UUXlOVGxhTURFeEZUQVRCZ05WQkFvVERFaDFZbXBsWTNRZ1IyMWlTREVZTUJZR0ExVUVBeE1QUlUxUU9UbERVVUZVUlZOVU1EQXhNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUVEQjU5dzUzQnhMdU1CRERZVHpEcXBKTG9KcUlaRUpvWldsWXRpK245N2VySllEOEpIYUEwNjMwdXpnaHJObmpWYThzWktxQnY4WFg2VjlINkgrZ1lTNk5uTUdVd0VRWURWUjBPQkFvRUNFUEpSTkh2UFdOZE1CTUdBMVVkSXdRTU1BcUFDRWY2Zjl2ZXJPelZNRHNHQ0NzR0FRVUZCd0VCQkM4d0xUQXJCZ2dyQmdFRkJRY3dBWVlmYUhSMGNEb3ZMMjlqYzNBdGNXRXVhSFZpYW1WamRDNWpiMjA2T0RBNE1EQUtCZ2dxaGtqT1BRUURBZ05JQURCRkFpRUEzUzZEckYxdVRweVpXL2VGM1hQZXlrWDJMNnVibC8yZmlOdWpUNEVOWDFjQ0lGL0QvZnRpSGlJS2N1RExySFJWRnhwY1hlUWZROE5tVUhoVGh0TlpSRFJDPC9uczQ6Q2VydGlmaWNhdGU+PG5zNDpTdWJDZXJ0aWZpY2F0ZXM+PG5zNDpDZXJ0aWZpY2F0ZT5NSUlDZ0RDQ0FpYWdBd0lCQWdJUVYzeHM1eDFTWlVRelVhTTFCeFZ6TkRBS0JnZ3Foa2pPUFFRREFqQldNUXN3Q1FZRFZRUUdFd0pFUlRFVk1CTUdBMVVFQ2hNTVNIVmlhbVZqZENCSGJXSklNUk13RVFZS0NaSW1pWlB5TEdRQkdSWURWakpITVJzd0dRWURWUVFERXhKTlR5QlRkV0l4SUVOQklGRkJJRWN4TGpFd0hoY05NVGt3TlRBeU1EZ3dPVFF3V2hjTk1qa3dOVEF5TURnd09UUXdXakJZTVFzd0NRWURWUVFHRXdKRVJURVZNQk1HQTFVRUNoTU1TSFZpYW1WamRDQkhiV0pJTVIwd0d3WURWUVFERXhSTlR5QlRkV0l5SUVOQklGRkJJRWN4TGpFdU1URVRNQkVHQ2dtU0pvbVQ4aXhrQVJrV0ExWXlSekJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUFCS0o0YXNwTVBYcEF4MVpERk1MQVNIUHByb1U4QzdQTVV6WnQwZHh5TzMxOEtaQlhhS3NVSTBSZUUxYkFBT214eGVPSG5OczFraWlVUFdNNktLZzBmSHlqZ2RNd2dkQXdFZ1lEVlIwVEFRSC9CQWd3QmdFQi93SUJBREFSQmdOVkhRNEVDZ1FJUi9wLzI5NnM3TlV3UlFZRFZSMGdCRDR3UERBNkJnd3JCZ0VFQVlMRU5RRUNBUUF3S2pBb0JnZ3JCZ0VGQlFjQ0FSWWNhSFIwY0hNNkx5OTNkM2N1YUhWaWFtVmpkQzVqYjIwdmNHdHBMekFUQmdOVkhTTUVEREFLZ0FoSW5oWS92SGQwbWpBN0JnZ3JCZ0VGQlFjQkFRUXZNQzB3S3dZSUt3WUJCUVVITUFHR0gyaDBkSEE2THk5dlkzTndMWEZoTG1oMVltcGxZM1F1WTI5dE9qZ3dPREF3RGdZRFZSMFBBUUgvQkFRREFnRUdNQW9HQ0NxR1NNNDlCQU1DQTBnQU1FVUNJUUN5aDFuRUJYUUFRZUpiei82RksrdnpyNjJJRHUxa1pIT1NKZXhaUGdEaC9BSWdMdEFldDhjOXVYNzljM3NrRytobXY0ZXUvWlBIMXlyNDhmQVdxMnVLbDBFPTwvbnM0OkNlcnRpZmljYXRlPjxuczQ6Q2VydGlmaWNhdGU+TUlJQ2ZUQ0NBaU9nQXdJQkFnSVFXdC90cVZoSDI3VFdORFhEdnVjRWVqQUtCZ2dxaGtqT1BRUURBakJWTVFzd0NRWURWUVFHRXdKRVJURVZNQk1HQTFVRUNoTU1TSFZpYW1WamRDQkhiV0pJTVJNd0VRWUtDWkltaVpQeUxHUUJHUllEVmpKSE1Sb3dHQVlEVlFRREV4RldNa2NnVW05dmRDQkRRU0JSUVNCSE1UQWVGdzB4T1RBME1qWXdPVEEwTURGYUZ3MHpPVEEwTWpZd09UQTBNREZhTUZZeEN6QUpCZ05WQkFZVEFrUkZNUlV3RXdZRFZRUUtFd3hJZFdKcVpXTjBJRWR0WWtneEV6QVJCZ29Ka2lhSmsvSXNaQUVaRmdOV01rY3hHekFaQmdOVkJBTVRFazFQSUZOMVlqRWdRMEVnVVVFZ1J6RXVNVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUFCTkRNWGdCandDL2ZWSE5CaFFrWE1OSHpURW5KRE1KK0tROVNtMEwydVBNNmZBOE0yeWsyOWR2VHd6STZtTENSK3hvVm5aeTc1ejJpVUNrQnFTVFBWRGFqZ2RNd2dkQXdFZ1lEVlIwVEFRSC9CQWd3QmdFQi93SUJBVEFSQmdOVkhRNEVDZ1FJU0o0V1A3eDNkSm93UlFZRFZSMGdCRDR3UERBNkJnd3JCZ0VFQVlMRU5RRUNBUUF3S2pBb0JnZ3JCZ0VGQlFjQ0FSWWNhSFIwY0hNNkx5OTNkM2N1YUhWaWFtVmpkQzVqYjIwdmNHdHBMekFUQmdOVkhTTUVEREFLZ0FoTFJmK0NKZndRbGpBN0JnZ3JCZ0VGQlFjQkFRUXZNQzB3S3dZSUt3WUJCUVVITUFHR0gyaDBkSEE2THk5dlkzTndMWEZoTG1oMVltcGxZM1F1WTI5dE9qZ3dPREF3RGdZRFZSMFBBUUgvQkFRREFnRUdNQW9HQ0NxR1NNNDlCQU1DQTBnQU1FVUNJUUNYVzI2cFdKM0xaMkdUblFZWEVIQnFyUjJCTGV5bDFQRWJZZnpZSzNwQVZnSWdZRTFrWnpZeGo2dFFVanJGVjhzRCsxSjlZV2VWVTNkNC9rbVV2d01vVWRvPTwvbnM0OkNlcnRpZmljYXRlPjwvbnM0OlN1YkNlcnRpZmljYXRlcz48L25zNzpDb250cmFjdFNpZ25hdHVyZUNlcnRDaGFpbj48bnM3OkNvbnRyYWN0U2lnbmF0dXJlRW5jcnlwdGVkUHJpdmF0ZUtleSBuczQ6SWQ9IklEMiI+UEQ1L3Y4WjAwNXlpYW5IZWd4dnMydkUvdVJQT2pCYVA0YnloQVZ3eWo2QVBnNkJGT1pleENwQ2FjSFR4Z0VMcjwvbnM3OkNvbnRyYWN0U2lnbmF0dXJlRW5jcnlwdGVkUHJpdmF0ZUtleT48bnM3OkRIcHVibGlja2V5IG5zNDpJZD0iSUQzIj5CQy8vYmptWEZXaXNXQ3huSmVvQTJrTUJabUVIZng5aC9aS2xUTWhiSlV2bTZjZGMvV0J1S3dQbEM1cVZIbnhndUk1Um91VTU5ZmM5UDN5MnFVMFF1MGM9PC9uczc6REhwdWJsaWNrZXk+PG5zNzplTUFJRCBuczQ6SWQ9IklENCI+RU1QOTlDUUFURVNUMDAxPC9uczc6ZU1BSUQ+PC9uczc6Q2VydGlmaWNhdGVJbnN0YWxsYXRpb25SZXM+PC9uczY6Qm9keT48L25zNjpWMkdfTWVzc2FnZT4=
+      properties:
+        emaid:
+          type: string
+          description: Contract identifier of contract certificate
+          pattern: ^[A-Za-z]{2}[-]?\w{3}[-]?\w{9}[-]?(\w{1})?$
+        pcid:
+          type: string
+          description: PCID of regarding vehicle certificate
+          pattern: ^[a-zA-Z0-9]{17,18}$
+        signedData:
+          type: string
+          description: Format of certificationInstallationRes as defined in ISO 15118-2:2014 in XML encoded in Base64.
+        metaData:
+          type: string
+          description: Placeholder for future adaption
+        xsdMsgDefNamespace:
+          type: string
+          default: urn:iso:15118:2:2013:MsgDef
+          description: ISO Version
+        cpsV2GRootCertificateFingerprint:
+          type: string
+          description: 'The SHA256 Fingerprint of the desired V2G root CA which shall be used to sign these data with the regarding CPS signing certificate. Its optional. If not given, the CPS will decide which CPS signing V2G PKI will be used
+
+            '
+          pattern: ^[0-9a-fA-F]{8}\-([0-9a-fA-F]{4}\-){3}[0-9a-fA-F]{12}$
+          example: 896b6655-180e-4304-b642-606bb00df8f0
+          x-stoplight:
+            id: hw8e0dlr0ca3k
+        cpsRootDistinguishedName:
+          type: string
+          description: Reflects the subjects distinguished name of the used V2G Root PKI. (informative)
+          pattern: ^((CN|OU|O|C|DC|ST)=[^,]+,? ?)+$
+          example: CN=V2G Root CA QA G1, DC=V2G, O=Hubject GmbH, C=DE
+      required:
+      - emaid
+      - pcid
+      - signedData
+      - xsdMsgDefNamespace
+    ProvisioningCertificateData:
+      title: ProvisioningCertificateData
+      type: object
+      description: Object containing provisioning certificate data stored in Provisioning Certificate Pool.
+      x-examples:
+        example:
+          subCA1Certificate: MIICdDCCAhqgAwIBAgIQd6E8MyXPT8KasimANSaOHDAKBggqhkjOPQQDAjBHMQswCQYDVQQGEwJERTEQMA4GA1UEChMHSHViamVjdDETMBEGCgmSJomT8ixkARkWA1YyRzERMA8GA1UEAxMIVjJHIFJvb3QwHhcNMTkwNzI0MTAxNTU1WhcNMjkwNzI0MTAxNTU1WjBZMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMRMwEQYKCZImiZPyLGQBGRYDVjJHMR4wHAYDVQQDExVPRU0gU3ViMSBDQSBURVNUIEcxLjIwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAS5seXlzunHvx0hCoh8DszaqnViXGDv4cLozIJs7ci47tUxARhXcNF/tFbr6YK0DUse9fD9AHrFsBi5PlHwxg50o4HVMIHSMBIGA1UdEwEB/wQIMAYBAf8CAQEwEQYDVR0OBAoECEZzBfcYaWBDMEUGA1UdIAQ+MDwwOgYMKwYBBAGCxDUBAgEAMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8vd3d3Lmh1YmplY3QuY29tL3BraS8wEwYDVR0jBAwwCoAITnyuwUYTll4wPQYIKwYBBQUHAQEEMTAvMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC10ZXN0Lmh1YmplY3QuY29tOjgwODAwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIQDL2D6vTsU+h5Z3HbrCG6NeIDv5P+YuIRlK0MeY3M106QIgLq6pBy39xwr5AFTVSMJG2l/ioze+Y2HCKfwpxf0zsAY=
+          subCA2Certificate: MIICdDCCAhqgAwIBAgIQd6E8MyXPT8KasimANSaOHDAKBggqhkjOPQQDAjBHMQswCQYDVQQGEwJERTEQMA4GA1UEChMHSHViamVjdDETMBEGCgmSJomT8ixkARkWA1YyRzERMA8GA1UEAxMIVjJHIFJvb3QwHhcNMTkwNzI0MTAxNTU1WhcNMjkwNzI0MTAxNTU1WjBZMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMRMwEQYKCZImiZPyLGQBGRYDVjJHMR4wHAYDVQQDExVPRU0gU3ViMSBDQSBURVNUIEcxLjIwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAS5seXlzunHvx0hCoh8DszaqnViXGDv4cLozIJs7ci47tUxARhXcNF/tFbr6YK0DUse9fD9AHrFsBi5PlHwxg50o4HVMIHSMBIGA1UdEwEB/wQIMAYBAf8CAQEwEQYDVR0OBAoECEZzBfcYaWBDMEUGA1UdIAQ+MDwwOgYMKwYBBAGCxDUBAgEAMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8vd3d3Lmh1YmplY3QuY29tL3BraS8wEwYDVR0jBAwwCoAITnyuwUYTll4wPQYIKwYBBQUHAQEEMTAvMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC10ZXN0Lmh1YmplY3QuY29tOjgwODAwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIQDL2D6vTsU+h5Z3HbrCG6NeIDv5P+YuIRlK0MeY3M106QIgLq6pBy39xwr5AFTVSMJG2l/ioze+Y2HCKfwpxf0zsAY=
+          vehicleCertificate: MIICdDCCAhqgAwIBAgIQd6E8MyXPT8KasimANSaOHDAKBggqhkjOPQQDAjBHMQswCQYDVQQGEwJERTEQMA4GA1UEChMHSHViamVjdDETMBEGCgmSJomT8ixkARkWA1YyRzERMA8GA1UEAxMIVjJHIFJvb3QwHhcNMTkwNzI0MTAxNTU1WhcNMjkwNzI0MTAxNTU1WjBZMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMRMwEQYKCZImiZPyLGQBGRYDVjJHMR4wHAYDVQQDExVPRU0gU3ViMSBDQSBURVNUIEcxLjIwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAS5seXlzunHvx0hCoh8DszaqnViXGDv4cLozIJs7ci47tUxARhXcNF/tFbr6YK0DUse9fD9AHrFsBi5PlHwxg50o4HVMIHSMBIGA1UdEwEB/wQIMAYBAf8CAQEwEQYDVR0OBAoECEZzBfcYaWBDMEUGA1UdIAQ+MDwwOgYMKwYBBAGCxDUBAgEAMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8vd3d3Lmh1YmplY3QuY29tL3BraS8wEwYDVR0jBAwwCoAITnyuwUYTll4wPQYIKwYBBQUHAQEEMTAvMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC10ZXN0Lmh1YmplY3QuY29tOjgwODAwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIQDL2D6vTsU+h5Z3HbrCG6NeIDv5P+YuIRlK0MeY3M106QIgLq6pBy39xwr5AFTVSMJG2l/ioze+Y2HCKfwpxf0zsAY=
+      minProperties: 3
+      properties:
+        subCA1Certificate:
+          type: string
+          description: Sub CA 1 Certificate in base64 encoded DER form. Deprecated in this form, will be changed to `subCa1Certificate` in future releases.
+          example: MIICcDCCAhagAwIBAgIQXMXiFXMtVoQuJEiVS6/hkDAKBggqhkjOPQQDAjBaMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMSHViamVjdCBJbmMuMRMwEQYKCZImiZPyLGQBGRYDVjJHMR8wHQYDVQQDExZVUyBWMkcgUm9vdCBDQSBURVNUIEcyMB4XDTIwMDQwMTIxNTk1OVoXDTMwMDQwMTIxNTk1OVowZTELMAkGA1UEBhMCVVMxHjAcBgNVBAoTFUVsZWN0cmlmeSBBbWVyaWNhIExMQzETMBEGCgmSJomT8ixkARkWA1YyRzEhMB8GA1UEAxMYVVMgT0VNIFN1YjEgQ0EgVEVTVCBHMi4xMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEsXy1jgnjOaAlV8XPoawTX6xVi5of7FpNCUvCT7MylIogG1wuNefIM4M5pmP2jwUqhFpnKqppUvWKj8QiTSxJj6OBsjCBrzASBgNVHRMBAf8ECDAGAQH/AgEBMBEGA1UdDgQKBAhKDP6+ZPsRazAZBgNVHSAEEjAQMA4GDCsGAQQBg64NAQIBAjATBgNVHSMEDDAKgAhPEzNrrjPLHDBGBggrBgEFBQcBAQQ6MDgwNgYIKwYBBQUHMAGGKmh0dHA6Ly9vY3NwLXRlc3QuZWxlY3RyaWZ5YW1lcmljYS5jb206ODA4MDAOBgNVHQ8BAf8EBAMCAQYwCgYIKoZIzj0EAwIDSAAwRQIgFbsW5u11EgVDNKlhWBPZXsy8USfHKrScrUMyRxyWJ2cCIQCvXRhAXn9SWLSoRtgU3ssFc/z++vCIO6RLTV/VMZAXiw==
+        subCA2Certificate:
+          type: string
+          description: Sub CA 2 Certificate in base64 encoded DER form. Optional for leaf certificates with only one intermediate certificate. Deprecated in this form, will be changed to `subCa2Certificate` in future releases.
+          example: MIICfTCCAiOgAwIBAgIQV8r0UuTi+jfwY8ifpELM7jAKBggqhkjOPQQDAjBlMQswCQYDVQQGEwJVUzEeMBwGA1UEChMVRWxlY3RyaWZ5IEFtZXJpY2EgTExDMRMwEQYKCZImiZPyLGQBGRYDVjJHMSEwHwYDVQQDExhVUyBPRU0gU3ViMSBDQSBURVNUIEcyLjEwHhcNMjAwNDAxMjE1OTU5WhcNMzAwNDAxMjE1OTU5WjBnMQswCQYDVQQGEwJVUzEeMBwGA1UEChMVRWxlY3RyaWZ5IEFtZXJpY2EgTExDMRMwEQYKCZImiZPyLGQBGRYDVjJHMSMwIQYDVQQDExpVUyBPRU0gU3ViMiBDQSBURVNUIEcyLjEuMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABDHsKEUHVmO1CnNsocXz8/Ix9nom93is1nIe2RvuCNNOTSQF15skyBu2tObjg5atZe+4D0FXll+pqafanYkHEhmjgbIwga8wEgYDVR0TAQH/BAgwBgEB/wIBADARBgNVHQ4ECgQISX1zCMOyu74wGQYDVR0gBBIwEDAOBgwrBgEEAYOuDQECAQIwEwYDVR0jBAwwCoAISgz+vmT7EWswRgYIKwYBBQUHAQEEOjA4MDYGCCsGAQUFBzABhipodHRwOi8vb2NzcC10ZXN0LmVsZWN0cmlmeWFtZXJpY2EuY29tOjgwODAwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIAvUXtdhtkSs31QApigXViBfI7GR7iZGN7dSQcSTEh/MAiEA22ao571oT6g1z81hdXe5o1dEOdp7dDLv8hfwhHKhDR4=
+        vehicleCertificate:
+          type: string
+          description: Provisioning Certificate in base64 encoded DER form. Deprecated in this form. Will be renamed to `provisioningCertificate` in future versions.
+          example: MIIChzCCAi2gAwIBAgIQZqyzB7Lsiy3AEgqy3j16qzAKBggqhkjOPQQDAjBnMQswCQYDVQQGEwJVUzEeMBwGA1UEChMVRWxlY3RyaWZ5IEFtZXJpY2EgTExDMRMwEQYKCZImiZPyLGQBGRYDVjJHMSMwIQYDVQQDExpVUyBPRU0gU3ViMiBDQSBURVNUIEcyLjEuMTAeFw0yMDA1MjcxNjI4MzlaFw0yNDA1MjcxNjI4MzlaMIGPMQswCQYDVQQGEwJERTEVMBMGA1UEChMMSHViamVjdCBHbWJIMRowGAYDVQQDExFodWJVc0VhVGVzdDAwMDAwNDEPMA0GA1UEBxMGQmVybGluMSswKQYJKoZIhvcNAQkBFhxzdXBwb3J0LmlzbzE1MTE4QGh1YmplY3QuY29tMQ8wDQYDVQQIEwZCZXJsaW4wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQ6W3xDW/bnPdyocQAW+rpOK54rfjBQznrtMlBFwdyVM1PYzuEf3kJtIQ4n3TTTwnqxquFZ+Cl3LhfZb4BJYmFwo4GRMIGOMBEGA1UdDgQKBAhKko8a3LDPuzAcBgNVHREEFTATghFodWJVc0VhVGVzdDAwMDAwNDATBgNVHSMEDDAKgAhJfXMIw7K7vjBGBggrBgEFBQcBAQQ6MDgwNgYIKwYBBQUHMAGGKmh0dHA6Ly9vY3NwLXRlc3QuZWxlY3RyaWZ5YW1lcmljYS5jb206ODA4MDAKBggqhkjOPQQDAgNIADBFAiEAuKsKk8xKIFo7wkg7CGvzCQXR08LqHFkuEQJ5jNWc7GMCICNVExUixZWDbGl0rd4Kqq4s87tDOxFGx4o1tLMRdY47
+        xsdMsgDefNamespace:
+          type: string
+          enum:
+          - urn:iso:15118:2:2013:MsgDef
+          description: ISO15118 Version
+        rootIssuerDistinguishedName:
+          type: string
+          description: Distinguished name of the root certificate which is the trust anchor of the given certificate chain. Deprecated in future versions. The root certificate will be determined from the Sub-CA 1 certificate automatically.
+        rootIssuerSerialNumber:
+          type: string
+          description: Serial number of the root certificate which is the trust anchor of the given certificate chain. A serial number is a large integer. The interface expects and returns serial numbers in its hexadecimal representation in lower case _without_ separators. Deprecated in future versions. The root certificate will be determined from the Sub-CA 1 certificate automatically.
+        v2gRootAuthorityKeyIdentifiers:
+          type: array
+          description: List of root authority key identifiers in a hex formated string (with ":"as separator) which are installed in the EV.
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+        rootAuthorityKeyIdentifier:
+          type: string
+          description: authority key identifier in a hex formated string (with ":"as separator)
+        fingerprint:
+          type: string
+          description: SHA256 certificate fingerprint (informative)
+        previousPcid:
+          type: string
+          pattern: ^[a-zA-Z0-9]{17,18}$
+          minLength: 17
+          maxLength: 18
+          description: if the PCID of a vehicle changed, the OEM can use this field to store the previous identifier
+      required:
+      - subCA1Certificate
+      - vehicleCertificate
+      - rootIssuerDistinguishedName
+      - rootIssuerSerialNumber
+    GetProvisioningCertificateResponse:
+      type: object
+      title: GetProvisioningCertificateResponse
+      description: ''
+      properties:
+        OEMMessage:
+          $ref: '#/components/schemas/ProvisioningCertificateData'
+  securitySchemes:
+    MO:
+      type: oauth2
+      description: 'OAuth2 is used to grant access to the endpoint. '
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+    OEM:
+      type: oauth2
+      description: 'OAuth2 is used to grant access to the endpoint. '
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+    CPO:
+      type: oauth2
+      description: 'OAuth2 is used to grant access to the endpoint. '
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+    CPS:
+      type: oauth2
+      description: 'OAuth2 is used to grant access to the endpoint. '
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+    MO_without_PKI:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+      description: OAuth2 is used to grant access to the endpoint. In the case of "MO without PKI" role, the MO is using Hubject V2G PKI to sign certificates.
+    MO_with_own_PKI:
+      type: oauth2
+      description: 'OAuth2 is used to grant access to the endpoint. '
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+x-refined-from:
+- hubject-opcp-ccp-openapi.json
+- hubject-opcp-cps-openapi.json
+- hubject-opcp-pcp-openapi.json

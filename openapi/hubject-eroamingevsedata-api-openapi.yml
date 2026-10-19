@@ -1,0 +1,1855 @@
+openapi: 3.2.0
+info:
+  title: Hubject E Roaming Evse Data API
+  version: 2.3.0
+  contact:
+    name: API Support
+    url: https://support.hubject.com
+    email: support@hubject.com
+  description: 'Operations tagged eRoamingEvseData across 2 of this provider''s published API definitions: hubject-oicp-cpo-2.3-openapi.yml, hubject-oicp-emp-2.3-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://service-qa.hubject.com/api/oicp
+  description: QA environment
+- url: https://service.hubject.com/api/oicp
+  description: Production environment
+tags:
+- name: eRoamingEvseData
+  description: 'Hubject offers the possibility to upload and download charging spot (EVSE) data and, thus, to exchange data between different partners.
+
+
+    See apendix for a detailed business process diagram regarding the EVSE data service.
+
+
+    The eRoamingEvseData service offers two operations:
+
+
+    eRoamingPushEvseData in order to give CPOs the possibility to upload (push) EVSE master data
+
+
+    eRoamingPullEvseData in order to give EMPs the possibility to download (pull) EVSE data from partner operators via Hubject.
+
+
+    Hub CPOs may also push EVSE data of sub operators. Hubject does not distinguish between EVSE records of hub operators and related sub operators.'
+paths:
+  /evsepush/v23/operators/{operatorID}/data-records:
+    post:
+      summary: eRoamingPushEvseData_V2.3
+      operationId: eRoamingPushEvseData_V2.3
+      description: '__Note:__
+
+        * To `SEND`
+
+        * Implementation: `MANDATORY`
+
+
+        !Push evse data diagram
+
+
+        When a CPO sends an eRoamingPushEvseData request, Hubject checks whether there is a valid contract between Hubject and the CPO for the service type (Hubject must be the subscriber). If so, the operation allows uploading EVSE data to Hubject.
+
+        Furthermore, it is possible to update or delete EVSE data that has been pushed with an earlier operation request.
+
+        How Hubject handles the transferred data `MUST` be defined in the request field "ActionType", which offers four options.
+
+
+        The EvseData that will be inserted or updated `MUST` be provided in the OperatorEvseData field, which consists of EvseDataRecord structures. Hubject keeps a history of all updated and changed data records. Every successful push operation – irrespective of the performed action – leads to a new version of currently valid data records. Furthermore, every operation is logged with the current timestamp. Thus, Hubject can reconstruct the status of EvseData for every point in time in the past.
+
+
+        EVSE consistency:
+
+
+        EvseIDs contain the ID of the corresponding CPO (With every data upload operation Hubject checks whether the given CPO’s OperatorID or Sub-OperatorIDs if necessary) matches every given EvseID. If not, Hubject refuses the data upload and responds with the status code 018.
+
+
+        Note:
+
+        * The eRoamingPushEvseData operation `MUST` always be used sequentially as described in Data Push Operations.'
+      tags:
+      - eRoamingEvseData
+      parameters:
+      - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPushEvseData'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+  /evsepull/v23/providers/{providerID}/data-records:
+    post:
+      summary: eRoamingPullEvseData_V2.3
+      operationId: eRoamingPullEvseData_V2.3
+      description: '__Note:__
+
+        * To `SEND`
+
+        * Implementation: `MANDATORY`
+
+
+        !Pull evse data diagram
+
+
+        This operation allows downloading EVSEData from Hubject. When an EMP sends an eRoamingPullEVSEData request, Hubject identifies all currently valid EVSEData records of relevant operators.
+
+
+        For every EVSE data record Hubject identifies the timestamp of the last update, which has been performed on the record. The timestamp is returned with the attribute “lastUpdate”.
+
+
+        __Delta pull:__
+
+
+        As mentioned above, the operation by default returns all currently valid EVSE data records. However, the requesting EMP has the possibility to download only the changes (delta) compared to a certain time in the past. In order to do so, the EMP MUST provide the optional date/time field “LastCall”, indicating his last EVSE pull request. In case that Hubject receives the LastCall parameter, Hubject compares the EVSE records from the time of the last call with the currently valid records. As a result, Hubject assigns the attribute “deltaType” (possible values: insert, update, delete) to every response EVSE data record indicating whether the particular record has been inserted, updated or deleted in the meantime. EVSE data records that have not changed will not be part of the response.
+
+
+        Note:
+
+        * The delta pull option cannot be combined with radial search, because in some cases this could lead to data inconsistency on the EMP’s side. This is why the API only allows the provision of either the attribute “SearchCenter” or “LastCall”.
+
+
+        __Pagination:__
+
+
+        Starting from OICP 2.3, eRoamingPullEvseData uses pagination. This is an implementation that EMPs `MUST` use in order to divide the amount of EvseDataRecords contained in the response of the pull request.
+
+
+        The parameters of the pagination are given at the end of the end point: `…​?page=0&size=20` where `page` indicates the number of the page for the response and `size` the amount of records to be provided in the response.
+
+
+        Important:
+
+        * __The default number of records provided in the eRoamingEvseData response is 20 elements.__'
+      tags:
+      - eRoamingEvseData
+      parameters:
+      - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPullEVSEData'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingEVSEData'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+components:
+  schemas:
+    PaymentOption:
+      type: string
+      enum:
+      - No Payment
+      - Direct
+      - Contract
+      description: '| Option | Description |
+
+        | ------ | ----------- |
+
+        | No payment | Free. |
+
+        | Direct | e. g. Cash, Card, SMS, ... |
+
+        | Contract | i. e. Subscription  |
+
+
+        Note
+
+
+        `No Payment` can not be combined with other payment option
+
+        '
+      example: Direct
+    InfoTextType:
+      type: object
+      required:
+      - lang
+      - value
+      properties:
+        lang:
+          type: string
+          pattern: ^[a-z]{2,3}(?:-[A-Z]{2,3}(?:-[a-zA-Z]{4})?)?(?:-x-[a-zA-Z0-9]{1,8})?$
+          description: '`^[a-z]{2,3}(?:-[A-Z]{2,3}(?:-[a-zA-Z]{4})?)?(?:-x-[a-zA-Z0-9]{1,8})?$`
+
+
+            The language in which the additional info text is provided
+
+
+            The expression validates the string as a language code as per ISO-639-1 or ISO-639-2/T
+
+
+            The LanguageCodeType is used in the AdditionalInfo field, which is part of the EvseDataRecordType.
+
+            '
+        value:
+          type: string
+          maximum: 150
+          description: The Additional Info text
+    Plug:
+      type: string
+      enum:
+      - Small Paddle Inductive
+      - Large Paddle Inductive
+      - AVCON Connector
+      - Tesla Connector
+      - NEMA 5-20
+      - Type E French Standard
+      - Type F Schuko
+      - Type G British Standard
+      - Type J Swiss Standard
+      - Type 1 Connector (Cable Attached)
+      - Type 2 Outlet
+      - Type 2 Connector (Cable Attached)
+      - Type 3 Outlet
+      - IEC 60309 Single Phase
+      - IEC 60309 Three Phase
+      - CCS Combo 2 Plug (Cable Attached)
+      - CCS Combo 1 Plug (Cable Attached)
+      - CHAdeMO
+      description: '| Option | Description |
+
+        |Small Paddle Inductive | Defined plug type. |
+
+        | Large Paddle Inductive | Defined plug type.|
+
+        | AVCON Connector | Defined plug type.|
+
+        | Tesla Connector | Defined plug type.|
+
+        | NEMA 5-20 | Defined plug type.|
+
+        | Type E French Standard | CEE 7/5. |
+
+        | Type F Schuko | CEE 7/4. |
+
+        | Type G British Standard | BS 1363. |
+
+        | Type J Swiss Standard | SEV 1011. |
+
+        | Type 1 Connector (Cable Attached) | Cable attached to IEC 62196-1 type 1, SAE J1772 connector. |
+
+        | Type 2 Outlet | IEC 62196-1 type 2. |
+
+        | Type 2 Connector (Cable Attached) | Cable attached to IEC 62196-1 type 2 connector. |
+
+        | Type 3 Outlet | IEC 62196-1 type 3. |
+
+        | IEC 60309 Single Phase | IEC 60309. |
+
+        | IEC 60309 Three Phase | IEC 60309. |
+
+        | CCS Combo 2 Plug (Cable Attached) | IEC 62196-3 CDV DC Combined Charging Connector DIN SPEC 70121 refers to ISO / IEC 15118-1 DIS, -2 DIS and 15118-3. |
+
+        | CCS Combo 1 Plug (Cable Attached) | IEC 62196-3 CDV DC Combined Charging Connector with IEC 62196-1 type 2 SAE J1772 connector. |
+
+        | CHAdeMO | DC CHAdeMO Connector. |
+
+        '
+      example: CHAdeMO
+    GeoCoordinates:
+      type: object
+      description: 'Important
+
+
+        __One of the following three options `MUST` be provided__
+
+        '
+      properties:
+        Google:
+          type: object
+          description: 'Geocoordinates using Google Structure
+
+            Based on WGS84
+
+            '
+          required:
+          - Coordinates
+          properties:
+            Coordinates:
+              type: string
+              pattern: ^-?1?\d{1,2}\.\d{1,6}\s*\,?\s*-?1?\d{1,2}\.\d{1,6}$
+              description: 'A string that `MUST` be valid with respect to the following regular expression:
+
+
+                `^-?1?\d{1,2}\.\d{1,6}\s*\,?\s*-?1?\d{1,2}\.\d{1,6}$`
+
+                The expression validates the string as geo coordinates with respect to the Google standard. The string contains latitude and longitude (in this sequence) separated by a space.
+
+
+                Example: “47.662249 9.360922”
+
+                '
+              example: 47.662249 9.360922
+        DecimalDegree:
+          type: object
+          description: Geocoordinates using DecimalDegree Structure
+          required:
+          - Longitude
+          - Latitude
+          properties:
+            Longitude:
+              type: string
+              pattern: ^-?1?\d{1,2}\.\d{1,6}$
+              description: 'A string that `MUST` be valid with respect to the following regular expression:
+
+
+                `^-?1?\d{1,2}\.\d{1,6}$`
+
+                The expression validates the string as a geo coordinate (longitude or latitude) with decimal degree syntax.
+
+
+                Examples: “9.360922”, “-21.568201”
+
+                '
+              example: '9.360922'
+            Latitude:
+              type: string
+              pattern: ^-?1?\d{1,2}\.\d{1,6}$
+              description: 'A string that `MUST` be valid with respect to the following regular expression:
+
+
+                `^-?1?\d{1,2}\.\d{1,6}$`
+
+                The expression validates the string as a geo coordinate (longitude or latitude) with decimal degree syntax.
+
+
+                Examples: “9.360922”, “-21.568201”
+
+                '
+              example: '9.360922'
+        DegreeMinuteSeconds:
+          type: object
+          description: Geocoordinates using DegreeMinutesSeconds Structure
+          required:
+          - Longitude
+          - Latitude
+          properties:
+            Longitude:
+              type: string
+              pattern: ^-?1?\d{1,2}°[ ]?\d{1,2}'[ ]?\d{1,2}\.\d+''$
+              description: 'A string that `MUST` be valid with respect to the following regular expression:
+
+
+                `^-?1?\d{1,2}°[ ]?\d{1,2}''[ ]?\d{1,2}\.\d+''''$`
+
+                The expression validates the string as a geo coordinate (longitude or latitude) consisting of degree, minutes, and seconds
+
+
+                Examples: “9°21''39.32''''”, “-21°34''23.16''''
+
+                '
+              example: 9°21'39.32''
+            Latitude:
+              type: string
+              pattern: ^-?1?\d{1,2}°[ ]?\d{1,2}'[ ]?\d{1,2}\.\d+''$
+              description: 'A string that `MUST` be valid with respect to the following regular expression:
+
+
+                `^-?1?\d{1,2}°[ ]?\d{1,2}''[ ]?\d{1,2}\.\d+''''$`
+
+                The expression validates the string as a geo coordinate (longitude or latitude) consisting of degree, minutes, and seconds
+
+
+                Examples: “9°21''39.32''''”, “-21°34''23.16''''
+
+                '
+              example: 9°21'39.32''
+    eRoamingPushEvseData:
+      type: object
+      required:
+      - ActionType
+      - OperatorEvseData
+      properties:
+        ActionType:
+          type: string
+          enum:
+          - fullLoad
+          - update
+          - insert
+          - delete
+          description: Describes the action that has to be performed by Hubject with the provided data.
+        OperatorEvseData:
+          type: object
+          required:
+          - OperatorID
+          - OperatorName
+          - EvseDataRecord
+          properties:
+            OperatorID:
+              $ref: '#/components/schemas/OperatorID'
+            OperatorName:
+              type: string
+              maximum: 100
+              description: Free text for operator
+            EvseDataRecord:
+              type: array
+              description: EVSE entries
+              items:
+                $ref: '#/components/schemas/EvseDataRecord'
+      example:
+        ActionType: fullLoad
+        OperatorEvseData:
+          EvseDataRecord:
+          - Accessibility: Restricted access
+            AccessibilityLocation: ParkingGarage
+            AdditionalInfo:
+            - lang: en
+              value: This charging station is for testing purposes
+            Address:
+              City: Berlin
+              Country: DEU
+              Floor: 6OG
+              HouseNum: '22'
+              PostalCode: '10829'
+              Region: Berlin
+              Street: EUREF CAMPUS
+              TimeZone: UTC+01:00
+              ParkingFacility: true
+              ParkingSpot: E36
+            AuthenticationModes:
+            - NFC RFID Classic
+            - REMOTE
+            CalibrationLawDataAvailability: Local
+            ChargingFacilities:
+            - Amperage: 32
+              Power: 22
+              PowerType: AC_3_PHASE
+              Voltage: 480
+              ChargingModes:
+              - Mode_4
+            ChargingPoolID: DE*ABC*P1234TEST*1
+            ChargingStationID: TEST 1
+            ChargingStationImage: http://www.testlink.com
+            ChargingStationNames:
+            - lang: en
+              value: ABC Charging Station Test
+            - lang: de
+              value: ABC Testladestation
+            ChargingStationLocationReference:
+            - lang: en
+              value: Charging station is inside Hubject Officem Parking Lot
+            ClearinghouseID: TEST ID
+            DynamicInfoAvailable: 'true'
+            DynamicPowerLevel: true
+            EvseID: DE*XYZ*ETEST1
+            EnergySource:
+            - Energy: Solar
+              Percentage: 85
+            - Energy: Wind
+              Percentage: 15
+            EnvironmentalImpact:
+              CO2Emission: 30.3
+            GeoChargingPointEntrance:
+              Google:
+                Coordinates: 52.480495 13.356465
+            GeoCoordinates:
+              Google:
+                Coordinates: 52.480495 13.356465
+            HardwareManufacturer: Charger Hardware Muster Company
+            HotlinePhoneNumber: '+49123123123123'
+            HubOperatorID: DE*ABC
+            IsHubjectCompatible: true
+            IsOpen24Hours: false
+            MaxCapacity: 50
+            OpeningTimes:
+            - Period:
+              - begin: 09:00
+                end: '18:00'
+              'on': Everyday
+            PaymentOptions:
+            - No Payment
+            Plugs:
+            - Type 2 Outlet
+            RenewableEnergy: true
+            SubOperatorName: XYZ Technologies
+            ValueAddedServices:
+            - Reservation
+            deltaType: insert
+            lastUpdate: '2018-01-23T14:04:29.377Z'
+          OperatorID: DE*ABC
+          OperatorName: ABC technologies
+    EvseID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$
+      description: 'The ID that identifies the charging spot.
+
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.
+
+
+        `^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$`
+
+        The expression validates the string as EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the EvseID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional. Furthermore the ID MUST provide an “E” after the OperatorID in order to identify the ID as ISO EvseID without doubt.
+
+
+        In case the EvseID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+
+        Examples ISO: “DE*AB7*E840*6487”, “DEAB7E8406487”
+
+
+        Example DIN: “+49*810*000*438”
+
+        '
+      example: +49*810*000*438
+    OperatorID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$
+      description: 'A string that MUST be valid with respect to the following regular expression: ISO | DIN
+
+
+        ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$
+
+        The expression validates the string as OperatorID including the preceding country code, which is part of EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118. In case the OperatorID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional.
+
+
+        In case the OperatorID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+
+        Examples ISO: “DE*A36”, “DEA36”
+
+
+        Example DIN: “+49*536”
+
+        '
+      example: +49*536
+    EnergySource:
+      type: object
+      description: energy source that the charging station uses to supply electric energy
+      properties:
+        Energy:
+          type: string
+          description: '| Option | Description |
+
+            | Solar | Energy coming from Solar radiation |
+
+            | Wind | Energy produced by wind |
+
+            | HydroPower | Energy produced by the movement of water |
+
+            | GeothermalEnergy | Energy coming from the sub-surface of the earth |
+
+            | Biomass | Energy produced using plant or animal material as fuel |
+
+            | Coal | Energy produced using coal as fuel |
+
+            | NuclearEnergy | Energy being produced by nuclear fission |
+
+            | Petroleum | Energy produced by using Petroleum as fuel |
+
+            | NaturalGas | Energy produced using Natural Gas as fuel |
+
+            '
+          enum:
+          - Solar
+          - Wind
+          - HydroPower
+          - GeothermalEnergy
+          - Biomass
+          - Coal
+          - NuclearEnergy
+          - Petroleum
+          - NaturalGas
+        Percentage:
+          type: integer
+          description: Percentage of EnergyType being used by the charging stations
+          maximum: 99
+          minimum: 0
+    OpeningTimes:
+      type: object
+      required:
+      - Period
+      - 'on'
+      properties:
+        Period:
+          type: array
+          description: 'The starting and end time for pricing product applicability in the specified period
+
+            '
+          items:
+            type: object
+            required:
+            - begin
+            - end
+            properties:
+              begin:
+                type: string
+                description: The opening time
+                pattern: '[0-9]{2}:[0-9]{2}'
+              end:
+                type: string
+                description: The closing time
+                pattern: '[0-9]{2}:[0-9]{2}'
+        'on':
+          type: string
+          enum:
+          - Everyday
+          - Workdays
+          - Weekend
+          - Monday
+          - Tuesday
+          - Wednesday
+          - Thursday
+          - Friday
+          - Saturday
+          - Sunday
+          description: Day values to be used in specifying periods on which the product is available. Workdays = Monday – Friday, Weekend = Saturday – Sunday
+      example:
+        Period:
+        - begin: 08:30
+          end: '22:45'
+        'on': Everyday
+    ChargingFacility:
+      type: object
+      required:
+      - PowerType
+      - Power
+      properties:
+        PowerType:
+          type: string
+          description: Charging Facility power type (e.g. AC or DC)
+          enum:
+          - AC_1_PHASE
+          - AC_3_PHASE
+          - DC
+        Voltage:
+          type: integer
+          maximum: 999
+          minimum: 0
+          description: Voltage (Line to Neutral) of the Charging Facility
+        Amperage:
+          type: integer
+          maximum: 99
+          minimum: 0
+          description: Amperage of the Charging Facility
+        Power:
+          type: integer
+          maximum: 999
+          minimum: 0
+          description: Charging Facility power in kW
+        ChargingModes:
+          type: array
+          items:
+            type: string
+            description: '| Option | Description |
+
+              | Mode_1 | conductive connection between a standard socket-outlet of an AC supply network and electric vehicle without communication or additional safety features (IEC 61851-1) |
+
+              | Mode_2 | conductive connection between a standard socket-outlet of an AC supply network and electric vehicle with communication and additional safety features (IEC 61851-1) |
+
+              | Mode_3 | conductive connection of an EV to an AC EV supply equipment permanently connected to an AC supply network with communication and additional safety features (IEC 61851-1) |
+
+              | Mode_4 | conductive connection of an EV to an AC or DC supply network utilizing a DC EV supply equipment, with (high-level) communication and additional safety features (IEC 61851-1) |
+
+              | CHAdeMO | CHAdeMo Specification |
+
+              '
+            enum:
+            - Mode_1
+            - Mode_2
+            - Mode_3
+            - Mode_4
+            - CHAdeMO
+          description: List of charging modes that are supported.
+    EvseDataRecord:
+      type: object
+      required:
+      - EvseID
+      - ChargingStationNames
+      - Address
+      - GeoCoordinates
+      - Plugs
+      - ChargingFacilities
+      - RenewableEnergy
+      - CalibrationLawDataAvailability
+      - AuthenticationModes
+      - PaymentOptions
+      - ValueAddedServices
+      - Accessibility
+      - HotlinePhoneNumber
+      - IsOpen24Hours
+      - IsHubjectCompatible
+      - DynamicInfoAvailable
+      properties:
+        deltaType:
+          type: string
+          enum:
+          - update
+          - insert
+          - delete
+          description: In case that the operation “PullEvseData” is performed with the parameter “LastCall”, Hubject assigns this attribute to every response EVSE record in order to return the changes compared to the last call.
+        lastUpdate:
+          type: string
+          format: date-time
+          description: The attribute indicates the date and time of the last update of the record. Hubject assigns this attribute to every response EVSE record.
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ChargingPoolID:
+          $ref: '#/components/schemas/ChargingPoolID'
+        ChargingStationId:
+          type: string
+          description: The ID that identifies the charging station.
+          maximum: 50
+        ChargingStationNames:
+          type: array
+          items:
+            $ref: '#/components/schemas/InfoTextType'
+          description: Name of the charging station
+        HardwareManufacturer:
+          type: string
+          maximum: 50
+          description: Name of the charging point manufacturer
+        ChargingStationImage:
+          type: string
+          maximum: 200
+          description: URL that redirect to an online image of the related EVSEID
+        SubOperatorName:
+          type: string
+          maximum: 100
+          description: Name of the Sub Operator owning the Charging Station
+        Address:
+          $ref: '#/components/schemas/AddressIso19773'
+        GeoCoordinates:
+          $ref: '#/components/schemas/GeoCoordinates'
+        Plugs:
+          type: array
+          description: List of plugs that are supported.
+          items:
+            $ref: '#/components/schemas/Plug'
+        DynamicPowerLevel:
+          type: boolean
+          description: Informs is able to deliver different power outputs.
+        ChargingFacilities:
+          type: array
+          description: List of facilities that are supported.
+          items:
+            $ref: '#/components/schemas/ChargingFacility'
+        RenewableEnergy:
+          type: boolean
+          description: 'If the Charging Station provides only renewable energy then the value `MUST` be ”true”, if it use grey energy then value `MUST` be “false”.
+
+            '
+        EnergySource:
+          type: array
+          description: List of energy source that the charging station uses to supply electric energy.
+          items:
+            $ref: '#/components/schemas/EnergySource'
+        EnvironmentalImpact:
+          type: object
+          properties:
+            CO2Emission:
+              type: number
+              description: Total CO2 emited by the energy source being used by this charging station to supply energy to EV. Units are in g/kWh
+              maximum: 99999
+            NuclearWaste:
+              type: number
+              description: Total NuclearWaste emited by the energy source being used by this charging station to supply energy to EV. Units are in g/kWh
+              maximum: 99999
+        CalibrationLawDataAvailability:
+          type: string
+          description: '| Option | Description |
+
+            | Local | Calibration law data is shown at the charging station. |
+
+            | External | Calibration law data is provided externaly. |
+
+            | Not Available | Calibration law data is not provided. |
+
+            '
+          enum:
+          - Local
+          - External
+          - Not Available
+        AuthenticationModes:
+          type: array
+          description: List of authentication modes that are supported.
+          items:
+            $ref: '#/components/schemas/AuthenticationMode'
+        MaxCapacity:
+          type: integer
+          description: This field is used if the EVSE has a limited capacity (e.g. built-in battery). Values must be given in kWh.
+        PaymentOptions:
+          type: array
+          description: List of payment options that are supported.
+          items:
+            $ref: '#/components/schemas/PaymentOption'
+        ValueAddedServices:
+          type: array
+          description: List of value added services that are supported.
+          items:
+            $ref: '#/components/schemas/ValueAddedService'
+        Accessibility:
+          $ref: '#/components/schemas/Accessibility'
+        AccessibilityLocation:
+          type: string
+          enum:
+          - OnStreet
+          - ParkingLot
+          - ParkingGarage
+          - UndergroundParkingGarage
+          description: '| Option | Description |
+
+            | ------ | ----------- |
+
+            | OnStreet | The charging station is located on the street|
+
+            | ParkingLot | The Charging Point is located inside a Parking Lot|
+
+            | ParkingGarage | The Charging Point is located inside a Parking Garage|
+
+            | UndergroundParkingGarage | The Charging Point is located inside an Underground Parking Garage |
+
+            '
+        HotlinePhoneNumber:
+          type: string
+          pattern: ^\+[0-9]{5,15}$
+          description: '`^\+[0-9]{5,15}$`
+
+            The expression validates the string as a telephone number starting with “+” and containing only numbers.
+
+
+            Example: “+0305132787”
+
+            '
+        AdditionalInfo:
+          type: array
+          description: Optional information.
+          items:
+            $ref: '#/components/schemas/InfoTextType'
+        ChargingStationLocationReference:
+          type: array
+          description: Inform the EV driver where the ChargingPoint could be accessed.
+          items:
+            $ref: '#/components/schemas/InfoTextType'
+        GeoChargingPointEntrance:
+          $ref: '#/components/schemas/GeoCoordinates'
+        IsOpen24Hours:
+          type: boolean
+          description: Set in case the charging spot is open 24 hours.
+        OpeningTimes:
+          type: array
+          description: Opening time in case that the charging station cannot be accessed around the clock.
+          items:
+            $ref: '#/components/schemas/OpeningTimes'
+        HubOperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        ClearinghouseID:
+          type: string
+          maximum: 20
+          description: 'Identification of the corresponding clearing house in the event that roaming between different clearing houses `MUST` be processed in the future.
+
+            '
+        IsHubjectCompatible:
+          type: boolean
+          description: Is eRoaming via intercharge at this charging station possible? If set to "false" the charge spot will not be started/stopped remotely via Hubject.
+        DynamicInfoAvailable:
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+          - auto
+          description: 'Values: true / false / auto This attribute indicates whether a CPO provides (dynamic) EVSE Status info in addition to the (static) EVSE Data for this EVSERecord. Value auto is set to true by Hubject if the operator offers Hubject EVSEStatus data.'
+    AddressIso19773:
+      type: object
+      required:
+      - Country
+      - City
+      - Street
+      - PostalCode
+      - HouseNum
+      properties:
+        Country:
+          type: string
+          description: 'The CountryCodeType allows for Alpha-3 country codes only as of OICP 2.2 and OICP 2.3
+
+
+            For Alpha-3 (three-letter) country codes as defined in ISO 3166-1.
+
+
+            __Examples:__
+
+
+            | Option | Description |
+
+            | ------ | ----------- |
+
+            | AUT | Austria |
+
+            | DEU | Germany |
+
+            | FRA | France |
+
+            | USA | United States |
+
+            '
+          maximum: 3
+          minimum: 3
+        City:
+          type: string
+          maximum: 50
+          minimum: 1
+        Street:
+          type: string
+          maximum: 100
+          minimum: 2
+        PostalCode:
+          type: string
+          maximum: 10
+        HouseNum:
+          type: string
+          maximum: 10
+        Floor:
+          type: string
+          maximum: 5
+        Region:
+          type: string
+          maximum: 50
+        ParkingFacility:
+          type: boolean
+        ParkingSpot:
+          type: string
+          maximum: 5
+        TimeZone:
+          type: string
+          pattern: '[U][T][C][+,-][0-9][0-9][:][0-9][0-9]'
+          description: '`[U][T][C][+,-][0-9][0-9][:][0-9][0-9]`
+
+            The expression validates a string as a Time zone with UTC offset.
+
+
+            Examples:
+
+
+            UTC+01:00
+
+
+            UTC-05:00
+
+            '
+          example: UTC-05:00
+    SessionID:
+      type: string
+      pattern: ^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$
+      description: 'The Hubject SessionID that identifies the process
+
+
+        A string that `MUST` be valid with respect to the following regular expression:
+
+
+        `^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$`
+
+
+        The expression validates the string as a GUID.
+
+
+        Example: “b2688855-7f00-0002-6d8e-48d883f6abb6”
+
+        '
+      example: b2688855-7f00-0002-6d8e-48d883f6abb6
+    StatusCode:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: some description
+        AdditionalInfo: some additional info
+    ValueAddedService:
+      type: string
+      enum:
+      - Reservation
+      - DynamicPricing
+      - ParkingSensors
+      - MaximumPowerCharging
+      - PredictiveChargePointUsage
+      - ChargingPlans
+      - RoofProvided
+      - None
+      description: '| Option | Description |
+
+        | ------ | ----------- |
+
+        | Reservation | Can an EV driver reserve the charging sport via remote services? |
+
+        | DynamicPricing | Does the EVSE ID support dynamic pricing? |
+
+        | ParkingSensors | Is dynamic status info on the parking area in front of the EVSE-ID available? |
+
+        | MaximumPowerCharging | Does the EVSE-ID offer a dynamic maximum power charging? |
+
+        | PredictiveChargePointUsage | Is predictive charge Point usage info available for the EVSE-ID? |
+
+        | ChargingPlans | Does the EVSE-ID offer charging plans, e.g. As described in ISO15118-2? |
+
+        | RoofProvided | Indicates if the charging station is under a roof |
+
+        | None | There are no value-added services available. |
+
+        '
+    Accessibility:
+      type: string
+      enum:
+      - Free publicly accessible
+      - Restricted access
+      - Paying publicly accessible
+      - Test Station
+      description: 'Specifies how the charging station can be accessed.
+
+
+        | Option | Description |
+
+        | ------ | ----------- |
+
+        | Free publicly accessible | EV Driver can reach the charging point without paying a fee, e.g. street, free public place, free parking lot, etc. |
+
+        | Restricted access | EV Driver needs permission to reach the charging point, e.g. Campus, building complex, etc. |
+
+        | Paying publicly accessible | EV Driver needs to pay a fee in order to reach the charging point, e.g. payable parking garage, etc. |
+
+        | Test Station | Station is just for testing purposes. Access may be restricted. |
+
+        '
+      example: Free publicly accessible
+    eRoamingAcknowledgment:
+      type: object
+      description: 'The acknowledgement is a message that is sent in response to several requests.
+
+
+        * To `SEND` and `RECEIVE`
+
+        * Implementation: `MANDATORY`
+
+        '
+      required:
+      - Result
+      - StatusCode
+      properties:
+        Result:
+          type: boolean
+          description: 'If result is true, the message was received and the respective operation was performed successfully.
+
+
+            If result is false, the message was received and the respective operation was not performed successfully.
+
+            '
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+      example:
+        Result: true
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: Success
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+    AuthenticationMode:
+      type: string
+      enum:
+      - NFC RFID Classic
+      - NFC RFID DESFire
+      - PnC
+      - REMOTE
+      - Direct Payment
+      - No Authentication Required
+      description: '| Option | Description |
+
+        | NFC RFID Classic | Defined authentication. |
+
+        | NFC RFID DESFire | Defined authentication. |
+
+        | PnC | ISO/IEC 15118. |
+
+        | REMOTE | App, QR-Code, Phone. |
+
+        | Direct Payment | Remote use via direct payment. E.g. intercharge direct |
+
+        | No Authentication Required | Not Authentication Method Required |
+
+        '
+    ChargingPoolID:
+      type: string
+      pattern: ([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?P[A-Za-z0-9\*]{1,30})
+      description: 'VSEs may be grouped by using a charging pool id according to emi³ standard definition. The Evse Pool ID MUST match the following structure (the notation corresponds to the augmented Backus-Naur Form (ABNF) as defined in RFC5234):
+
+        <Evse Pool ID> = <Country Code> <S> <Spot Operator ID> <S> <ID Type> <Pool ID>
+
+
+        with:
+
+
+        <Country Code> = 2 ALPHA ; two character country code according to ISO-3166-1 (Alpha-2-Code).
+
+
+        <Spot Operator ID> = 3 (ALPHA / DIGIT); three alphanumeric characters.
+
+
+        <ID Type> = “P”; one character “P” indicating that this ID represents a “Pool”.
+
+
+        <Pool Instance> = (ALPHA / DIGIT) 1 * 30 ( 1*(ALPHA / DIGIT) [/ <S>] ); between 1 and 31sequence of alphanumeric characters, including additional optional separators. Starts with alphanumeric character referring to a specific Pool in EVSE Operator data system.
+
+
+        ALPHA = %x41-5A / %x61-7A; according to RFC 5234 (7-Bit ASCII).
+
+
+        DIGIT = %x30-39; according to RFC 5234 (7-Bit ASCII).
+
+
+        <S> = *1 ( “*” ); optional separator
+
+
+        An example for a valid Evse Pool ID is “IT*123*P456*AB789” with :
+
+
+        “IT” indicating Italy,
+
+
+        “123” representing a particular Spot Operator,
+
+
+        “P” indicating the Pool, and
+
+
+        “456*AB789” representing one of its POOL.
+
+
+        Note
+
+
+        In contrast to the eMA ID, no check digit is specified for the Evse Pool ID in this document. Alpha characters SHALL be interpreted case insensitively. emi³ strongly recommends that implementations SHOULD - use the separator between Country Code and Spot Operator ID - use the separator between Spot Operator ID and ID type
+
+        This leads to the following regular expression:
+
+
+        `([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?P[A-Za-z0-9\*]{1,30})`
+
+
+        This regular expression is similar to that of the ISO EvseIDType but E is replaced with P to indicate a pool.
+
+        '
+      example: IT*123*P456*AB789
+    ProviderID:
+      type: string
+      pattern: ^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$
+      description: 'The ProviderID is defined by Hubject and is used to identify the EMP
+
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN
+
+
+        `^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$`
+
+
+        The expression validates the string as ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the ProviderID is provided corresponding to ISO, the country code `MUST` be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “-” is optional.
+
+
+        Examples ISO: “DE8EO”, “DE-8EO”
+
+
+        Examples DIN: “DE8EO”, “DE*8EO”, “DE-8EO”
+
+        '
+      example: DE-8EO
+    GeoCoordinatesResponseFormat:
+      type: string
+      description: Defines the format of geo coordinates that shall be provided with the response.
+      enum:
+      - Google
+      - DegreeMinuteSeconds
+      - DecimalDegree
+    ChargingFacility_2:
+      type: object
+      required:
+      - PowerType
+      - Power
+      properties:
+        PowerType:
+          type: string
+          description: Charging Facility power type (e.g. AC or DC)
+          enum:
+          - AC_1_PHASE
+          - AC_3_PHASE
+          - DC
+        Voltage:
+          type: integer
+          maximum: 999
+          minimum: 0
+          description: Voltage (Line to Neutral) of the Charging Facility
+        Amperage:
+          type: integer
+          maximum: 99
+          minimum: 0
+          description: Amperage of the Charging Facility
+        Power:
+          type: number
+          description: Charging Facility power in kW
+        ChargingModes:
+          type: array
+          items:
+            type: string
+            description: '| Option | Description |
+
+              | Mode_1 | conductive connection between a standard socket-outlet of an AC supply network and electric vehicle without communication or additional safety features (IEC 61851-1) |
+
+              | Mode_2 | conductive connection between a standard socket-outlet of an AC supply network and electric vehicle with communication and additional safety features (IEC 61851-1) |
+
+              | Mode_3 | conductive connection of an EV to an AC EV supply equipment permanently connected to an AC supply network with communication and additional safety features (IEC 61851-1) |
+
+              | Mode_4 | conductive connection of an EV to an AC or DC supply network utilizing a DC EV supply equipment, with (high-level) communication and additional safety features (IEC 61851-1) |
+
+              | CHAdeMO | CHAdeMo Specification |
+
+              '
+            enum:
+            - Mode_1
+            - Mode_2
+            - Mode_3
+            - Mode_4
+            - CHAdeMO
+          description: List of charging modes that are supported.
+    AddressIso19773_2:
+      type: object
+      required:
+      - Country
+      - City
+      - Street
+      - PostalCode
+      - HouseNum
+      properties:
+        Country:
+          $ref: '#/components/schemas/CountryCode'
+        City:
+          type: string
+          maximum: 50
+          minimum: 1
+        Street:
+          type: string
+          maximum: 100
+          minimum: 2
+        PostalCode:
+          type: string
+          maximum: 10
+        HouseNum:
+          type: string
+          maximum: 10
+        Floor:
+          type: string
+          maximum: 5
+        Region:
+          type: string
+          maximum: 50
+        ParkingFacility:
+          type: boolean
+        ParkingSpot:
+          type: string
+          maximum: 5
+        TimeZone:
+          type: string
+          pattern: '[U][T][C][+,-][0-9][0-9][:][0-9][0-9]'
+          description: '`[U][T][C][+,-][0-9][0-9][:][0-9][0-9]`
+
+            The expression validates a string as a Time zone with UTC offset.
+
+
+            Examples:
+
+
+            UTC+01:00
+
+
+            UTC-05:00
+
+            '
+          example: UTC-05:00
+    eRoamingPullEVSEData:
+      type: object
+      description: eRoamingPullEVSEData is a message that is sent in order to request the download of EVSE data of operators stored on the Hubject system.
+      required:
+      - ProviderID
+      - GeoCoordinatesResponseFormat
+      properties:
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        SearchCenter:
+          type: object
+          description: '"The data can be restricted using search parameters that are provided in this field.
+
+
+            Cannot be combined with “LastCall”."
+
+            '
+          required:
+          - GeoCoordinates
+          - Radius
+          properties:
+            GeoCoordinates:
+              $ref: '#/components/schemas/GeoCoordinates'
+            Radius:
+              type: number
+              description: Radius in km around the position that is defined by the geo coordinates
+        LastCall:
+          type: string
+          format: date-time
+          description: 'In case that this field is set, Hubject does not return the currently valid set of EVSE data but the changes compared to the status of EVSE data at the time of the last call. Cannot be combined with “SearchCenter”, “CountryCodes”, and “OperatorIDs”. '
+        GeoCoordinatesResponseFormat:
+          $ref: '#/components/schemas/GeoCoordinatesResponseFormat'
+        CountryCodes:
+          type: array
+          description: A list of countries whose EVSE’s a provider wants to retrieve. Cannot be combined with “LastCall”.
+          items:
+            $ref: '#/components/schemas/CountryCode'
+        OperatorIds:
+          type: array
+          description: A list of Operator Ids in ISO or DIN standard to download only EVSE’s of one or more operators. Cannot be combined with “LastCall”.
+          items:
+            $ref: '#/components/schemas/OperatorID'
+        AuthenticationModes:
+          type: array
+          description: A list of Authentication Modes to start a charging process
+          items:
+            $ref: '#/components/schemas/AuthenticationMode'
+        Accessibility:
+          type: array
+          description: A list of accessibility of the charging point
+          items:
+            $ref: '#/components/schemas/Accessibility'
+        CalibrationLawDataAvailability:
+          type: array
+          description: A list of how caliration law data is provided by the charging point
+          items:
+            type: string
+            enum:
+            - Local
+            - External
+            - Not Available
+        RenewableEnergy:
+          type: boolean
+          description: Select the charging stations use Renewable energy or not
+        IsHubjectCompatible:
+          type: boolean
+          description: Select if the charging station is Hubject Compatible
+        IsOpen24Hours:
+          type: boolean
+          description: Select the charging stations that are open 24 hours.
+      example:
+        AuthenticationModes:
+        - PnC
+        Accessibility:
+        - Free publicly accessible
+        CalibrationLawDataAvailability:
+        - Local
+        CountryCodes:
+        - DEU
+        GeoCoordinatesResponseFormat: Google
+        IsHubjectCompatible: true
+        IsOpen24Hours: true
+        LastCall: '2020-09-23T14:27:43.052Z'
+        OperatorIds:
+        - DE*ABC
+        ProviderID: DE-DCB
+        RenewableEnergy: true
+        SearchCenter:
+          GeoCoordinates:
+            Google:
+              Coordinates: 52.480495 13.356465
+            DecimalDegree:
+              Latitude: '52.480495'
+              Longitude: '13.356465'
+            DegreeMinuteSeconds:
+              Latitude: 9°21'39.32''
+              Longitude: 9°21'39.32''
+          Radius: 0
+    StatusCode_2:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: Success
+        AdditionalInfo: Success
+    eRoamingEVSEData:
+      type: object
+      required:
+      - content
+      - number
+      - size
+      - totalElements
+      - last
+      - totalPages
+      - first
+      - numberOfElements
+      - StatusCode
+      properties:
+        content:
+          type: array
+          description: A list of EVSE data blocks that are each assigned to a certain operator.
+          items:
+            $ref: '#/components/schemas/PullEvseDataRecord'
+        number:
+          type: integer
+          description: Number of the page
+        size:
+          type: integer
+          description: Size of records requested per page
+        totalElements:
+          type: integer
+          description: Number of total charging stations available from the request
+        last:
+          type: boolean
+          description: Indicates if the current page is the last page
+        totalPages:
+          type: integer
+          description: Number of total pages available for the request
+        first:
+          type: boolean
+          description: indicates if the current page is the first page
+        numberOfElements:
+          type: integer
+          description: Number of records in the page
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode_2'
+    PullEvseDataRecord:
+      type: object
+      required:
+      - EvseID
+      - ChargingStationNames
+      - Address
+      - GeoCoordinates
+      - Plugs
+      - ChargingFacilities
+      - RenewableEnergy
+      - CalibrationLawDataAvailability
+      - AuthenticationModes
+      - PaymentOptions
+      - ValueAddedServices
+      - Accessibility
+      - HotlinePhoneNumber
+      - IsOpen24Hours
+      - IsHubjectCompatible
+      - DynamicInfoAvailable
+      - OperatorID
+      - OperatorName
+      properties:
+        deltaType:
+          type: string
+          enum:
+          - update
+          - insert
+          - delete
+          description: In case that the operation “PullEvseData” is performed with the parameter “LastCall”, Hubject assigns this attribute to every response EVSE record in order to return the changes compared to the last call.
+        lastUpdate:
+          type: string
+          format: date-time
+          description: The attribute indicates the date and time of the last update of the record. Hubject assigns this attribute to every response EVSE record.
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ChargingPoolID:
+          $ref: '#/components/schemas/ChargingPoolID'
+        ChargingStationId:
+          type: string
+          description: The ID that identifies the charging station.
+          maximum: 50
+        ChargingStationNames:
+          type: array
+          items:
+            $ref: '#/components/schemas/InfoTextType'
+          description: Name of the charging station
+        HardwareManufacturer:
+          type: string
+          maximum: 50
+          description: Name of the charging point manufacturer
+        ChargingStationImage:
+          type: string
+          maximum: 200
+          description: URL that redirect to an online image of the related EVSEID
+        SubOperatorName:
+          type: string
+          maximum: 100
+          description: Name of the Sub Operator owning the Charging Station
+        Address:
+          $ref: '#/components/schemas/AddressIso19773_2'
+        GeoCoordinates:
+          $ref: '#/components/schemas/GeoCoordinates'
+        Plugs:
+          type: array
+          description: List of plugs that are supported.
+          items:
+            $ref: '#/components/schemas/Plug'
+        DynamicPowerLevel:
+          type: boolean
+          description: Informs is able to deliver different power outputs.
+        ChargingFacilities:
+          type: array
+          description: List of facilities that are supported.
+          items:
+            $ref: '#/components/schemas/ChargingFacility_2'
+        RenewableEnergy:
+          type: boolean
+          description: 'If the Charging Station provides only renewable energy then the value `MUST` be ”true”, if it use grey energy then value `MUST` be “false”.
+
+            '
+        EnergySource:
+          type: array
+          description: List of energy source that the charging station uses to supply electric energy.
+          items:
+            $ref: '#/components/schemas/EnergySource'
+        EnvironmentalImpact:
+          type: object
+          properties:
+            CO2Emission:
+              type: number
+              description: Total CO2 emited by the energy source being used by this charging station to supply energy to EV. Units are in g/kWh
+              maximum: 99999
+            NuclearWaste:
+              type: number
+              description: Total NuclearWaste emited by the energy source being used by this charging station to supply energy to EV. Units are in g/kWh
+              maximum: 99999
+        CalibrationLawDataAvailability:
+          type: string
+          description: '| Option | Description |
+
+            | Local | Calibration law data is shown at the charging station. |
+
+            | External | Calibration law data is provided externaly. |
+
+            | Not Available | Calibration law data is not provided. |
+
+            '
+          enum:
+          - Local
+          - External
+          - Not Available
+        AuthenticationModes:
+          type: array
+          description: List of authentication modes that are supported.
+          items:
+            $ref: '#/components/schemas/AuthenticationMode'
+        MaxCapacity:
+          type: integer
+          description: This field is used if the EVSE has a limited capacity (e.g. built-in battery). Values must be given in kWh.
+        PaymentOptions:
+          type: array
+          description: List of payment options that are supported.
+          items:
+            $ref: '#/components/schemas/PaymentOption'
+        ValueAddedServices:
+          type: array
+          description: List of value added services that are supported.
+          items:
+            $ref: '#/components/schemas/ValueAddedService'
+        Accessibility:
+          $ref: '#/components/schemas/Accessibility'
+        AccessibilityLocation:
+          type: string
+          enum:
+          - OnStreet
+          - ParkingLot
+          - ParkingGarage
+          - UndergroundParkingGarage
+          description: '| Option | Description |
+
+            | ------ | ----------- |
+
+            | OnStreet | The charging station is located on the street|
+
+            | ParkingLot | The Charging Point is located inside a Parking Lot|
+
+            | ParkingGarage | The Charging Point is located inside a Parking Garage|
+
+            | UndergroundParkingGarage | The Charging Point is located inside an Underground Parking Garage |
+
+            '
+        HotlinePhoneNumber:
+          type: string
+          pattern: ^\+[0-9]{5,15}$
+          description: '`^\+[0-9]{5,15}$`
+
+            The expression validates the string as a telephone number starting with “+” and containing only numbers.
+
+
+            Example: “+0305132787”
+
+            '
+        AdditionalInfo:
+          type: array
+          description: Optional information.
+          items:
+            $ref: '#/components/schemas/InfoTextType'
+        ChargingStationLocationReference:
+          type: array
+          description: Inform the EV driver where the ChargingPoint could be accessed.
+          items:
+            $ref: '#/components/schemas/InfoTextType'
+        GeoChargingPointEntrance:
+          $ref: '#/components/schemas/GeoCoordinates'
+        IsOpen24Hours:
+          type: boolean
+          description: Set in case the charging spot is open 24 hours.
+        OpeningTimes:
+          type: array
+          description: Opening time in case that the charging station cannot be accessed around the clock.
+          items:
+            $ref: '#/components/schemas/OpeningTimes'
+        HubOperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        ClearinghouseID:
+          type: string
+          maximum: 20
+          description: 'Identification of the corresponding clearing house in the event that roaming between different clearing houses `MUST` be processed in the future.
+
+            '
+        IsHubjectCompatible:
+          type: boolean
+          description: Is eRoaming via intercharge at this charging station possible? If set to "false" the charge spot will not be started/stopped remotely via Hubject.
+        DynamicInfoAvailable:
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+          - auto
+          description: 'Values: true / false / auto This attribute indicates whether a CPO provides (dynamic) EVSE Status info in addition to the (static) EVSE Data for this EVSERecord. Value auto is set to true by Hubject if the operator offers Hubject EVSEStatus data.'
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        OperatorName:
+          type: string
+          description: Free text for operator
+    CountryCode:
+      type: string
+      description: 'The CountryCodeType allows for Alpha-3 country codes only as of OICP 2.2 and OICP 2.3
+
+
+        For Alpha-3 (three-letter) country codes as defined in ISO 3166-1.
+
+
+        __Examples:__
+
+
+        | Option | Description |
+
+        | ------ | ----------- |
+
+        | AUT | Austria |
+
+        | DEU | Germany |
+
+        | FRA | France |
+
+        | USA | United States |
+
+        '
+      maximum: 3
+      minimum: 3
+  parameters:
+    operatorID:
+      name: operatorID
+      in: path
+      required: true
+      description: The id of the operator
+      schema:
+        type: string
+    providerID:
+      name: providerID
+      in: path
+      required: true
+      description: The id of the provider
+      schema:
+        type: string
+x-refined-from:
+- hubject-oicp-cpo-2.3-openapi.yml
+- hubject-oicp-emp-2.3-openapi.yml

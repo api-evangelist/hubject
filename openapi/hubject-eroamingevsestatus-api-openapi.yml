@@ -1,0 +1,794 @@
+openapi: 3.2.0
+info:
+  title: Hubject E Roaming Evse Status API
+  version: 2.3.0
+  contact:
+    name: API Support
+    url: https://support.hubject.com
+    email: support@hubject.com
+  description: 'Operations tagged eRoamingEvseStatus across 2 of this provider''s published API definitions: hubject-oicp-cpo-2.3-openapi.yml, hubject-oicp-emp-2.3-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://service-qa.hubject.com/api/oicp
+  description: QA environment
+- url: https://service.hubject.com/api/oicp
+  description: Production environment
+tags:
+- name: eRoamingEvseStatus
+  description: 'Hubject offers the possibility to upload and download dynamic charging spot (EVSE) status information and thus to exchange the data between different partners.
+
+
+    The eRoamingEvseStatus service offers two operations:
+
+
+    1. eRoamingPushEvseStatus in order to give CPOs the possibility to upload (push) EvseStatus data
+
+
+    2. eRoamingPullEvseStatus in order to give EMPs the possibility to download (pull) EVSE status data from partner operators via Hubject
+
+
+    Hub CPOs may also push EVSE status records of sub operators. Hubject does not distinguish between EvseStatus records of hub operators and related sub operators.'
+paths:
+  /evsepush/v21/operators/{operatorID}/status-records:
+    post:
+      summary: eRoamingPushEvseStatus_V2.1
+      operationId: eRoamingPushEvseStatus_V2.1
+      description: '__Note:__
+
+        * To `SEND`
+
+        * Implementation: `Mandatory`
+
+
+        !Push EVSE status
+
+
+        When a CPO sends an eRoamingPushEvseStatus request, Hubject checks whether there is a valid contract between Hubject and the CPO for the service type (Hubject must be the subscriber). If so, the operation allows uploading EVSE status data to Hubject. Furthermore, it is possible to update EVSE status data that has been pushed with an earlier operation request.
+
+
+        The way how Hubject handles the transferred data `MUST` be defined in the request field "ActionType2, which offers four options. This option works in the same way as the eRoamingAuthenticationData service. The EVSE status data that will be inserted or updated MUST be provided with the field “OperatorEvseStatus”, which consists of “EvseStatusRecord” structures. Hubject keeps a history of all updated and changed data records. Every successful push operation – irrespective of the performed action – leads to a new version of currently valid data records. Furthermore, every operation is logged with the current timestamp. Thus, Hubject can reconstruct the status of EVSE status data for every point in time in the past.
+
+
+        Note:
+
+
+        The eRoamingPushEvseStatus operation `MUST` always be used sequentiallyas described in Data Push Operations
+
+
+        Best Practices:
+
+
+        Please try to avoid race conditions by sending multiple status simultaneously. Status should be sent one by one.'
+      tags:
+      - eRoamingEvseStatus
+      parameters:
+      - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPushEvseStatus'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+  /evsepull/v21/providers/{providerID}/status-records:
+    post:
+      summary: eRoamingPullEvseStatus_V2.1
+      operationId: eRoamingPullEvseStatus_V2.1
+      description: '__Note:__
+
+        * To `SEND`
+
+        * Implementation: `Mandatory`
+
+
+        !Pull EVSE status
+
+
+        This operation allows downloading EVSE status data from Hubject. When an EMP sends an eRoamingPullEVSEStatus request, Hubject identifies all currently valid EVSE status records of relevant operators.
+
+
+        Hubject groups all resulting EVSE status records according to the related CPO. The response structure contains an “EvseStatuses” node that envelopes an “OperatorEVSEStatus” node for every CPO with currently valid and accessible status data records.'
+      tags:
+      - eRoamingEvseStatus
+      parameters:
+      - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/eRoamingPullEVSEStatus'
+              - $ref: '#/components/schemas/eRoamingPullEVSEStatusByID'
+              - $ref: '#/components/schemas/eRoamingPullEVSEStatusByOperatorID'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/eRoamingEVSEStatus'
+                - $ref: '#/components/schemas/eRoamingEVSEStatusByID'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+components:
+  schemas:
+    eRoamingPushEvseStatus:
+      type: object
+      required:
+      - ActionType
+      - OperatorEvseStatus
+      description: eRoamingPushEvseStatus is a message that is sent in order to upload EVSE status data to Hubject.
+      properties:
+        ActionType:
+          type: string
+          enum:
+          - fullLoad
+          - update
+          - insert
+          - delete
+          description: Describes the action that has to be performed by Hubject with the provided data.
+        OperatorEvseStatus:
+          type: object
+          required:
+          - OperatorID
+          - EvseStatusRecord
+          description: Indicates the Eves status
+          properties:
+            OperatorID:
+              $ref: '#/components/schemas/OperatorID'
+            OperatorName:
+              type: string
+              description: Free text for operator
+              maximum: 100
+            EvseStatusRecord:
+              type: array
+              description: EvseStatus list
+              items:
+                type: object
+                required:
+                - EvseID
+                - EvseStatus
+                properties:
+                  EvseID:
+                    $ref: '#/components/schemas/EvseID'
+                  EvseStatus:
+                    type: string
+                    enum:
+                    - Available
+                    - Reserved
+                    - Occupied
+                    - OutOfService
+                    - EvseNotFound
+                    - Unknown
+                    description: "| Option | Description |                \n| ------ | ----------- |\n| Available | Charging Spot is available for charging. |\n| Reserved | Charging Spot is reserved and not available for charging. |\n| Occupied | Charging Spot is busy. |\n| OutOfService | Charging Spot is out of service and not available for charging. |\n| EvseNotFound | The requested EvseID and EVSE status does not exist within the Hubject database. |\n| Unknown | No status information available. |\n"
+      example:
+        ActionType: fullLoad
+        OperatorEvseStatus:
+          OperatorID: DE*ABC
+          OperatorName: ABC technologies
+          EvseStatusRecord:
+          - EvseID: DE*XYZ*ETEST1
+            EvseStatus: Available
+    OperatorID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$
+      description: 'A string that MUST be valid with respect to the following regular expression: ISO | DIN
+
+
+        ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$
+
+        The expression validates the string as OperatorID including the preceding country code, which is part of EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118. In case the OperatorID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional.
+
+
+        In case the OperatorID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+
+        Examples ISO: “DE*A36”, “DEA36”
+
+
+        Example DIN: “+49*536”
+
+        '
+      example: +49*536
+    StatusCode:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: some description
+        AdditionalInfo: some additional info
+    eRoamingAcknowledgment:
+      type: object
+      description: 'The acknowledgement is a message that is sent in response to several requests.
+
+
+        * To `SEND` and `RECEIVE`
+
+        * Implementation: `MANDATORY`
+
+        '
+      required:
+      - Result
+      - StatusCode
+      properties:
+        Result:
+          type: boolean
+          description: 'If result is true, the message was received and the respective operation was performed successfully.
+
+
+            If result is false, the message was received and the respective operation was not performed successfully.
+
+            '
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+      example:
+        Result: true
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: Success
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+    SessionID:
+      type: string
+      pattern: ^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$
+      description: 'The Hubject SessionID that identifies the process
+
+
+        A string that `MUST` be valid with respect to the following regular expression:
+
+
+        `^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$`
+
+
+        The expression validates the string as a GUID.
+
+
+        Example: “b2688855-7f00-0002-6d8e-48d883f6abb6”
+
+        '
+      example: b2688855-7f00-0002-6d8e-48d883f6abb6
+    EvseID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$
+      description: 'The ID that identifies the charging spot.
+
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.
+
+
+        `^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$`
+
+        The expression validates the string as EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the EvseID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional. Furthermore the ID MUST provide an “E” after the OperatorID in order to identify the ID as ISO EvseID without doubt.
+
+
+        In case the EvseID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+
+        Examples ISO: “DE*AB7*E840*6487”, “DEAB7E8406487”
+
+
+        Example DIN: “+49*810*000*438”
+
+        '
+      example: +49*810*000*438
+    eRoamingPullEVSEStatus:
+      type: object
+      description: "eRoamingPullEVSEStatus is a message that is sent in order to request the download of EVSE status data stored on the Hubject system\n\nTip:\n  * In case not all but a specific EVSE status is needed, Hubject offers the service eRoamingPullEVSEStatusByID and eRoamingPullEVSEStatusByOperatorID.\n  * We recommend a to send the request with a frequency from 1 to 5 minutes.\n"
+      required:
+      - ProviderID
+      properties:
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        SearchCenter:
+          type: object
+          description: The data can be restricted using search parameters that are provided in this field.
+          required:
+          - GeoCoordinates
+          - Radius
+          properties:
+            GeoCoordinates:
+              $ref: '#/components/schemas/GeoCoordinates'
+            Radius:
+              type: number
+              description: Radius in km around the position that is defined by the geo coordinates
+        EVSEStatus:
+          $ref: '#/components/schemas/EvseStatus'
+      example:
+        EvseStatus: Available
+        ProviderID: DE-DCB
+        SearchCenter:
+          GeoCoordinates:
+            Google:
+              Coordinates: 52.480495 13.356465
+            DecimalDegree:
+              Latitude: '52.480495'
+              Longitude: '13.356465'
+            DegreeMinuteSeconds:
+              Latitude: 9°21'39.32''
+              Longitude: 9°21'39.32''
+          Radius: 0
+    eRoamingEVSEStatus:
+      type: object
+      description: "eRoamingEVSEStatus is sent in response to eRoamingPullEVSEStatus requests.\n\nNote:\n  * This message describes the response which will be received as response to the eRoamingPullEVSEStatus request.\n"
+      required:
+      - EvseStatuses
+      properties:
+        EvseStatuses:
+          type: object
+          description: A list of EVSE status blocks that are each assigned to a certain operator.
+          required:
+          - OperatorEvseStatus
+          properties:
+            OperatorEvseStatus:
+              type: array
+              items:
+                type: object
+                required:
+                - OperatorID
+                - EvseStatusRecord
+                properties:
+                  OperatorID:
+                    $ref: '#/components/schemas/OperatorID'
+                  OperatorName:
+                    type: string
+                    description: Free text for operator
+                  EvseStatusRecord:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                      - EvseID
+                      - EvseStatus
+                      properties:
+                        EvseID:
+                          $ref: '#/components/schemas/EvseID'
+                        EvseStatus:
+                          $ref: '#/components/schemas/EvseStatus'
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode_2'
+      example:
+        EvseStatuses:
+          OperatorEvseStatus:
+          - EvseStatusRecord:
+            - EvseID: DE*XYZ*ETEST1
+              EvseStatus: Available
+            OperatorID: DE*ABC
+            OperatorName: ABC technologies
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: string
+    eRoamingEVSEStatusByID:
+      type: object
+      description: "eRoamingEVSEStatusById is sent in response to eRoamingPullEVSEByIDStatus requests.\n\nNote:\n  * This message describes the response which will be received as response to the eRoamingPullEVSEByIDStatus request.\n"
+      required:
+      - EVSEStatusRecords
+      properties:
+        EVSEStatusRecords:
+          type: object
+          description: A list of the requested EVSE status blocks.
+          required:
+          - EvseStatusRecord
+          properties:
+            EvseStatusRecord:
+              type: array
+              items:
+                type: object
+                required:
+                - EvseID
+                - EvseStatus
+                properties:
+                  EvseID:
+                    $ref: '#/components/schemas/EvseID'
+                  EvseStatus:
+                    $ref: '#/components/schemas/EvseStatus'
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode_2'
+      example:
+        EVSEStatusRecords:
+          EvseStatusRecord:
+          - EvseID: DE*XYZ*ETEST1
+            EvseStatus: Available
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: string
+    StatusCode_2:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: Success
+        AdditionalInfo: Success
+    EvseStatus:
+      type: string
+      enum:
+      - Available
+      - Reserved
+      - Occupied
+      - OutOfService
+      - EvseNotFound
+      - Unknown
+      description: "| Option | Description |                \n| ------ | ----------- |\n| Available | Charging Spot is available for charging. |\n| Reserved | Charging Spot is reserved and not available for charging. |\n| Occupied | Charging Spot is busy. |\n| OutOfService | Charging Spot is out of service and not available for charging. |\n| EvseNotFound | The requested EvseID and EVSE status does not exist within the Hubject database. |\n| Unknown | No status information available. |\n"
+    GeoCoordinates:
+      type: object
+      description: 'Important
+
+
+        __One of the following three options `MUST` be provided__
+
+        '
+      properties:
+        Google:
+          type: object
+          description: 'Geocoordinates using Google Structure
+
+            Based on WGS84
+
+            '
+          required:
+          - Coordinates
+          properties:
+            Coordinates:
+              type: string
+              pattern: ^-?1?\d{1,2}\.\d{1,6}\s*\,?\s*-?1?\d{1,2}\.\d{1,6}$
+              description: 'A string that `MUST` be valid with respect to the following regular expression:
+
+
+                `^-?1?\d{1,2}\.\d{1,6}\s*\,?\s*-?1?\d{1,2}\.\d{1,6}$`
+
+                The expression validates the string as geo coordinates with respect to the Google standard. The string contains latitude and longitude (in this sequence) separated by a space.
+
+
+                Example: “47.662249 9.360922”
+
+                '
+              example: 47.662249 9.360922
+        DecimalDegree:
+          type: object
+          description: Geocoordinates using DecimalDegree Structure
+          required:
+          - Longitude
+          - Latitude
+          properties:
+            Longitude:
+              type: string
+              pattern: ^-?1?\d{1,2}\.\d{1,6}$
+              description: 'A string that `MUST` be valid with respect to the following regular expression:
+
+
+                `^-?1?\d{1,2}\.\d{1,6}$`
+
+                The expression validates the string as a geo coordinate (longitude or latitude) with decimal degree syntax.
+
+
+                Examples: “9.360922”, “-21.568201”
+
+                '
+              example: '9.360922'
+            Latitude:
+              type: string
+              pattern: ^-?1?\d{1,2}\.\d{1,6}$
+              description: 'A string that `MUST` be valid with respect to the following regular expression:
+
+
+                `^-?1?\d{1,2}\.\d{1,6}$`
+
+                The expression validates the string as a geo coordinate (longitude or latitude) with decimal degree syntax.
+
+
+                Examples: “9.360922”, “-21.568201”
+
+                '
+              example: '9.360922'
+        DegreeMinuteSeconds:
+          type: object
+          description: Geocoordinates using DegreeMinutesSeconds Structure
+          required:
+          - Longitude
+          - Latitude
+          properties:
+            Longitude:
+              type: string
+              pattern: ^-?1?\d{1,2}°[ ]?\d{1,2}'[ ]?\d{1,2}\.\d+''$
+              description: 'A string that `MUST` be valid with respect to the following regular expression:
+
+
+                `^-?1?\d{1,2}°[ ]?\d{1,2}''[ ]?\d{1,2}\.\d+''''$`
+
+                The expression validates the string as a geo coordinate (longitude or latitude) consisting of degree, minutes, and seconds
+
+
+                Examples: “9°21''39.32''''”, “-21°34''23.16''''
+
+                '
+              example: 9°21'39.32''
+            Latitude:
+              type: string
+              pattern: ^-?1?\d{1,2}°[ ]?\d{1,2}'[ ]?\d{1,2}\.\d+''$
+              description: 'A string that `MUST` be valid with respect to the following regular expression:
+
+
+                `^-?1?\d{1,2}°[ ]?\d{1,2}''[ ]?\d{1,2}\.\d+''''$`
+
+                The expression validates the string as a geo coordinate (longitude or latitude) consisting of degree, minutes, and seconds
+
+
+                Examples: “9°21''39.32''''”, “-21°34''23.16''''
+
+                '
+              example: 9°21'39.32''
+    eRoamingPullEVSEStatusByOperatorID:
+      type: object
+      description: eRoamingPullEVSEStatusByOperatorID is a message that is sent in order to request the EVSE status data for specific OperatorsIDs (i.e. CPO(s) specific EVSE status data).
+      required:
+      - ProviderID
+      - OperatorID
+      properties:
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        OperatorID:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperatorID'
+      example:
+        ProviderID: DE-DCB
+        OperatorID:
+        - DE*ABC
+    eRoamingPullEVSEStatusByID:
+      type: object
+      description: 'eRoamingPullEVSEStatusByID is a message that is sent in order to request the EVSE status data for specific EVSE IDs.
+
+        '
+      required:
+      - ProviderID
+      - EvseID
+      properties:
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        EvseID:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/EvseID'
+      example:
+        ProviderID: DE-DCB
+        EvseID:
+        - DE*XYZ*ETEST1
+    ProviderID:
+      type: string
+      pattern: ^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$
+      description: 'The ProviderID is defined by Hubject and is used to identify the EMP
+
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN
+
+
+        `^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$`
+
+
+        The expression validates the string as ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the ProviderID is provided corresponding to ISO, the country code `MUST` be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “-” is optional.
+
+
+        Examples ISO: “DE8EO”, “DE-8EO”
+
+
+        Examples DIN: “DE8EO”, “DE*8EO”, “DE-8EO”
+
+        '
+      example: DE-8EO
+  parameters:
+    operatorID:
+      name: operatorID
+      in: path
+      required: true
+      description: The id of the operator
+      schema:
+        type: string
+    providerID:
+      name: providerID
+      in: path
+      required: true
+      description: The id of the provider
+      schema:
+        type: string
+x-refined-from:
+- hubject-oicp-cpo-2.3-openapi.yml
+- hubject-oicp-emp-2.3-openapi.yml

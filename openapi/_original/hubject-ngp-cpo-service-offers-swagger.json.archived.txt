@@ -1,0 +1,2 @@
+# x-archived-from: hubject-ngp-cpo-service-offers-swagger.json
+# x-archived-on: 2026-10-19

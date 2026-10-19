@@ -1,0 +1,1065 @@
+openapi: 3.2.0
+info:
+  title: Hubject E Roaming Charging Notifications API
+  version: 2.3.0
+  contact:
+    name: API Support
+    url: https://support.hubject.com
+    email: support@hubject.com
+  description: 'Operations tagged eRoamingChargingNotifications across 2 of this provider''s published API definitions: hubject-oicp-cpo-2.3-openapi.yml, hubject-oicp-emp-2.3-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://service-qa.hubject.com/api/oicp
+  description: QA environment
+- url: https://service.hubject.com/api/oicp
+  description: Production environment
+tags:
+- name: eRoamingChargingNotifications
+paths:
+  /notificationmgmt/v11/charging-notifications:
+    post:
+      summary: eRoamingChargingNotifications_V1.1
+      operationId: eRoamingChargingNotifications_V1.1
+      description: '__Note:__
+
+        * To `SEND`
+
+        * Implementation: `OPTIONAL`
+
+
+        __Functional Description:__
+
+
+        !Charging notifications diagram
+
+        The ChargingNotification feature enables CPOs to notify EMPs about the end of charge
+
+
+        The ChargingNotification feature basically increases the transparency between CPO - EMP - End Consumer to the level of each charging session.
+
+
+        This feature enables CPO to send various notifications during a single Charging Session. These notifications give the details like
+
+
+        1. When the charging session has started. The CPO can send ChargingNotification of type “Start” to Hubject containing information like ChargingStart, MeterStartValue, EVSEID etc.
+
+
+        2. Consumed Energy values during the charging process or duration of successful charging process that has lapsed. The CPO can send ChargingNotification of type “Progress” to Hubject containing information like ChargingStart, EventOccurred, ChargingDuration, ConsumedEnergyProgress, EVSEID etc. The frequency between two progress notifications for one charging session should be at least 5 minutes.
+
+
+        3. When the charging session has ended (because no energy is transmitted anymore). The CPO can send a ChargingNotification of type “End” to Hubject containing information such as ChargingEnd, ConsumedEnergy, EVSEID etc.
+
+
+        4. Error occurred before charging starts or during charging process or abrupt changing end. The CPO can send a ChargingNotification of type “Error” to Hubject containing information such as ErrorClass, ErrorAdditionalInfo, EVSEID etc.
+
+
+        Hubject will forward Start, Progress, End and Error notification requests to the EMP. The EMP responds with an eRoamingAcknowledgement. This acknowledgement is then being forwarded to the CPO.
+
+
+        This feature should cover all the notifications that could happen between Session Start and Session End in future. Each bit of information increases transparency to the customer of EMP.'
+      tags:
+      - eRoamingChargingNotifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/eRoamingChargingNotificationStart'
+              - $ref: '#/components/schemas/eRoamingChargingNotificationProgress'
+              - $ref: '#/components/schemas/eRoamingChargingNotificationEnd'
+              - $ref: '#/components/schemas/eRoamingChargingNotificationError'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+components:
+  schemas:
+    RFIDMifareFamilyIdentification:
+      type: object
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+        '
+      properties:
+        UID:
+          $ref: '#/components/schemas/UID'
+      required:
+      - UID
+      example:
+        UID: 7568290FFF765F
+    Identification:
+      type: object
+      description: 'Authentication data
+
+
+        1. The option RFIDIdentification `MUST` not be used in the eRoamingAuthorization process. For RFID Authorization, only the option RFIDMifareFamilyIdentification `SHOULD` be used in the respective eRoamingAuthorization messages.
+
+        2. For the Remote Authorization process, only the option RemoteIdentification MUST be used in the respective messages.
+
+        '
+      properties:
+        RFIDMifareFamilyIdentification:
+          $ref: '#/components/schemas/RFIDMifareFamilyIdentification'
+        RFIDIdentification:
+          $ref: '#/components/schemas/RFIDIdentification'
+        QRCodeIdentification:
+          $ref: '#/components/schemas/QRCodeIdentification'
+        PlugAndChargeIdentification:
+          $ref: '#/components/schemas/PlugAndChargeIdentification'
+        RemoteIdentification:
+          $ref: '#/components/schemas/RemoteIdentification'
+    RFIDIdentification:
+      type: object
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+        '
+      properties:
+        UID:
+          $ref: '#/components/schemas/UID'
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+        RFID:
+          $ref: '#/components/schemas/RFID'
+        PrintedNumber:
+          type: string
+          maximum: 150
+          description: A number printed on a customer’s card for manual authorization (e.q. via a call center)
+        ExpiryDate:
+          type: string
+          description: Until when this card is valid. Should not be set if card does not have an expiration
+      required:
+      - UID
+      - RFID
+      example:
+        UID: 7568290FFF765F
+        RFID: mifareCls
+    ProductID:
+      type: string
+      description: 'The ProductIDType defines some standard values (see below). The type however also supports custom ProductIDs that can be specified by partners (as a string of 50 characters maximum length).
+
+        | Option | Description |
+
+        |--------|-------------|
+
+        | Standard Price | Standard Price |
+
+        | AC1 | Product for AC 1 Phase charging |
+
+        | AC3 | Product for AC 3 Phase charging |
+
+        | DC | Product for DC charging |
+
+        | CustomProductID | There is no option “CustomProductID”, this sample option is meant to indicates that custom product ID specifications by partners (as a string of 50 characters maximum length) are allowed as well.|
+
+        '
+      example: AC1
+      maximum: 50
+    UID:
+      type: string
+      pattern: ^([0-9A-F]{8,8}|[0-9A-F]{14,14}|[0-9A-F]{20,20})$
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+
+        The expression validates the string as a unique RFID with a length of 8, 14 or 20 characters.
+
+
+        Examples: “7568290FFF765F”
+
+        '
+      example: 7568290FFF765F
+    PlugAndChargeIdentification:
+      type: object
+      description: 'Authentication required for Plug&Charge (EMAID/EVCOID)
+
+        '
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+      required:
+      - EvcoID
+      example:
+        EvcoID: DE*8EO*Aet5e4*3
+    QRCodeIdentification:
+      type: object
+      required:
+      - EvcoID
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+        HashedPIN:
+          type: object
+          required:
+          - Value
+          - Function
+          properties:
+            Value:
+              type: string
+              pattern: ^[0-9A-Za-z\\.+/=\\$]{10,100}$
+              description: 'Hash value created by partner
+
+
+                The expression validates the string as a hash function result value with a length between 10 and 100 characters
+
+
+                Example: “a5ghdhf73h”
+
+                '
+              example: a5ghdhf73h
+            Function:
+              type: string
+              enum:
+              - Bcrypt
+              description: Function that was used to generate the hash value.
+              example: Bcrypt
+            LegacyHashData:
+              type: object
+              required:
+              - Function
+              properties:
+                Function:
+                  type: string
+                  enum:
+                  - MD5
+                  - SHA-1
+                  description: Function used for hashing of the PIN at the partner.
+                  example: SHA-1
+                Salt:
+                  type: string
+                  minimum: 0
+                  maximum: 100
+                  description: The salt value used by the partner for hashing the PIN.
+                  example: example-salt
+                Value:
+                  type: string
+                  minimum: 0
+                  maximum: 20
+                  description: PIN hash at the partner.
+                  example: a5ghdhf73h
+        PIN:
+          type: string
+    EvseID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$
+      description: 'The ID that identifies the charging spot.
+
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.
+
+
+        `^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$`
+
+        The expression validates the string as EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the EvseID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional. Furthermore the ID MUST provide an “E” after the OperatorID in order to identify the ID as ISO EvseID without doubt.
+
+
+        In case the EvseID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+
+        Examples ISO: “DE*AB7*E840*6487”, “DEAB7E8406487”
+
+
+        Example DIN: “+49*810*000*438”
+
+        '
+      example: +49*810*000*438
+    OperatorID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$
+      description: 'A string that MUST be valid with respect to the following regular expression: ISO | DIN
+
+
+        ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$
+
+        The expression validates the string as OperatorID including the preceding country code, which is part of EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118. In case the OperatorID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional.
+
+
+        In case the OperatorID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+
+        Examples ISO: “DE*A36”, “DEA36”
+
+
+        Example DIN: “+49*536”
+
+        '
+      example: +49*536
+    SessionID:
+      type: string
+      pattern: ^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$
+      description: 'The Hubject SessionID that identifies the process
+
+
+        A string that `MUST` be valid with respect to the following regular expression:
+
+
+        `^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$`
+
+
+        The expression validates the string as a GUID.
+
+
+        Example: “b2688855-7f00-0002-6d8e-48d883f6abb6”
+
+        '
+      example: b2688855-7f00-0002-6d8e-48d883f6abb6
+    ChargingNotificationType:
+      type: string
+      description: The type of ChargingNotification
+      enum:
+      - Start
+      - Progress
+      - End
+      - Error
+      example: Start
+    StatusCode:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: some description
+        AdditionalInfo: some additional info
+    eRoamingChargingNotificationError:
+      type: object
+      description: 'A customer of EMP Authorizes the charging session at particular charging station (via any means for eg REFID card, Mobile etc). Due to some errors sometime, it is possible that charging does not start or charging process is abruptly stopped or fluctuations in the charging process. It is really important for Customer as well as EMP to know what exactly is happening at the charging process. This notification eventually helps EMPs well informed about the problem occurred with the charging process. This information can be easily passed onto Customer so that he/she can take appropriate action.
+
+
+        The CPO’s backend system MAY send a ChargingNotification of type “Error” after the CPO gets an information about the error at the charging station. The CPO can transmit one of the ErrorClass defined by Hubject along with the additional information which elaborated the Error. The customer has to take one of the three action EV needs to be charged at some different station, Cables is properly attached or the error is for information only no action required by customer.
+
+
+        The ChargingNotification of type “Error” is a message that contains information about the charging end of a session (e.g. ErrorClass, ErrorAdditionalInfo).
+
+        '
+      required:
+      - Type
+      - SessionID
+      - EvseID
+      - ErrorType
+      - OperatorID
+      properties:
+        Type:
+          $ref: '#/components/schemas/ChargingNotificationType'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          description: 'Optional field containing the session ID assigned by the CPO to the related operation.
+
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+
+            '
+          maximum: 250
+        EMPPartnerSessionID:
+          type: string
+          description: 'Optional field containing the session ID assigned by an EMP to the related operation.
+
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+
+            '
+          maximum: 250
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ErrorType:
+          type: string
+          enum:
+          - ConnectorError
+          - CriticalError
+          description: '| Option | Description |
+
+            | ------ | ----------- |
+
+            | ConnectorError | Charging process cannot be started or stopped. EV driver needs to check if the the Plug is properly inserted or taken out from socket. |
+
+            | CriticalError | Charging process stopped abruptly. Reason: Physical check at the station is required. Station cannot be reset online. <br /> Or <br /> Error with the software or hardware of the station locally. <br /> Or <br /> Communication failure with the vehicle. <br /> Or <br /> The error needs to be investigated <br /> Or <br /> Ground Failure |
+
+            '
+        ErrorAdditionalInfo:
+          type: string
+          description: The CPO can put in the additional information about the error
+          maximum: 250
+      example:
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        EvseID: DE*XYZ*ETEST1
+        ErrorType: ConnectorError
+        ErrorAdditionalInfo: Plug was not connected, EVSEID timed out reached
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+        OperatorID: DE*ABC
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        Type: Error
+    eRoamingAcknowledgment:
+      type: object
+      description: 'The acknowledgement is a message that is sent in response to several requests.
+
+
+        * To `SEND` and `RECEIVE`
+
+        * Implementation: `MANDATORY`
+
+        '
+      required:
+      - Result
+      - StatusCode
+      properties:
+        Result:
+          type: boolean
+          description: 'If result is true, the message was received and the respective operation was performed successfully.
+
+
+            If result is false, the message was received and the respective operation was not performed successfully.
+
+            '
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+      example:
+        Result: true
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: Success
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+    eRoamingChargingNotificationProgress:
+      type: object
+      description: 'A customer of EMP has started the charging session. Just like as that of regular gasoline stations customer would like to know either how much charging Duration have passed or how much energy is consumed by the EV so far. This information will help Customer to decide if he/she wants to stop the charging session as per their affordability or journey planning.
+
+
+        The CPO’s backend system MAY send a ChargingNotification of type “Progess” after the CPO gets the charging energy or time information from EVSEID. This is required in order to inform the EMP that the progress energy or chargingduration for a perticular charging session.
+
+
+        The ChargingNotification of type “Progress” is a message that contains information about the charging Duration or energy consumed during charging process (e.g. EventOccurred, ChargingDuration, ConsumedEnergyProgress).
+
+        '
+      required:
+      - Type
+      - SessionID
+      - EvseID
+      - ChargingStart
+      - EventOccurred
+      - OperatorID
+      properties:
+        Type:
+          $ref: '#/components/schemas/ChargingNotificationType'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          description: 'Optional field containing the session ID assigned by the CPO to the related operation.
+
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+
+            '
+          maximum: 250
+        EMPPartnerSessionID:
+          type: string
+          description: 'Optional field containing the session ID assigned by an EMP to the related operation.
+
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+
+            '
+          maximum: 250
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ChargingStart:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process started.
+        EventOccurred:
+          type: string
+          format: date-time
+          description: The date and time at which the charging progress parameters are captured.
+        ChargingDuration:
+          type: integer
+          description: 'Charging Duration = EventOccurred - ChargingStart. It is a time in millisecond.
+
+
+            Either ChargingDuration or ConsumedEnergyProgress should be provided. Both can also be provided with each progress notification.
+
+            '
+        SessionStart:
+          type: string
+          format: date-time
+          description: The date and time at which the session started, e.g. swipe of RFID or cable connected.
+        ConsumedEnergyProgress:
+          type: number
+          description: 'This represents the consumed energy in kWh from the start of the charging process until the charging progress notification is generated (EventOccurred).
+
+
+            Either ChargingDuration or ConsumedEnergyProgress should be provided. Both can also be provided with each progress notification.
+
+            '
+        MeterValueStart:
+          type: number
+          description: The starting meter value in kWh.
+        MeterValueInBetween:
+          type: object
+          description: List of meter values that may have been taken in between (kWh).
+          properties:
+            meterValues:
+              type: array
+              items:
+                type: number
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+      example:
+        Type: Progress
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ChargingStart: '2020-09-23T14:17:53.038Z'
+        EventOccurred: '2020-09-23T14:25:53.038Z'
+        ChargingDuration: 48000
+        ConsumedEnergyProgress: 9
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+        MeterValueStart: 0
+        MeterValueInBetween:
+          meterValues:
+          - 9
+        PartnerProductID: AC 1
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        SessionStart: '2020-09-23T14:17:53.038Z'
+        OperatorID: DE*ABC
+    RFID:
+      type: string
+      description: 'Defined RFID Type
+
+        '
+      enum:
+      - mifareCls
+      - mifareDes
+      - calypso
+      - nfc
+      - mifareFamily
+    eRoamingChargingNotificationStart:
+      type: object
+      description: 'A customer of EMP Authorizes the charging session at particular charging station (via any means for eg REFID card, Mobile etc). The charging session is authorized by Hubject / CPO system. The authorization of charging process and plugging the cable in EV does not guarantee that energy flow into the Vehicle is initiated. It is really important for for EMP and its end consumer to know if the charging has started.
+
+
+        The CPO’s backend system MAY send a ChargingNotification of type “Start” after the CPO considers the charging of an EV is started (since energy flow have started) in order to inform the EMP that the actual charging (the energy flow) of the vehicle has started.
+
+
+        The ChargingNotification of type “Start” is a message that contains information about the charging start of a session (e.g. ChargingStart).
+
+        '
+      required:
+      - Type
+      - SessionID
+      - EvseID
+      - ChargingStart
+      - OperatorID
+      properties:
+        Type:
+          $ref: '#/components/schemas/ChargingNotificationType'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          description: 'Optional field containing the session ID assigned by the CPO to the related operation.
+
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+
+            '
+          maximum: 250
+        EMPPartnerSessionID:
+          type: string
+          description: 'Optional field containing the session ID assigned by an EMP to the related operation.
+
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+
+            '
+          maximum: 250
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ChargingStart:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process started.
+        SessionStart:
+          type: string
+          format: date-time
+          description: The date and time at which the session started, e.g. swipe of RFID or cable connected.
+        MeterValueStart:
+          type: number
+          description: The starting meter value in kWh.
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+      example:
+        Type: Start
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ChargingStart: '2020-09-23T14:17:53.038Z'
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+        MeterValueStart: 0
+        PartnerProductID: AC 1
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        SessionStart: '2020-09-23T14:17:53.038Z'
+        OperatorID: DE*ABC
+    EvcoID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\-?[A-Za-z0-9]{3}\-?C[A-Za-z0-9]{8}\-?[\d|A-Za-z])|([A-Za-z]{2}[\*|\-]?[A-Za-z0-9]{3}[\*|\-]?[A-Za-z0-9]{6}[\*|\-]?[\d|X]))$
+      description: 'A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.
+
+
+        ^(([A-Za-z]{2}\-?[A-Za-z0-9]{3}\-?C[A-Za-z0-9]{8}\-?[\d|A-Za-z])|([A-Za-z]{2}[\*|\-]?[A-Za-z0-9]{3}[\*|\-]?[A-Za-z0-9]{6}[\*|\-]?[\d|X]))$
+
+        The expression validates the string as EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the EvcoID is provided corresponding to ISO, the instance part MUST be eight characters long and MUST be provided with a prepended “C”. The optional separating character MUST be “-“.
+
+
+        In case the EvcoID is provided corresponding to DIN, the instance part MUST be six characters long. The optional separating character can either be “*” or “-“.
+
+
+        Examples ISO: “DE-8EO-CAet5e4XY-3”, “DE8EOCAet5e43X1”
+
+
+        Examples DIN: “DE*8EO*Aet5e4*3”, “DE-8EO-Aet5e4-3”, “DE8EOAet5e43”
+
+        '
+      example: DE*8EO*Aet5e4*3
+    eRoamingChargingNotificationEnd:
+      type: object
+      description: 'A customer of an EMP has fully charged a vehicle at a charging station of a CPO. The charging process was started with an eRoamingAuthorizeStart or an eRoamingAuthorizeRemoteStart operation. The energy flow has ended, but the process has not yet been stopped and the vehicle is blocking the charging station.
+
+
+        The CPO’s backend system MAY send a ChargingNotification of type “End” after the CPO considers the charging of an EV concluded (because no energy is transmitted anymore) in order to inform the EMP that the actual charging (the energy flow) of the vehicle has stopped. The charging process has not yet been stopped by the customer and the session is still active.
+
+
+        The ChargingNotification of type “End” is a message that contains information about the charging end of a session (e.g. ConsumedEnergy, ChargingEnd).
+
+        '
+      required:
+      - Type
+      - SessionID
+      - EvseID
+      - ChargingEnd
+      - OperatorID
+      properties:
+        Type:
+          $ref: '#/components/schemas/ChargingNotificationType'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          description: 'Optional field containing the session ID assigned by the CPO to the related operation.
+
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+
+            '
+          maximum: 250
+        EMPPartnerSessionID:
+          type: string
+          description: 'Optional field containing the session ID assigned by an EMP to the related operation.
+
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+
+            '
+          maximum: 250
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ChargingStart:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process started.
+        ChargingEnd:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process stoped.
+        SessionStart:
+          type: string
+          format: date-time
+          description: The date and time at which the session started, e.g. swipe of RFID or cable connected.
+        SessionEnd:
+          type: string
+          format: date-time
+          description: The date and time at which the session started, e.g. swipe of RFID or cable connected.
+        ConsumedEnergy:
+          type: number
+          description: The difference between MeterValueEnd and MeterValueStart in kWh.
+        MeterValueStart:
+          type: number
+          description: The starting meter value in kWh.
+        MeterValueEnd:
+          type: number
+          description: The ending meter value in kWh.
+        MeterValueInBetween:
+          type: object
+          description: List of meter values that may have been taken in between (kWh).
+          properties:
+            meterValues:
+              type: array
+              items:
+                type: number
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+        PenaltyTimeStart:
+          type: string
+          format: date-time
+          description: The date and time at which the penalty time start after the grace period.
+      example:
+        Type: End
+        CPOPartnerSessionID: 1234XYZ
+        ChargingEnd: '2020-09-23T14:17:53.038Z'
+        ChargingStart: '2020-09-23T14:50:53.038Z'
+        ConsumedEnergy: 10
+        EMPPartnerSessionID: 2345ABC
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+        MeterValueStart: 0
+        MeterValueEnd: 10
+        MeterValueInBetween:
+          meterValues:
+          - 0
+        PartnerProductID: AC 1
+        PenaltyTimeStart: '2020-09-23T14:17:53.038Z'
+        OperatorID: DE*ABC
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        SessionEnd: '2020-09-23T14:50:53.038Z'
+        SessionStart: '2020-09-23T14:17:53.038Z'
+    RemoteIdentification:
+      type: object
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+        '
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+      required:
+      - EvcoID
+      example:
+        EvcoID: DE*8EO*Aet5e4*3
+    StatusCode_2:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: Success
+        AdditionalInfo: Success
+    eRoamingChargingNotificationProgress_2:
+      type: object
+      description: 'A customer of EMP has started the charging session. Just like as that of regular gasoline stations customer would like to know either how much charging Duration have passed or how much energy is consumed by the EV so far. This information will help Customer to decide if he/she wants to stop the charging session as per their affordability or journey planning.
+
+
+        The CPO’s backend system MAY send a ChargingNotification of type “Progess” after the CPO gets the charging energy or time information from EVSEID. This is required in order to inform the EMP that the progress energy or chargingduration for a perticular charging session.
+
+
+        The ChargingNotification of type “Progress” is a message that contains information about the charging Duration or energy consumed during charging process (e.g. EventOccurred, ChargingDuration, ConsumedEnergyProgress).
+
+        '
+      required:
+      - Type
+      - SessionID
+      - EvseID
+      - ChargingStart
+      - EventOccurred
+      - OperatorID
+      properties:
+        Type:
+          $ref: '#/components/schemas/ChargingNotificationType'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          description: 'Optional field containing the session ID assigned by the CPO to the related operation.
+
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+
+            '
+          maximum: 250
+        EMPPartnerSessionID:
+          type: string
+          description: 'Optional field containing the session ID assigned by an EMP to the related operation.
+
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+
+            '
+          maximum: 250
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ChargingStart:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process started.
+        EventOccurred:
+          type: string
+          format: date-time
+          description: The date and time at which the charging progress parameters are captured.
+        ChargingDuration:
+          type: integer
+          description: 'Charging Duration = EventOccurred - Charging Duration. It is a time in millisecond.
+
+
+            Either ChargingDuration or ConsumedEnergyProgress should be provided. Both can also be provided with each progress notification.
+
+            '
+        SessionStart:
+          type: string
+          format: date-time
+          description: The date and time at which the session started, e.g. swipe of RFID or cable connected.
+        ConsumedEnergyProgress:
+          type: number
+          description: 'This is consumed energy when from Start of charging process till the charging progress notification generated (EventOccurred)
+
+
+            Either ChargingDuration or ConsumedEnergyProgress should be provided. Both can also be provided with each progress notification.
+
+            '
+        MeterValueStart:
+          type: number
+          description: The starting meter value in kWh.
+        MeterValueInBetween:
+          type: object
+          description: List of meter values that may have been taken in between (kWh).
+          properties:
+            meterValues:
+              type: array
+              items:
+                type: number
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+      example:
+        Type: Progress
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ChargingStart: '2020-09-23T14:17:53.038Z'
+        EventOccurred: '2020-09-23T14:25:53.038Z'
+        ChargingDuration: 48000
+        ConsumedEnergyProgress: 9
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+        MeterValueStart: 0
+        MeterValueInBetween:
+          meterValues:
+          - 9
+        PartnerProductID: AC 1
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        SessionStart: '2020-09-23T14:17:53.038Z'
+        OperatorID: DE*ABC
+x-refined-from:
+- hubject-oicp-cpo-2.3-openapi.yml
+- hubject-oicp-emp-2.3-openapi.yml

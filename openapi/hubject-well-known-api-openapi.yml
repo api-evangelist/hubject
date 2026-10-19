@@ -1,0 +1,157 @@
+openapi: 3.2.0
+info:
+  title: EST .well Known API
+  version: '1.0'
+  description: 'The EST interface receives CSRs from CPOs, MOs, OEMs abd CPSs, signs them and delivers an ISO 15118 leaf certificate. The PKI Gateway/Certificate Manager creates the leaf certificates from the Sub 2 CA of the respective role.
+
+
+    This interface can create leaf certificates for CPOs (SECC Certificate), MOs (Contract Certificate), OEMs (Provisioning Certificate) and CPSs (Provisioning Signing Certificates)
+
+
+    An EST interface is a standard implementation, which is described in the RFC7030. For further information, please see https://tools.ietf.org/html/rfc7030
+
+
+    Each CA in the V2G PKI Service has its own Protocol Gateway handler, which need to be addressed in the URL postfix of the requests. The postfix is displayed below for the default named CAs:'
+  contact:
+    name: Hubject GmbH
+    url: https://hubject.com
+    email: support@pnc.hubject.com
+  termsOfService: https://www.hubject.com/pki/
+  license:
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+    name: Attribution-ShareAlike 4.0 International
+servers: []
+tags:
+- name: .well Known
+paths:
+  /.well-known/est/{ca}/simpleenroll/{iso-version}:
+    parameters:
+    - schema:
+        type: string
+        example: mo
+        pattern: ^(\w+-)?(mo|cpo|oem|cps|veh)$
+        enum:
+        - mo
+        - cps
+        - oem
+        - cpo
+        - veh
+      name: ca
+      in: path
+      required: true
+      description: The Sub-CA identifier the certificate is requested from.
+    - schema:
+        type: string
+        example: ISO15118-20
+        enum:
+        - ISO15118-20
+        - ISO15118-2
+        default: ISO15118-2
+      name: iso-version
+      in: path
+      description: The ISO version which shall be used. If not set, ISO15118:2 will be used as default
+    - schema:
+        type: string
+        default: urn:iso:15118:2:2013:MsgDef
+        enum:
+        - urn:iso:15118:20:2020:MsgDef
+        - urn:iso:15118:2:2013:MsgDef
+        example: urn:iso:15118:2:2013:MsgDef
+      in: query
+      name: xsdMsgDefNamespace
+      description: specific ISO version
+    post:
+      summary: simpleEnroll
+      tags:
+      - .well Known
+      responses:
+        '200':
+          description: OK
+          content:
+            application/pkcs7:
+              schema:
+                type: string
+                description: The response body is the base64 encoded PKCS7 blobb of the certificate
+              examples: {}
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/pkcs7-mime; smime-type=certs-only
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        5XX:
+          description: Internal Server Error
+      operationId: simpleenroll
+      description: 'The Certificate Request Functions are provided for each role. Each entity can get leaf certificates regarding to its role
+
+
+        | role | CA | End Entity ||
+
+        | ---- | --- |--- |--- |
+
+        | CPO | cpo | EVSE Leaf Certificate from V2G PKI |
+
+        | MO | mo | Contract Certificate from V2G PKI|
+
+        | OEM | oem | Provisioning Certificate from V2G PKI|
+
+        | OEM | veh | Vehicle Certificate from V2G PKI (ISO15118:20)|
+
+        | CPS | cps | Provisioning Signing Certificate (CPS) from V2G PKI |'
+      requestBody:
+        content:
+          application/pkcs10:
+            schema:
+              description: "The body is the base64 encoded CSR (Certificate Siging Request).\n\n+++Requirements for EVSE Leafs+++\n\nWhen `{ca}` path parameter is `cpo`, the CSR CommonName must match to the <EVSID> regex format `^[A-Za-z]{2}[\\*]?\\w{3}[\\*]?[E][\\w\\*]{1,30}$`. \n\nWhere `EVSEID` = `<Country Code>` `<S>` `<EVSE Operator ID>` `<S>` `<ID Type>` `<Power Outlet ID>` \n\n `Country Code` = 2 ALPHA two alphanumeric characters \n\n `EVSE Operator ID` = 3 (ALPHA / DIGIT) three alphanumeric characters, defined and listed by eMI3 group \n\n `ID Type` = “E” one character “E” indicating that this ID represents an “EVSE” \n\n `Power Outlet ID` = (ALPHA / DIGIT) *30 (ALPHA / DIGIT / S) sequence of alphanumeric characters or separators \n\n `S` = optional separator \n\n Reference: ISO 15118-2:2014, Annex H, H.2.1 EVSEID Syntax"
+              type: string
+            examples: {}
+        description: The Certificate Signing Request
+      security:
+      - CPO: []
+      - MO_with_V2G_PKI: []
+      - OEM_with_V2G_PKI: []
+      - CPS: []
+      parameters: []
+components:
+  securitySchemes:
+    CPO:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+      description: 'OAuth2 is used to grant access to the CPO related endpoint.  '
+    MO_with_V2G_PKI:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+      description: 'OAuth2 is used to grant access to the MO related endpoint. '
+    OEM_with_V2G_PKI:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+      description: 'OAuth2 is used to grant access to the OEM related endpoint. '
+    CPS:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: ''
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes: {}
+      description: 'OAuth2 is used to grant access to the CPS Operator related endpoint. '

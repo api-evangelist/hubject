@@ -1,0 +1,734 @@
+openapi: 3.2.0
+info:
+  title: Hubject E Roaming Reservation API
+  version: 2.3.0
+  contact:
+    name: API Support
+    url: https://support.hubject.com
+    email: support@hubject.com
+  description: 'Operations tagged eRoamingReservation across 2 of this provider''s published API definitions: hubject-oicp-cpo-2.3-openapi.yml, hubject-oicp-emp-2.3-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://service-qa.hubject.com/api/oicp
+  description: QA environment
+- url: https://service.hubject.com/api/oicp
+  description: Production environment
+tags:
+- name: eRoamingReservation
+  description: 'The service eRoamingReservation contains two operations.
+
+    It `MUST` be offered by Hubject and MAY be offered by CPO partner systems.
+
+    The Service `MUST` be enabled by Hubject for the CPO. If the charging station offers reservation services, the CPO can provide this information in the field ValueAddedServices.'
+paths:
+  /reservation/v11/providers/{providerID}/reservation-start-request:
+    post:
+      summary: eRoamingAuthorizeRemoteReservationStart_V1.1
+      operationId: eRoamingAuthorizeRemoteReservationStart_V1.1
+      description: '__Note:__
+
+        * To `RECEIVE`
+
+        * Implementation: `OPTIONAL`
+
+        * This operation is used by EMPs in order to remotely reserve a charging point.
+
+
+        !Reservation start diagram
+
+
+        __Functional Description:__
+
+
+        Scenario:
+
+
+        A customer of an EMP wants to reserve a charging point of a CPO for a later charging process.
+
+        The customer informs his EMP of his intention, e.g. via mobile phone or smart phone application.
+
+        The EMP’s provider system can then initiate a reservation of the CPO’s charging point by sending an eRoamingAuthorizeRemoteReservationStart request to Hubject.
+
+        The request `MUST` contain the ProviderID and the EvseID.
+
+        The demanded reservation product can be specified using the field PartnerProductID.
+
+
+        Hubject will derive the CPO’s OperatorID from the EvseID.
+
+
+        Hubject will check whether there is a valid contract between the two partners for the service Reservation (EMP must be the subscriber). If so, Hubject continues with checking the charging point compatibility. In case that the CPO has uploaded at least one charging point data record, Hubject will check whether the requested EvseID is among the uploaded data. If not, Hubject will respond with the status code 603 “Unknown EvseID”. If yes, Hubject will check whether the charging spot’s property “IsHubjectCompatible” is set “true”. If the property is false, Hubject will respond with the status code 604 “EvseID is not Hubject compatible”.
+
+
+        In case that the requested EvseID is compatible or the CPO has not uploaded any EVSE records at all, Hubject generates a SessionID for the reservation process and forwards the request (including the SessionID) to the CPO. The CPO MUST return an eRoamingAcknowledgement message that MUST contain the result indicating whether the reservation was successful and that MAY contain a status code for further information.
+
+
+        In case that the CPO’s system cannot be addressed (e.g. due to technical problems), Hubject will return to the requestor a “false” result and a message indicating the connection error.'
+      tags:
+      - eRoamingReservation
+      parameters:
+      - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingAuthorizeRemoteReservationStart'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+  /reservation/v11/providers/{providerID}/reservation-stop-request:
+    post:
+      summary: eRoamingAuthorizeRemoteReservationStop_V1.1
+      operationId: eRoamingAuthorizeRemoteReservationStop_V1
+      description: '__Note:__
+
+        * To `RECEIVE`
+
+        * Implementation: `OPTIONAL`
+
+
+        !Reservation stop diagram
+
+
+        eRoamingAuthorizeRemoteReservationStop basically works in the same way as eRoamingAuthorizeRemoteReservationStart.
+
+        The only difference is that this request is sent in order to end the reservation of a charging spot.
+
+        The request `MUST` contain the SessionID that was created by Hubject after the initial eRoamingAuthorizeRemoteReservationStart request.
+
+        After the eRoamingAuthorizeRemoteReservationStop the CPO `MUST` provide a CDR.'
+      tags:
+      - eRoamingReservation
+      parameters:
+      - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingAuthorizeRemoteReservationStop'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+    servers:
+    - url: https://service-qa.hubject.com/api/oicp
+      description: QA environment
+    - url: https://service.hubject.com/api/oicp
+      description: Production environment
+components:
+  schemas:
+    RFIDMifareFamilyIdentification:
+      type: object
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+        '
+      properties:
+        UID:
+          $ref: '#/components/schemas/UID'
+      required:
+      - UID
+      example:
+        UID: 7568290FFF765F
+    StatusCode:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: some description
+        AdditionalInfo: some additional info
+    Identification:
+      type: object
+      description: 'Authentication data
+
+
+        1. The option RFIDIdentification `MUST` not be used in the eRoamingAuthorization process. For RFID Authorization, only the option RFIDMifareFamilyIdentification `SHOULD` be used in the respective eRoamingAuthorization messages.
+
+        2. For the Remote Authorization process, only the option RemoteIdentification MUST be used in the respective messages.
+
+        '
+      properties:
+        RFIDMifareFamilyIdentification:
+          $ref: '#/components/schemas/RFIDMifareFamilyIdentification'
+        RFIDIdentification:
+          $ref: '#/components/schemas/RFIDIdentification'
+        QRCodeIdentification:
+          $ref: '#/components/schemas/QRCodeIdentification'
+        PlugAndChargeIdentification:
+          $ref: '#/components/schemas/PlugAndChargeIdentification'
+        RemoteIdentification:
+          $ref: '#/components/schemas/RemoteIdentification'
+    SessionID:
+      type: string
+      pattern: ^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$
+      description: 'The Hubject SessionID that identifies the process
+
+
+        A string that `MUST` be valid with respect to the following regular expression:
+
+
+        `^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$`
+
+
+        The expression validates the string as a GUID.
+
+
+        Example: “b2688855-7f00-0002-6d8e-48d883f6abb6”
+
+        '
+      example: b2688855-7f00-0002-6d8e-48d883f6abb6
+    eRoamingAuthorizeRemoteReservationStart:
+      type: object
+      required:
+      - ProviderID
+      - EvseID
+      - Identification
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation. Partner systems can use this field to link their own session handling to HBS processes.
+        EMPPartnerSessionId:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation. Partner systems can use this field to link their own session handling to HBS processes.
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+        Duration:
+          type: integer
+          format: int64
+          maximum: 99
+          minimum: 1
+          example: 10
+          description: Duration of reservation in minutes
+      example:
+        CPOPartnerSessionID: 1234XYZ
+        Duration: 15
+        EMPPartnerSessionID: 2345ABC
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+          QRCodeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            HashedPIN:
+              Function: Bcrypt
+              LegacyHashData:
+                Function: MD5
+                Salt: a5ghdhf73h
+                Value: a5ghdhf73h
+              Value: a5ghdhf73h
+            PIN: '1234'
+          PlugAndChargeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          RemoteIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          RFIDIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            ExpiryDate: '2021-01-23T14:23:54.228Z'
+            PrintedNumber: '9876655'
+            RFID: mifareCls
+            UID: 1234ABCD
+        PartnerProductID: Reservation
+        ProviderID: DE-DCB
+        SessionID: b2688855-7f00-0002-6d8e-48d883f6abb6
+    QRCodeIdentification:
+      type: object
+      required:
+      - EvcoID
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+        HashedPIN:
+          type: object
+          required:
+          - Value
+          - Function
+          properties:
+            Value:
+              type: string
+              pattern: ^[0-9A-Za-z\\.+/=\\$]{10,100}$
+              description: 'Hash value created by partner
+
+
+                The expression validates the string as a hash function result value with a length between 10 and 100 characters
+
+
+                Example: “a5ghdhf73h”
+
+                '
+              example: a5ghdhf73h
+            Function:
+              type: string
+              enum:
+              - Bcrypt
+              description: Function that was used to generate the hash value.
+              example: Bcrypt
+            LegacyHashData:
+              type: object
+              required:
+              - Function
+              properties:
+                Function:
+                  type: string
+                  enum:
+                  - MD5
+                  - SHA-1
+                  description: Function used for hashing of the PIN at the partner.
+                  example: SHA-1
+                Salt:
+                  type: string
+                  minimum: 0
+                  maximum: 100
+                  description: The salt value used by the partner for hashing the PIN.
+                  example: example-salt
+                Value:
+                  type: string
+                  minimum: 0
+                  maximum: 20
+                  description: PIN hash at the partner.
+                  example: a5ghdhf73h
+        PIN:
+          type: string
+    UID:
+      type: string
+      pattern: ^([0-9A-F]{8,8}|[0-9A-F]{14,14}|[0-9A-F]{20,20})$
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+
+        The expression validates the string as a unique RFID with a length of 8, 14 or 20 characters.
+
+
+        Examples: “7568290FFF765F”
+
+        '
+      example: 7568290FFF765F
+    RFIDIdentification:
+      type: object
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+        '
+      properties:
+        UID:
+          $ref: '#/components/schemas/UID'
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+        RFID:
+          $ref: '#/components/schemas/RFID'
+        PrintedNumber:
+          type: string
+          maximum: 150
+          description: A number printed on a customer’s card for manual authorization (e.q. via a call center)
+        ExpiryDate:
+          type: string
+          description: Until when this card is valid. Should not be set if card does not have an expiration
+      required:
+      - UID
+      - RFID
+      example:
+        UID: 7568290FFF765F
+        RFID: mifareCls
+    eRoamingAcknowledgment:
+      type: object
+      description: 'The acknowledgement is a message that is sent in response to several requests.
+
+
+        * To `SEND` and `RECEIVE`
+
+        * Implementation: `MANDATORY`
+
+        '
+      required:
+      - Result
+      - StatusCode
+      properties:
+        Result:
+          type: boolean
+          description: 'If result is true, the message was received and the respective operation was performed successfully.
+
+
+            If result is false, the message was received and the respective operation was not performed successfully.
+
+            '
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+      example:
+        Result: true
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: Success
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+    ProductID:
+      type: string
+      description: 'The ProductIDType defines some standard values (see below). The type however also supports custom ProductIDs that can be specified by partners (as a string of 50 characters maximum length).
+
+        | Option | Description |
+
+        |--------|-------------|
+
+        | Standard Price | Standard Price |
+
+        | AC1 | Product for AC 1 Phase charging |
+
+        | AC3 | Product for AC 3 Phase charging |
+
+        | DC | Product for DC charging |
+
+        | CustomProductID | There is no option “CustomProductID”, this sample option is meant to indicates that custom product ID specifications by partners (as a string of 50 characters maximum length) are allowed as well.|
+
+        '
+      example: AC1
+      maximum: 50
+    EvcoID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\-?[A-Za-z0-9]{3}\-?C[A-Za-z0-9]{8}\-?[\d|A-Za-z])|([A-Za-z]{2}[\*|\-]?[A-Za-z0-9]{3}[\*|\-]?[A-Za-z0-9]{6}[\*|\-]?[\d|X]))$
+      description: 'A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.
+
+
+        ^(([A-Za-z]{2}\-?[A-Za-z0-9]{3}\-?C[A-Za-z0-9]{8}\-?[\d|A-Za-z])|([A-Za-z]{2}[\*|\-]?[A-Za-z0-9]{3}[\*|\-]?[A-Za-z0-9]{6}[\*|\-]?[\d|X]))$
+
+        The expression validates the string as EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the EvcoID is provided corresponding to ISO, the instance part MUST be eight characters long and MUST be provided with a prepended “C”. The optional separating character MUST be “-“.
+
+
+        In case the EvcoID is provided corresponding to DIN, the instance part MUST be six characters long. The optional separating character can either be “*” or “-“.
+
+
+        Examples ISO: “DE-8EO-CAet5e4XY-3”, “DE8EOCAet5e43X1”
+
+
+        Examples DIN: “DE*8EO*Aet5e4*3”, “DE-8EO-Aet5e4-3”, “DE8EOAet5e43”
+
+        '
+      example: DE*8EO*Aet5e4*3
+    RFID:
+      type: string
+      description: 'Defined RFID Type
+
+        '
+      enum:
+      - mifareCls
+      - mifareDes
+      - calypso
+      - nfc
+      - mifareFamily
+    eRoamingAuthorizeRemoteReservationStop:
+      type: object
+      required:
+      - ProviderID
+      - EvseID
+      - SessionID
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation. Partner systems can use this field to link their own session handling to HBS processes.
+        EMPPartnerSessionId:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation. Partner systems can use this field to link their own session handling to HBS processes.
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+      example:
+        EvseID: DE*XYZ*ETEST1
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ProviderID: DE-DCB
+        SessionID: b2688855-7f00-0002-6d8e-48d883f6abb6
+    PlugAndChargeIdentification:
+      type: object
+      description: 'Authentication required for Plug&Charge (EMAID/EVCOID)
+
+        '
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+      required:
+      - EvcoID
+      example:
+        EvcoID: DE*8EO*Aet5e4*3
+    ProviderID:
+      type: string
+      pattern: ^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$
+      description: 'The ProviderID is defined by Hubject and is used to identify the EMP
+
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN
+
+
+        `^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$`
+
+
+        The expression validates the string as ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the ProviderID is provided corresponding to ISO, the country code `MUST` be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “-” is optional.
+
+
+        Examples ISO: “DE8EO”, “DE-8EO”
+
+
+        Examples DIN: “DE8EO”, “DE*8EO”, “DE-8EO”
+
+        '
+      example: DE-8EO
+    RemoteIdentification:
+      type: object
+      description: 'Authentication data details. The data structure differs depending on the authentication technology
+
+        '
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+      required:
+      - EvcoID
+      example:
+        EvcoID: DE*8EO*Aet5e4*3
+    EvseID:
+      type: string
+      pattern: ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$
+      description: 'The ID that identifies the charging spot.
+
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.
+
+
+        `^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$`
+
+        The expression validates the string as EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+
+        In case the EvseID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional. Furthermore the ID MUST provide an “E” after the OperatorID in order to identify the ID as ISO EvseID without doubt.
+
+
+        In case the EvseID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+
+        Examples ISO: “DE*AB7*E840*6487”, “DEAB7E8406487”
+
+
+        Example DIN: “+49*810*000*438”
+
+        '
+      example: +49*810*000*438
+    StatusCode_2:
+      type: object
+      description: 'The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+
+        '
+      required:
+      - Code
+      properties:
+        Code:
+          type: string
+          description: '| Option | Description | Area of Usage |
+
+            | -------|-------------|---------------|
+
+            | 000 | Success. | General codes |
+
+            | 001 | Hubject system error. | Internal system codes |
+
+            | 002 | Hubject database error. |Internal system codes|
+
+            | 009 |Data transaction error. | Internal system codes|
+
+            |017 |Unauthorized Access. |Internal system codes |
+
+            |018 |Inconsistent EvseID. |Internal system codes |
+
+            |019 |Inconsistent EvcoID. |Internal system codes |
+
+            |021 |System error. |General codes |
+
+            |022 |Data error. |General codes |
+
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+
+            |200 |EvcoID locked. |Authentication codes |
+
+            |210 |No valid contract. |Session codes |
+
+            |300 |Partner not found. |Session codes |
+
+            |310 |Partner did not respond. |Session codes |
+
+            |320 |Service not available. |Session codes |
+
+            |400 |Session is invalid. |Session codes |
+
+            |501 |Communication to EVSE failed. |EVSE codes |
+
+            |510 |No EV connected to EVSE. |EVSE codes |
+
+            |601 |EVSE already reserved. |EVSE codes |
+
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+
+            |603 |Unknown EVSE ID. |EVSE codes |
+
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+
+            |700 |EVSE out of service. |EVSE codes |
+
+            '
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: Success
+        AdditionalInfo: Success
+  parameters:
+    providerID:
+      name: providerID
+      in: path
+      required: true
+      description: The id of the provider
+      schema:
+        type: string
+x-refined-from:
+- hubject-oicp-cpo-2.3-openapi.yml
+- hubject-oicp-emp-2.3-openapi.yml
